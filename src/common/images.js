@@ -1,0 +1,19 @@
+
+export const x_logo = require('./assets/x_logo.png');
+export const validifyX_logo = require('./assets/validifyX_logo.png');
+export const background_image = require('./assets/background_image.png');
+export const finger_print = require('./assets/finger_print.png');
+export const validifyX = require('./assets/validifyX.png');
+export const verification = require('./assets/verification.png');
+export const phone = require('./assets/phone.png');
+export const logo = require('./assets/logo.png');
+export const back_arow = require('./assets/back_arrow.png');
+export const plan_select = require('./assets/plan_select.png');
+export const checked = require('./assets/checked.png');
+export const unchecked = require('./assets/unchecked.png');
+export const check = require('./assets/check.png');
+export const back = require('./assets/back.png');
+export const profile = require('./assets/profile.png');
+export const plus = require('./assets/plus.png');
+export const close = require('./assets/close.png');
+export const team = require('./assets/team.png');

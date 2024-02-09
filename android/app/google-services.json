@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "218066194358",
+    "project_id": "ekyc-ab996",
+    "storage_bucket": "ekyc-ab996.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:218066194358:android:fd3763ff13479bbd42bb17",
+        "android_client_info": {
+          "package_name": "com.ekyc"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCzxCwdnW4DUs1Dnc7sC7zm5HIwzo2G8T8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
