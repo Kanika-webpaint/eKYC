@@ -5,5 +5,6 @@ export default colors = {
     black:'#000000',
     light_purple:'#F2EFFF',
     white:'#ffffff',
-    grey:'#575C69'
+    grey:'#575C69',
+    placeholder_grey:"#999"
 }

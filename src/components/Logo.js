@@ -27,19 +27,19 @@ function Logo({ fingerPrintStyle, logoStyle }) {
 
 const styles = StyleSheet.create({
     imageContainer: {
-        marginLeft: 20,
+        marginLeft: '10%',
         marginTop: '30%',
         justifyContent: 'center',
     },
     backgroundImage: {
         position: 'absolute',
-        height: 80,
-        width: 80,
+        height: 70,
+        width: 70,
     },
     logo: {
         height: 50,
-        marginLeft: 25,
-        width: '80%',
+        marginLeft: 18,
+        width: '85%',
     },
 });
 

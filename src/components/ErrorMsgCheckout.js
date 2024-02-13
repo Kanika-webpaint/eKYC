@@ -12,21 +12,19 @@ import {
 } from 'react-native';
 import { fonts } from '../common/fonts';
 
-function ErrorMessage({ errorMessageText,style }) {
+function ErrorMessageCheckout({ errorMessageText, style }) {
     return (
         <>
-            <Text style={[styles.errorMessage, style]}>{errorMessageText}</Text>
+            <Text style={styles.errorMessage}>{errorMessageText}</Text>
         </>
     );
 }
 
 const styles = StyleSheet.create({
     errorMessage: {
-        color: 'red',
-        marginLeft: '8%',
-        marginTop: 5,
+        color: colors.app_red, marginLeft: 5,
         fontFamily: fonts.regular
     },
 });
 
-export default ErrorMessage;
+export default ErrorMessageCheckout;

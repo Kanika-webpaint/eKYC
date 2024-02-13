@@ -14,32 +14,48 @@ import {
     Text,
     ScrollView,
     TouchableOpacity,
+    ToastAndroid,
 } from 'react-native';
 import colors from '../../common/colors';
 import { back, checked, plan_select, unchecked } from '../../common/images';
 import { useNavigation } from '@react-navigation/native';
 import { items } from '../../common/PlansList';
 import { fonts } from '../../common/fonts';
-
+import Status from '../../components/Status';
 
 function ChoosePlan() {
     const [selectedItem, setSelectedItem] = useState(items[0]);
     const navigation = useNavigation();
+    const [selectedEnterprise, setSelectEnterprise] = useState(false)
 
-
-    const handleSelection = (item) => {
-        setSelectedItem(item?.id === selectedItem?.id ? null : item);
-        if (item?.id === 1) {
-            navigation.navigate('PlanDetails', { plan: 'Basic', amount: 'N1500' })
-        } else if (item?.id === 2) {
-            navigation.navigate('PlanDetails', { plan: 'Premium', amount: 'N1000' })
+    const showAlert = (message) => {
+        if (Platform.OS === 'android') {
+            ToastAndroid.show(message, ToastAndroid.SHORT);
         } else {
-            navigation.navigate('PlanDetails', { plan: 'Enterprise' })
+            AlertIOS.alert(message);
         }
     };
 
+    const handleSelection = (item) => {
+        setSelectEnterprise(false)
+        setSelectedItem(item?.id === selectedItem?.id ? null : item);
+        if (item?.id === 1) {
+            navigation.navigate('PlanDetails', { plan: 'Basic', amount: 'N1500' })
+        } else {
+            navigation.navigate('PlanDetails', { plan: 'Premium', amount: 'N1000' })
+        }
+    };
+
+    const selectEnterprise = () => {
+        setSelectEnterprise(true)
+        setSelectedItem('')
+        showAlert('We have recieved your request.Kindly check your mail.')
+        // call API here
+    }
+
     return (
         <SafeAreaView style={styles.safeArea}>
+            <Status isLight />
             <ScrollView>
                 <View style={styles.containerHeader}>
                     <View style={styles.header}>
@@ -68,6 +84,18 @@ function ChoosePlan() {
                                 </TouchableOpacity>
                             </View>
                         ))}
+                        <View style={styles.itemsView}>
+                            <TouchableOpacity
+                                style={styles.radioButton}
+                                onPress={() => selectEnterprise()}
+                            >
+                                {selectedEnterprise ? <Image style={styles.selectedImg} source={checked} /> : <Image style={styles.selectedImg} source={unchecked} />}
+                                <View style={{ flexDirection: 'column', marginTop: -8 }}>
+                                    <Text style={styles.itemsLabel}>{'Enterprise'}</Text>
+                                    <Text style={styles.itemsDescription}>{'200+ contact us'}</Text>
+                                </View>
+                            </TouchableOpacity>
+                        </View>
                     </View>
                 </View>
             </ScrollView>
@@ -108,9 +136,14 @@ const styles = StyleSheet.create({
         textAlign: 'center', // Center the text horizontally
         fontSize: 20,
         color: 'black', // Assuming text color
-        fontFamily:fonts.bold
+        fontFamily: fonts.bold
     },
-    imagePlanSelect: { height: 150, width: 150, alignSelf: 'center', resizeMode: 'contain' },
+    imagePlanSelect: {
+        height: 150,
+        width: 150,
+        alignSelf: 'center',
+        resizeMode: 'contain'
+    },
     itemsView: {
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 1 },
@@ -130,19 +163,19 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         textAlign: 'center',
         marginBottom: 10,
-        fontFamily:fonts.regular
+        fontFamily: fonts.regular
     },
     itemsDescription: {
         color: colors.grey,
         fontSize: 14,
         marginLeft: 10,
-        fontFamily:fonts.medium
+        fontFamily: fonts.medium
     },
     itemsLabel: {
         fontSize: 16,
         color: colors.black,
         marginLeft: 10,
-        fontFamily:fonts.bold
+        fontFamily: fonts.bold
     },
     selectedImg: {
         resizeMode: 'contain',

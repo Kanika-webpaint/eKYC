@@ -13,6 +13,7 @@ import {
     Text
 } from 'react-native';
 import { fonts } from '../common/fonts';
+import colors from '../common/colors';
 
 
 function MobileNumberCodeVerification({ verificationImageSource, textFirst, textMiddle, textLast }) {
@@ -47,22 +48,22 @@ const styles = StyleSheet.create({
         fontSize: 15,
         alignSelf: 'center',
         textAlign: 'center',
-        color: colors.light_grey,
-        fontFamily:fonts.medium
+        color: colors.white,
+        fontFamily:fonts.bold
     },
     textMobile: {
         fontSize: 20,
         alignSelf: 'center',
         textAlign: 'center',
-        color: colors.light_grey,
+        color: colors.white,
         fontWeight: '500',
-        fontFamily:fonts.medium
+        fontFamily:fonts.bold
     },
     textOTP: {
         fontSize: 15,
         alignSelf: 'center',
         textAlign: 'center',
-        color: colors.light_grey,
+        color: colors.white,
         fontFamily:fonts.medium
     },
 

@@ -23,9 +23,13 @@ import { useNavigation } from '@react-navigation/native';
 import { BasicPlanData, EnterprisePlanData, PreminumPlanData } from '../../common/PlansList';
 import RedButton from '../../components/RedButton';
 import { fonts } from '../../common/fonts';
+import Loader from '../../components/ActivityIndicator';
+import Status from '../../components/Status';
 
 function PlanDetails({ route }) {
     const navigation = useNavigation();
+    const [isLoading, setIsLoading] = useState(false);
+
     const renderPlanItem = (item) => {
         return (
             <View style={{ flexDirection: 'row', marginTop: 20 }}>
@@ -36,11 +40,16 @@ function PlanDetails({ route }) {
     }
 
     const NavigateToCheckout = () => {
-        navigation.navigate('Checkout', { amount: route?.params?.amount || '' })
+        setIsLoading(true)
+        setTimeout(() => {
+            navigation.navigate('Checkout', { amount: route?.params?.amount || '' })
+        }, 1000)
+
     }
 
     return (
         <SafeAreaView style={styles.safeArea}>
+              <Status isLight />
             <ScrollView style={{ backgroundColor: colors.light_purple }}>
                 <View style={styles.containerHeader}>
                     <View style={styles.header}>
@@ -64,7 +73,7 @@ function PlanDetails({ route }) {
                             PreminumPlanData : EnterprisePlanData}
                         renderItem={(item) => renderPlanItem(item)}
                     />
-                    <RedButton buttonContainerStyle={styles.buttonContainer} ButtonContent={'CHECKOUT'} contentStyle={styles.buttonText} onPress={() => NavigateToCheckout()} />
+                    <RedButton buttonContainerStyle={styles.buttonContainer} ButtonContent={isLoading ? <Loader /> : 'CHECKOUT'} contentStyle={styles.buttonText} onPress={() => NavigateToCheckout()} />
                 </View>
             </ScrollView>
         </SafeAreaView>
@@ -78,7 +87,7 @@ const styles = StyleSheet.create({
     amount: {
         color: colors.app_red,
         fontSize: 25,
-        fontFamily:fonts.bold,
+        fontFamily: fonts.bold,
         marginTop: '20%',
         marginBottom: '5%'
     },
@@ -104,7 +113,7 @@ const styles = StyleSheet.create({
         textAlign: 'center', // Center the text horizontally
         fontSize: 20,
         color: 'black', // Assuming text color
-        fontFamily:fonts.bold
+        fontFamily: fonts.bold
     },
     imagePlanSelect: {
         height: 150,
@@ -126,13 +135,13 @@ const styles = StyleSheet.create({
         color: colors.white,
         fontSize: 16,
         alignSelf: 'center',
-        fontFamily:fonts.bold
+        fontFamily: fonts.bold
     },
     itemText: {
         color: colors.black,
         fontSize: 18,
         alignSelf: 'center',
-        fontFamily:fonts.regular
+        fontFamily: fonts.regular
     },
     itemImage: {
         height: 22,

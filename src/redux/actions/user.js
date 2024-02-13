@@ -2,7 +2,7 @@
 import axios from 'axios'
 import { API_URL } from "@env"
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { createUserSlice, getOrgDetailsslice, getUserListSlice, phoneNumberslice, registerAdminslice, verifyCodeslice } from '../slices/user';
+import { createUserSlice, getOrgDetailsslice, getUserListSlice, getUserSlice, phoneNumberslice, registerAdminslice, verifyCodeslice } from '../slices/user';
 import { Platform, ToastAndroid } from 'react-native';
 
 
@@ -21,6 +21,7 @@ export const LoginAdminAction =
     ) => async (dispatch) => {
         try {
             const api_url = `${API_URL}/loginorganization`
+            // const api_url = 'http://192.168.1.26:5000/api/loginorganization'
             const res = await axios.post(api_url, data)
             console.log(res, api_url, "response login ADMIN")
             if (res?.status === 200) {
@@ -50,7 +51,7 @@ export const RegisterAdminAction =
             if (res?.status === 201) {
                 setIsLoading(false)
                 showAlert(res?.data)
-                navigation.navigate('LoginAdmin', { isOrgReg: true })
+                navigation.navigate('SuccessScreen') // send amount from here to show on success screen
             } else {
                 showAlert(res?.data)
             }
@@ -97,6 +98,7 @@ export const getUsersListAction = (token, setIsLoading) => async (dispatch) => {
             },
         }
         const api_url = `${API_URL}/users`
+        // const api_url = 'http://192.168.1.26:5000/api/users'
         const res = await axios.get(api_url, config)
         console.log(res, "response get users")
         await dispatch(getUserListSlice(res))
@@ -113,6 +115,67 @@ export const getUsersListAction = (token, setIsLoading) => async (dispatch) => {
 }
 
 
+export const CreateUserAction =
+    (
+        data,
+        token,
+        navigation,
+        setIsLoading
+    ) =>
+        async (dispatch) => {
+            try {
+                const config = {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `${token}`,
+                    },
+                }
+                const api_url = `${API_URL}/createuser`
+                const res = await axios.post(api_url, data, config)
+                console.log(res, "response create user by admin ")
+                if (res.status === 201) {
+                    setIsLoading(false)
+                    showAlert(res?.data?.message)
+                    navigation.navigate('DashboardAdmin')
+                } else {
+                    showAlert(res?.data?.message)
+                }
+                await dispatch(createUserSlice(res))
+            } catch (e) {
+                setIsLoading(false)
+                showAlert('User already exists')
+            }
+        }
+
+export const getUserByIdAction =
+    (
+        id,
+        token,
+        setIsLoading
+    ) =>
+        async (dispatch) => {
+            try {
+                const config = {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `${token}`,
+                    },
+                }
+                const api_url = `${API_URL}/users/${id}`
+                // const api_url = `http://192.168.1.26:5000/api/users/${id}`;
+                const res = await axios.get(api_url, config)
+                console.log(res, "get particular user detail:::")
+                if (res.status === 200) {
+                    setIsLoading(false)
+                } else {
+                    showAlert(res?.data?.message)
+                }
+                await dispatch(getUserSlice(res))
+            } catch (e) {
+                setIsLoading(false)
+                showAlert('Unable to fetch details')
+            }
+        }
 
 export const PhoneNumberAction =
     (
@@ -122,7 +185,6 @@ export const PhoneNumberAction =
         setIsLoading
     ) =>
         async (dispatch) => {
-            console.log(data, "dataaaaaaaa")
             try {
                 // const api_url = `${API_URL}/sendOTP`
                 const api_url = 'http://192.168.1.14:5000/api/sendOTP'
@@ -168,34 +230,3 @@ export const VerifyCodeAction =
             }
         }
 
-export const CreateUserAction =
-    (
-        data,
-        token,
-        navigation,
-        setIsLoading
-    ) =>
-        async (dispatch) => {
-            try {
-                const config = {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `${token}`,
-                    },
-                }
-                const api_url = `${API_URL}/createuser`
-                const res = await axios.post(api_url, data, config)
-                console.log(res, "response create user by admin ")
-                if (res.status === 201) {
-                    setIsLoading(false)
-                    showAlert(res?.data?.message)
-                    navigation.navigate('DashboardAdmin')
-                } else {
-                    showAlert(res?.data?.message)
-                }
-                await dispatch(createUserSlice(res))
-            } catch (e) {
-                setIsLoading(false)
-                showAlert('User already exists')
-            }
-        }

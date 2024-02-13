@@ -27,18 +27,20 @@ function SignInUp({ onPress, signupContent, signUpText }) {
 
 const styles = StyleSheet.create({
     bottomSignUpView: {
-        flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 15
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: '10%'
     },
     bottomText: {
         color: colors.white,
         fontSize: 15,
-        fontFamily:fonts.regular
+        fontFamily: fonts.regular
     },
     signUpText: {
         color: colors.app_red,
         fontSize: 15,
-        fontWeight: '600',
-        fontFamily:fonts.regular
+        fontFamily: fonts.medium
     },
 });
 

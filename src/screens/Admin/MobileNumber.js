@@ -20,7 +20,7 @@ import {
   AlertIOS,
   ToastAndroid,
   Alert,
-  Keyboard
+  Keyboard,
 } from 'react-native';
 import colors from '../../common/colors';
 import { background_image, verification } from '../../common/images';
@@ -41,6 +41,7 @@ import { PhoneNumberAction, VerifyCodeAction } from '../../redux/actions/user';
 import { useDispatch } from 'react-redux';
 import NetworkLogger from 'react-native-network-logger';
 import { fonts, regular, thin } from '../../common/fonts';
+import Status from '../../components/Status';
 
 
 function MobileNumber() {
@@ -239,8 +240,8 @@ function MobileNumber() {
     return (
       <View style={styles.bottomView}>
         <TouchableOpacity style={styles.codeView} onPress={() => codeResend()}>
-          <Text style={styles.codeText}>Haven't recieved a code?</Text>
-          <Text style={styles.contactText}>Resend Code</Text>
+          <Text style={styles.codeText}>You should've received your code via SMS.</Text>
+          <Text style={styles.contactText}>If you haven't received a code, please contact {'\n'}             your agent to request a new one.</Text>
         </TouchableOpacity>
       </View>
     );
@@ -257,13 +258,16 @@ function MobileNumber() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ImageBackground
+    <Status lightContent/>
+      <View style={{ flex: 1, backgroundColor: colors.app_blue }}>
+
+        {/* <ImageBackground
         source={background_image}
         style={{ flex: 1 }}
-      >
+      > */}
         <ScrollView style={{ marginBottom: 10 }} keyboardShouldPersistTaps='handled'>
           <Logo />
-          <MobileNumberCodeVerification verificationImageSource={verification} textFirst={'Please enter your'} textMiddle={showOTP ? 'Unique Registration code' : 'Mobile Number'} textLast={showOTP ? '(Received by SMS)' : '(Receive an OTP by SMS)'} />
+          <MobileNumberCodeVerification verificationImageSource={verification} textFirst={'To begin, Please enter your'} textMiddle={showOTP ? 'Unique Registration code' : 'Mobile Number'} textLast={showOTP ? '(Received by SMS)' : '(Receive an OTP by SMS)'} />
           {showOTP ?
             <View style={styles.codeSection}>
               <CodeField
@@ -289,14 +293,14 @@ function MobileNumber() {
             :
             <>
               <View style={styles.container}>
-                <TouchableOpacity style={{ backgroundColor: colors.app_red, height: 30, width: 50, marginLeft: 10, marginRight: 10, borderRadius: 5, justifyContent: 'center', alignItems: 'center' }} onPress={() => onChangeCountryCode()}>
+                <TouchableOpacity style={{ height: 30, width: 50, marginLeft: 10, marginRight: 10, borderRadius: 5, justifyContent: 'center', alignItems: 'center' }} onPress={() => onChangeCountryCode()}>
                   <Text style={{ color: colors.white }}>{countryCode ? countryCode : '+91'}</Text>
                 </TouchableOpacity>
                 <TextInput
                   value={mobileNumber}
                   style={styles.input}
-                  placeholder="Enter your phone number"
-                  placeholderTextColor="#999"
+                  placeholder="Enter mobile number"
+                  placeholderTextColor={colors.placeholder_grey}
                   keyboardType="phone-pad"
                   onChangeText={(text) => onChangeMobile(text)}
                 />
@@ -318,9 +322,9 @@ function MobileNumber() {
             setCountryCode(item.dial_code);
             setShow(false);
           }} />
-
         </ScrollView>
-      </ImageBackground>
+      </View>
+      {/* </ImageBackground> */}
       {/* remove later */}
       {/* <TouchableOpacity style={{ margin: 30, height: 50, width: 50, borderRadius: 25, backgroundColor: colors.app_red, justifyContent: 'center', alignItems: 'center' }} onPress={() => setOpenLogs(!openLogs)}>
         <Text style={{ alignSelf: 'center', color: colors.white }}>Logs</Text>
@@ -338,30 +342,32 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'white',
-    borderRadius: 8,
+    backgroundColor: 'transparent',
+    borderWidth: 0,
+    borderBottomColor: colors.white,
+    borderBottomWidth: 1,
     marginHorizontal: 30,
     marginTop: 20,
-    elevation: 3, // Add elevation for a subtle shadow (Android)
   },
   input: {
-    flex: 1,
+    flex: 1, // Ensure the TextInput fills the available space
+    borderWidth: 0,
     fontSize: 16,
     color: colors.grey,
     fontFamily: fonts.regular
   },
   buttonContainer: {
-    marginTop: 25,
+    marginTop: '10%',
+    marginBottom: '3%',
     backgroundColor: colors.app_red,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
+    paddingVertical: 10,
     borderRadius: 8,
     alignItems: 'center',
     marginHorizontal: 30,
   },
   buttonText: {
     color: 'white',
-    fontSize: 20,
+    fontSize: 16,
     fontFamily: fonts.bold
   },
   bottomView: {
@@ -380,9 +386,11 @@ const styles = StyleSheet.create({
     color: colors.light_grey
   },
   contactText: {
+    marginTop: 20,
     fontSize: 16,
     fontFamily: fonts.medium,
-    color: colors.light_grey
+    color: colors.light_grey,
+    alignSelf: 'center'
   },
   root: {
     flex: 1,
@@ -397,22 +405,19 @@ const styles = StyleSheet.create({
     lineHeight: 35,
     fontSize: 24,
     borderRadius: 5,
-    borderColor: '#ffffff',
+    borderBottomColor: colors.white,
+    borderBottomWidth: 1,
+    color: colors.white,
     textAlign: 'center',
-    backgroundColor: '#ffffff'
   },
   focusCell: {
-    borderColor: '#000',
+    borderColor: colors.white,
     alignSelf: 'center'
   },
   codeSection: {
     marginLeft: 30,
     marginRight: 30,
-    marginTop: 30
-  },
-  loginAdminView: {
-    justifyContent: 'center',
-    alignItems: 'center'
+    marginTop: 18
   },
   adminText: {
     fontSize: 18,

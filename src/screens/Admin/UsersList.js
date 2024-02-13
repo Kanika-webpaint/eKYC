@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { View, TextInput, FlatList, Text, Image, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { back, close, profile } from '../../common/images';
+import { back, close, down, profile, rightArrow } from '../../common/images';
 import { useNavigation } from '@react-navigation/native';
 import { getUsersListAction } from '../../redux/actions/user';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useDispatch, useSelector } from 'react-redux';
+import Status from '../../components/Status';
 
 const UserList = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -34,17 +35,26 @@ const UserList = () => {
     setFilteredUsers(filtered);
   };
 
+  const navigateToUserProfile = (item) => {
+    navigation.navigate('UserProfile', { id: item?.id })
+  }
+
   const renderItem = ({ item }) => {
     return (
-      <View style={styles.itemContainer}>
-        <Image
-          source={profile}
-          style={styles.image}
-        />
-        <View style={styles.userInfoContainer}>
-          <Text style={styles.userName}>{item?.username || ''}</Text>
-          <Text style={styles.phoneNumber}>{item?.phoneNumber || ''}</Text>
-        </View>
+      <View style={{ justifyContent: 'space-between' }}>
+        <TouchableOpacity style={styles.itemContainer} onPress={() => navigateToUserProfile(item)}>
+          <Image
+            source={profile}
+            style={styles.image}
+          />
+          <View style={styles.userInfoContainer}>
+            <Text style={styles.userName}>{item?.username || ''}</Text>
+            <Text style={styles.phoneNumber}>{item?.phoneNumber || ''}</Text>
+          </View>
+          <TouchableOpacity onPress={() => navigateToUserProfile(item)}>
+            <Image source={rightArrow} style={{ height: 15, width: 15, resizeMode: 'contain' }} />
+          </TouchableOpacity>
+        </TouchableOpacity>
       </View>
     )
   }
@@ -55,11 +65,12 @@ const UserList = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      <Status isLight />
       <ScrollView keyboardShouldPersistTaps='handled'>
         <View style={{ margin: 20 }}>
           <View style={styles.containerHeader}>
             <View style={styles.header}>
-              <TouchableOpacity onPress={() => navigation.goBack()}>
+              <TouchableOpacity onPress={() => navigation.goBack()} hitSlop={{ top: 20, bottom: 20, left: 50, right: 50 }}>
                 <Image source={back} style={styles.backArrow} />
               </TouchableOpacity>
               <Text style={styles.title}>Users</Text>
@@ -79,9 +90,12 @@ const UserList = () => {
                   value={searchQuery}
                   style={styles.searchInput}
                 />
-                <TouchableOpacity onPress={() => removeSearchText()} style={{justifyContent:'center'}}>
-                  <Image source={close} style={{ height: 15, width: 20, alignSelf: 'center',marginRight:10 }} />
-                </TouchableOpacity>
+                {searchQuery && (
+                  <TouchableOpacity onPress={() => removeSearchText()} style={{ justifyContent: 'center' }}>
+                    <Image source={close} style={{ height: 15, width: 20, alignSelf: 'center', marginRight: 10 }} />
+                  </TouchableOpacity>
+                )}
+
               </View>
               <FlatList
                 data={searchQuery ? filteredUsers : usersListing} // Render filtered users if search query exists, otherwise render all users

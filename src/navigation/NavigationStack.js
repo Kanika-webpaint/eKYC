@@ -41,6 +41,7 @@ const NavigationStack = () => {
                 <OrganizationStack.Screen name="Plan" component={routeNames.Plan} />
                 <OrganizationStack.Screen name="Checkout" component={routeNames.Checkout} />
                 <OrganizationStack.Screen name="PlanDetails" component={routeNames.PlanDetails} />
+                <OrganizationStack.Screen name="SuccessScreen" component={routeNames.SuccessScreen} />
                 <OrganizationStack.Screen name="OrganizationHomeStack" component={OrganizationHomeStack} />
                 {/* Add more screens related to organization role */}
             </OrganizationStack.Navigator>
@@ -53,6 +54,7 @@ const NavigationStack = () => {
                 <OrganizationStack.Screen name="DashboardAdmin" component={routeNames.DashboardAdmin} />
                 <OrganizationStack.Screen name="CreateUser" component={routeNames.CreateUser} />
                 <OrganizationStack.Screen name="UsersList" component={routeNames.UserList} />
+                <OrganizationStack.Screen name="UserProfile" component={routeNames.UserProfile} />
                 {/* Add more screens related to organization role */}
             </OrganizationStack.Navigator>
         );

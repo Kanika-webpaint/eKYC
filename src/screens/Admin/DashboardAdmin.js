@@ -14,6 +14,7 @@ import {
     Text,
     ScrollView,
     TouchableOpacity,
+    FlatList,
 } from 'react-native';
 import colors from '../../common/colors';
 import { plan_select, plus, team } from '../../common/images';
@@ -23,12 +24,26 @@ import { getOrgDetailsAction } from '../../redux/actions/user';
 import Loader from '../../components/ActivityIndicator';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { fonts } from '../../common/fonts';
+import Status from '../../components/Status';
 
 function DashboardAdmin() {
     const [isLoading, setIsLoading] = useState(false);
     const navigation = useNavigation();
     const dispatch = useDispatch()
     const OrganizationHomeList = useSelector((state) => state?.login?.orgDetails)
+    const DashboardItemsData = [
+        {
+            id: 0,
+            image: team,
+            title: 'Users'
+        },
+        {
+            id: 1,
+            image: plan_select,
+            title: 'Plans'
+        },
+
+    ]
 
     useEffect(() => {
         AsyncStorage.getItem("authToken").then((value) => {
@@ -41,8 +56,29 @@ function DashboardAdmin() {
             });
     }, [dispatch]);
 
+
+    const onPressItem = (selectedItem) => {
+        console.log(selectedItem, "sellllllllllll")
+        if (selectedItem?.item?.id === 0) {
+            navigation.navigate('UsersList')
+        } else {
+            // navigation.navigate('UsersList') //navigate to plan detail
+        }
+
+    }
+
+
+    const renderItem = (item) => (
+        <TouchableOpacity style={styles.itemsView} onPress={() => onPressItem(item)}>
+            <Image style={styles.imgItem} source={item?.item?.image}></Image>
+            <Text style={styles.titleItem}>{item.item.title}</Text>
+        </TouchableOpacity>
+    );
+
+
     return (
         <SafeAreaView style={styles.safeArea}>
+            <Status isLight />
             <ScrollView keyboardShouldPersistTaps='handled'>
                 <View style={styles.mainView}>
                     <View >
@@ -54,28 +90,15 @@ function DashboardAdmin() {
                     </TouchableOpacity>
                 </View>
                 {isLoading ? <Loader /> :
-                    <View style={styles.midView}>
-                        <TouchableOpacity style={styles.dashboardItem} onPress={() => { navigation.navigate('UsersList') }}>
-                            <Image source={team} style={styles.imagePlanSelect} />
-                            <Text style={styles.itemText}>Users</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={styles.dashboardItem}>
-                            <Image source={plan_select} style={styles.imagePlanSelect} />
-                            <Text style={styles.itemText}>Plans</Text>
-                        </TouchableOpacity>
-                    </View>}
-                <View style={styles.midView}>
-                    <TouchableOpacity style={styles.dashboardItem} onPress={() => { navigation.navigate('UsersList') }}>
-                        <Image source={team} style={styles.imagePlanSelect} />
-                        <Text style={styles.itemText}>Users</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.dashboardItem}>
-                        <Image source={plan_select} style={styles.imagePlanSelect} />
-                        <Text style={styles.itemText}>Plans</Text>
-                    </TouchableOpacity>
-                </View>
+                    <FlatList
+                        nestedScrollEnabled
+                        numColumns={'2'}
+                        data={DashboardItemsData}
+                        renderItem={renderItem}
+                    />
+                }
             </ScrollView>
-        </SafeAreaView>
+        </SafeAreaView >
     );
 }
 
@@ -100,34 +123,15 @@ const styles = StyleSheet.create({
         fontFamily: fonts.bold
     },
     dashboardItem: {
-        shadowColor: '#fff',
+        shadowColor: '#000',
         shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 1,
-        shadowRadius: 0.4,
-        elevation: 3,
-        borderColor: colors.app_red,
+        shadowOpacity: 0.8,
+        shadowRadius: 2,
+        elevation: 5,
+        backgroundColor: colors.white,
         height: 120,
         width: 120,
         borderRadius: 10,
-        borderWidth: 0.8,
-    },
-    itemText: {
-        fontSize: 16,
-        color: colors.grey,
-        alignSelf: 'center',
-        fontFamily: fonts.medium
-    },
-    midView: {
-        margin: 5,
-        marginBottom: 20,
-        flexDirection: 'row',
-        justifyContent: 'space-evenly'
-    },
-    imagePlanSelect: {
-        height: 80,
-        width: 80,
-        alignSelf: 'center',
-        resizeMode: 'contain'
     },
     addView: {
         height: 45,
@@ -144,6 +148,30 @@ const styles = StyleSheet.create({
         height: 35,
         width: 35,
         resizeMode: 'contain'
+    },
+    itemsView: {
+        flex: 1,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.8,
+        shadowRadius: 2,
+        elevation: 5,
+        backgroundColor: colors.white,
+        margin: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 5,
+        borderRadius: 5
+    },
+    imgItem: {
+        height: 80,
+        width: 80,
+        alignSelf: 'center'
+    },
+    titleItem: {
+        fontFamily: fonts.bold,
+        fontSize: 18,
+        color: colors.black
     }
 });
 

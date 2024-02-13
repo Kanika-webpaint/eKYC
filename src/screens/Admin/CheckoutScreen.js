@@ -5,7 +5,7 @@
  * @format
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
     SafeAreaView,
     StyleSheet,
@@ -15,16 +15,21 @@ import {
     Text,
     ScrollView,
     TouchableOpacity,
+    Modal,
+    FlatList,
 } from 'react-native';
 import colors from '../../common/colors';
 import RedButton from '../../components/RedButton';
-import { back } from '../../common/images';
+import { back, down } from '../../common/images';
 import { useNavigation } from '@react-navigation/native';
 import { useDispatch } from 'react-redux'
 import { RegisterAdminAction } from '../../redux/actions/user';
 import Loader from '../../components/ActivityIndicator';
 import ErrorMessage from '../../components/ErrorMsg';
 import { fonts } from '../../common/fonts';
+import { Country, State, City } from 'country-state-city';
+import ErrorMessageCheckout from '../../components/ErrorMsgCheckout';
+import Status from '../../components/Status';
 
 function CheckoutScreen({ route }) {
     const [userData, setFormData] = useState({
@@ -32,20 +37,50 @@ function CheckoutScreen({ route }) {
         cardNo: '',
         expDate: '',
         cvv: '',
-        name: ''
+        name: '',
+        address: ''
     });
     const [errorMessages, setErrorMessages] = useState({
         email: '',
         cardNo: '',
         expDate: '',
         cvv: '',
-        name: ''
+        name: '',
+        address: '',
+        country: ''
     });
     const navigation = useNavigation();
     const dispatch = useDispatch()
     const [isLoading, setIsLoading] = useState(false);
+    const [showOptions, setShowOptions] = useState(false);
+    const [showState, setShowState] = useState(false);
+    const [selectedOption, setSelectedOption] = useState(null);
+    const [selectedState, setSelectedState] = useState(null);
+    const [countryData, setCountryData] = useState([]);
+    const [countryErrMsg, setCountryErrorMsg] = useState(false)
+    const [stateErrMsg, setStateErrorMsg] = useState(false)
+    const [statesData, setStatesData] = useState();
+    const [cityErrMsg, setCityErrorMsg] = useState(false)
+    const [cityData, setCitiesData] = useState();
+    const [showCity, setShowCity] = useState();
+    const [selectedCity, setSelectedCity] = useState(null);
+
+    useEffect(() => {
+        const nigeriaData = Country && Country?.getCountryByCode('NG');
+        if (nigeriaData) {
+            setCountryData([nigeriaData]);
+        }
+    }, []);
+
+    useEffect(() => {
+        const nigeriaStatesData = State && State?.getStatesOfCountry('NG');
+        if (nigeriaStatesData) {
+            setStatesData(nigeriaStatesData);
+        }
+    }, []);
 
     const handleLogin = () => {
+
         const newErrorMessages = {};
 
         if (!userData.name) {
@@ -63,10 +98,30 @@ function CheckoutScreen({ route }) {
         if (!userData.cvv) {
             newErrorMessages.cvv = 'CVV is required';
         }
-
+        if (!userData.address) {
+            newErrorMessages.address = 'Address is required';
+        }
+        if (selectedOption === null) {
+            setCountryErrorMsg(true)
+        }
+        if (selectedState === null) {
+            setStateErrorMsg(true)
+        }
+        if (selectedCity === null) {
+            setCityErrorMsg(true)
+        }
 
         if (Object.keys(newErrorMessages).length > 0) {
             setErrorMessages(newErrorMessages);
+            if (selectedOption !== null && selectedOption.length > 0) {
+                setCountryErrorMsg(false)
+            }
+            if (selectedState !== null) {
+                setStateErrorMsg(false)
+            }
+            if (selectedCity !== null) {
+                setCityErrorMsg(false)
+            }
             return;
         } else {
             // const requestData = {
@@ -77,6 +132,9 @@ function CheckoutScreen({ route }) {
             //     transactionId: "2564",
             //     planPrice: route?.params?.amount || ''
             // }
+
+            // navigation.navigate('SuccessScreen')
+
             const requestData =
             {
                 name: "webpaint",
@@ -85,8 +143,10 @@ function CheckoutScreen({ route }) {
                 expiryDate: "03-04-2024",
                 transactionId: "2564",
                 planPrice: "256"
+                // add other fields i.e address, city, state, country
             }
             setIsLoading(true)
+
             dispatch(RegisterAdminAction(requestData, navigation, setIsLoading))
         }
     }
@@ -96,8 +156,58 @@ function CheckoutScreen({ route }) {
         setErrorMessages({ ...errorMessages, [field]: '' });
     };
 
+    const handleOptionPress = (option) => {
+        setSelectedOption(option?.name);
+        setShowOptions(false);
+
+    };
+
+    const handleStatePress = (option) => {
+        setSelectedState(option?.name)
+        setShowState(false)
+        getCities(option)
+    }
+
+    const handleCityPress = (option) => {
+        setSelectedCity(option?.name)
+        setShowCity(false)
+    }
+
+    const getCities = async (option) => {
+        const nigeriaStatesCitiesData = await City && City?.getCitiesOfState('NG', option?.isoCode);
+        if (nigeriaStatesCitiesData && option?.isoCode) {
+            setCitiesData(nigeriaStatesCitiesData);
+        }
+    }
+
+
+    const onPressCountryItem = (item) => {
+        return (
+            <TouchableOpacity onPress={() => handleOptionPress(item)}>
+                <Text style={{ fontSize: 18, paddingVertical: 10 }}>{item?.name}</Text>
+            </TouchableOpacity>
+        )
+    }
+
+    const onPressStateItem = (item) => {
+        return (
+            <TouchableOpacity onPress={() => handleStatePress(item)}>
+                <Text style={{ fontSize: 18, paddingVertical: 10 }}>{item?.name}</Text>
+            </TouchableOpacity>
+        )
+    }
+
+    const onPressCityItem = (item) => {
+        return (
+            <TouchableOpacity onPress={() => handleCityPress(item)}>
+                <Text style={{ fontSize: 18, paddingVertical: 10 }}>{item?.name}</Text>
+            </TouchableOpacity>
+        )
+    }
+
     return (
         <SafeAreaView style={styles.safeArea}>
+            <Status isLight />
             <ScrollView keyboardShouldPersistTaps='handled'>
                 <View style={{ margin: 20 }}>
                     <View style={styles.containerHeader}>
@@ -120,7 +230,7 @@ function CheckoutScreen({ route }) {
                             onChangeText={(text) => handleInputChange('name', text)}
                             keyboardType="email-address"
                         />
-                        <ErrorMessage errorMessageText={errorMessages.name} />
+                        <ErrorMessageCheckout errorMessageText={errorMessages.name} />
                         <Text style={styles.titleText}>
                             Email
                         </Text>
@@ -132,7 +242,146 @@ function CheckoutScreen({ route }) {
                             onChangeText={(text) => handleInputChange('email', text)}
                             keyboardType="email-address"
                         />
-                        <ErrorMessage errorMessageText={errorMessages.email} />
+                        <ErrorMessageCheckout errorMessageText={errorMessages.email} />
+                        <View style={{ marginBottom: 10 }}>
+                            <Text style={styles.titleText}>Country</Text>
+                            <View style={styles.addressField}>
+                                <TextInput
+                                    value={selectedOption}
+                                    editable={false}
+                                    style={styles.inputCount}
+                                    placeholder="Select country"
+                                    placeholderTextColor={colors.light_grey}
+                                // onChangeText={(text) => handleInputChange('address', text)}
+                                />
+                                <TouchableOpacity onPress={() => setShowOptions(!showOptions)} style={{ marginRight: 20 }}>
+                                    <Image
+                                        source={down} // Change the path to your dropdown icon
+                                        style={{ width: 20, height: 20 }}
+                                    />
+                                </TouchableOpacity>
+                            </View>
+                            {countryErrMsg && <Text style={styles.errorMessageStyle}>{'Country is required'}</Text>}
+                            {showOptions && (
+                                <View style={{
+                                    backgroundColor: colors.white,
+                                    borderRadius: 5,
+                                    color: '#fff',
+                                    shadowColor: '#000',
+                                    shadowOffset: { width: 0, height: 1 },
+                                    shadowOpacity: 0.8,
+                                    shadowRadius: 2,
+                                    elevation: 5
+                                }}>
+                                    <FlatList
+                                        style={{ color: 'red', padding: 10 }}
+                                        data={countryData && countryData}
+                                        renderItem={({ item }) => onPressCountryItem(item)}
+                                        keyExtractor={(item) => item.code}
+                                    />
+                                </View>
+                            )}
+                        </View>
+                        {selectedOption && (
+                            <View>
+                                <Text style={styles.titleText}>State</Text>
+                                <View style={styles.addressField}>
+                                    <TextInput
+                                        value={selectedState}
+                                        editable={false}
+                                        style={styles.inputCount}
+                                        placeholder="Select State"
+                                        placeholderTextColor={colors.light_grey}
+                                    // onChangeText={(text) => handleInputChange('address', text)}
+                                    />
+                                    <TouchableOpacity onPress={() => setShowState(!showState)} style={{ marginRight: 20 }}>
+                                        <Image
+                                            source={down} // Change the path to your dropdown icon
+                                            style={{ width: 20, height: 20 }}
+                                        />
+                                    </TouchableOpacity>
+                                </View>
+                                {stateErrMsg && <Text style={styles.errorMessageStyle}>{'State is required'}</Text>}
+                                {showState && (
+                                    <View style={{
+                                        backgroundColor: colors.white,
+                                        borderRadius: 5,
+                                        shadowColor: '#000',
+                                        shadowOffset: { width: 0, height: 1 },
+                                        shadowOpacity: 0.8,
+                                        shadowRadius: 2,
+                                        elevation: 5,
+                                        height: 200,
+                                        flex: 1 // Allow the container to expand
+                                    }}>
+                                        <FlatList
+                                            nestedScrollEnabled
+                                            contentContainerStyle={{ flexGrow: 1 }}
+                                            style={{ padding: 10 }}
+                                            data={statesData && statesData}
+                                            renderItem={({ item }) => onPressStateItem(item)}
+                                            keyExtractor={(item) => item.code}
+                                        />
+                                    </View>
+                                )}
+                            </View>
+                        )}
+
+                        {selectedOption && selectedState && (
+                            <View>
+                                <Text style={styles.titleText}>City</Text>
+                                <View style={styles.addressField}>
+                                    <TextInput
+                                        value={selectedCity}
+                                        editable={false}
+                                        style={styles.inputCount}
+                                        placeholder="Select City"
+                                        placeholderTextColor={colors.light_grey}
+                                    // onChangeText={(text) => handleInputChange('address', text)}
+                                    />
+                                    <TouchableOpacity onPress={() => setShowCity(!showCity)} style={{ marginRight: 20 }}>
+                                        <Image
+                                            source={down} // Change the path to your dropdown icon
+                                            style={{ width: 20, height: 20 }}
+                                        />
+                                    </TouchableOpacity>
+                                </View>
+                                {cityErrMsg && <Text style={styles.errorMessageStyle}>{'City is required'}</Text>}
+                                {showCity && (
+                                    <View style={{
+                                        backgroundColor: colors.white,
+                                        borderRadius: 5,
+                                        shadowColor: '#000',
+                                        shadowOffset: { width: 0, height: 1 },
+                                        shadowOpacity: 0.8,
+                                        shadowRadius: 2,
+                                        elevation: 5,
+                                        height: 200,
+                                        flex: 1 // Allow the container to expand
+                                    }}>
+                                        <FlatList
+                                            nestedScrollEnabled
+                                            contentContainerStyle={{ flexGrow: 1 }}
+                                            style={{ padding: 10 }}
+                                            data={cityData && cityData}
+                                            renderItem={({ item }) => onPressCityItem(item)}
+                                            keyExtractor={(item) => item.code}
+                                        />
+                                    </View>
+                                )}
+                            </View>
+                        )}
+                        <Text style={styles.titleText}>
+                            Address
+                        </Text>
+                        <TextInput
+                            value={userData?.address}
+                            style={styles.input}
+                            placeholder="Enter address here"
+                            placeholderTextColor={colors.light_grey}
+                            onChangeText={(text) => handleInputChange('address', text)}
+                        />
+                        <ErrorMessageCheckout errorMessageText={errorMessages.address} />
                         <Text style={styles.titleText}>
                             Card number
                         </Text>
@@ -144,21 +393,21 @@ function CheckoutScreen({ route }) {
                             onChangeText={(text) => handleInputChange('cardNo', text)}
                             keyboardType="numeric"
                         />
-                        <ErrorMessage errorMessageText={errorMessages.cardNo} />
+                        <ErrorMessageCheckout errorMessageText={errorMessages.cardNo} styleMsg={{ marginLeft: 0 }} />
                         <View style={styles.fileds}>
                             <View >
                                 <Text style={styles.titleText}>
                                     Exp date
                                 </Text>
                                 <TextInput
-                                    value={userData?.expDate}
+                                    // value={userData?.expDate}
                                     style={styles.inputSmall}
                                     placeholder="DD/MM"
                                     placeholderTextColor={colors.light_grey}
                                     onChangeText={(text) => handleInputChange('expDate', text)}
                                     keyboardType="numeric"
                                 />
-                                <ErrorMessage errorMessageText={errorMessages.expDate} />
+                                <ErrorMessageCheckout errorMessageText={errorMessages.expDate} />
                             </View>
                             <View>
                                 <Text style={styles.titleText}>
@@ -172,8 +421,9 @@ function CheckoutScreen({ route }) {
                                     onChangeText={(text) => handleInputChange('cvv', text)}
                                     keyboardType="numeric"
                                 />
-                                <ErrorMessage errorMessageText={errorMessages.cvv} />
+                                <ErrorMessageCheckout errorMessageText={errorMessages.cvv} />
                             </View>
+
                         </View>
                     </View>
                     <RedButton buttonContainerStyle={styles.buttonContainer} ButtonContent={isLoading ? <Loader /> : route?.params?.amount + ' ' + 'PAY NOW'} contentStyle={styles.buttonText} onPress={() => handleLogin()} />
@@ -189,20 +439,20 @@ const styles = StyleSheet.create({
         backgroundColor: colors.light_purple
     },
     buttonContainer: {
-        marginTop: 50,
+        marginTop: '10%',
         backgroundColor: colors.app_red,
-        paddingVertical: 12,
-        paddingHorizontal: 20,
+        paddingVertical: 10,
         borderRadius: 8,
+        alignSelf: 'center',
         alignItems: 'center',
-        width: '100%',
-        height: 50
+        marginHorizontal: 30,
+        width: '100%'
     },
     buttonText: {
         color: colors.white,
         fontSize: 16,
         alignSelf: 'center',
-        fontFamily:fonts.bold
+        fontFamily: fonts.bold
     },
     containerHeader: {
         flex: 1,
@@ -260,6 +510,11 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         width: 180
     },
+    inputCount: {
+        color: colors.black,
+        fontSize: 18,
+        fontFamily: fonts.regular,
+    },
     titleText: {
         margin: 5,
         color: colors.grey,
@@ -268,7 +523,26 @@ const styles = StyleSheet.create({
     fileds: {
         flexDirection: 'row',
         justifyContent: 'space-between'
-    }
+    },
+    addressField: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        height: 50,
+        borderWidth: 1,
+        paddingLeft: 8,
+        borderRadius: 5,
+        borderWidth: 1,
+        width: '100%',
+        borderColor: colors.white,
+        backgroundColor: colors.white,
+        marginBottom: 10,
+        justifyContent: 'space-between'
+    },
+    errorMessageStyle: {
+        color: colors.app_red,
+        marginTop: 5,
+        fontFamily: fonts.regular
+    },
 });
 
 export default CheckoutScreen;

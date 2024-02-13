@@ -26,6 +26,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Loader from '../../components/ActivityIndicator';
 import { back } from '../../common/images';
 import { fonts } from '../../common/fonts';
+import Status from '../../components/Status';
 
 
 function CreateUser() {
@@ -57,7 +58,6 @@ function CreateUser() {
             .then(res => {
                 //do something else
             });
-
     }, [token]);
 
 
@@ -84,13 +84,13 @@ function CreateUser() {
                 phoneNumber: userData?.phoneNo,
                 organizationId: OrganizationHomeList?.organization?.id || ''
             }
-            console.log(requestData, "request dataaa")
             dispatch(CreateUserAction(requestData, token, navigation, setIsLoading))
         }
     };
 
     return (
         <SafeAreaView style={styles.safeArea}>
+            <Status isLight />
             <ScrollView style={styles.safeArea} keyboardShouldPersistTaps='handled'>
                 <View style={{ margin: 20 }}>
                     <View style={styles.containerHeader}>

@@ -60,6 +60,5 @@ export const EnterprisePlanData = [
 export const items = [
     { id: 1, label: 'Basic', description: 'N1500 per verification (1 to 15)' },
     { id: 2, label: 'Preminum', description: 'N1000 per verification (51-200)' },
-    { id: 3, label: 'Enterprise', description: '200+ contact us' },
 ];
 

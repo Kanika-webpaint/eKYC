@@ -12,6 +12,8 @@ import PlanDetails from "../screens/Admin/PlanDetails";
 import RegisterAdmin from "../screens/Admin/RegisterAdmin";
 import RegisterDetails from "../screens/RegisterDetails";
 import UsersList from "../screens/Admin/UsersList";
+import SuccessScreen from "../screens/Admin/SuccessScreen";
+import UserProfile from "../screens/Admin/UserProfile";
 
 export const routeNames = {
     MobileVerification: MobileNumber,
@@ -27,5 +29,7 @@ export const routeNames = {
     Checkout:CheckoutScreen,
     PlanDetails:PlanDetails,
     DashboardAdmin:DashboardAdmin,
-    CreateUser:CreateUser
+    CreateUser:CreateUser,
+    SuccessScreen:SuccessScreen,
+    UserProfile:UserProfile
 }

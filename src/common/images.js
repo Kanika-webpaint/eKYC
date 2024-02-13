@@ -17,3 +17,12 @@ export const profile = require('./assets/profile.png');
 export const plus = require('./assets/plus.png');
 export const close = require('./assets/close.png');
 export const team = require('./assets/team.png');
+export const success = require('./assets/success.png');
+export const down = require('./assets/down.png');
+export const rightArrow = require('./assets/rightArrow.png');
+export const mail = require('./assets/mail.png');
+export const padlock = require('./assets/padlock.png');
+export const view = require('./assets/view.png');
+export const hide = require('./assets/hide.png');
+
+
