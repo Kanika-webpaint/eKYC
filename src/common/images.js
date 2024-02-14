@@ -24,5 +24,6 @@ export const mail = require('./assets/mail.png');
 export const padlock = require('./assets/padlock.png');
 export const view = require('./assets/view.png');
 export const hide = require('./assets/hide.png');
+export const contact = require('./assets/contact.png');
 
 

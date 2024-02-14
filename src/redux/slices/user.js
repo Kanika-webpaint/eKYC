@@ -10,7 +10,8 @@ const authSlice = createSlice({
         orgDetails: [],
         userCreateAdmin: [],
         getUsersList: [],
-        getUser: []
+        getUser: [],
+        contact: []
     },
 
     reducers: {
@@ -37,6 +38,9 @@ const authSlice = createSlice({
         },
         getUserSlice: (state, action) => {
             state.getUser = action?.payload?.data
+        },
+        contactUsSlice: (state, action) => {
+            state.contact = action?.payload?.data
         }
         //add more slices here
     }
@@ -55,5 +59,6 @@ export const {
     createUserSlice,
     getUserListSlice,
     getUserSlice,
+    contactUsSlice
     // add more slices here
 } = authSlice.actions

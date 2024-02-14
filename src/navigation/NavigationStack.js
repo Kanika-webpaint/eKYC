@@ -42,6 +42,7 @@ const NavigationStack = () => {
                 <OrganizationStack.Screen name="Checkout" component={routeNames.Checkout} />
                 <OrganizationStack.Screen name="PlanDetails" component={routeNames.PlanDetails} />
                 <OrganizationStack.Screen name="SuccessScreen" component={routeNames.SuccessScreen} />
+                <OrganizationStack.Screen name="ContactUs" component={routeNames.ContactUs} />
                 <OrganizationStack.Screen name="OrganizationHomeStack" component={OrganizationHomeStack} />
                 {/* Add more screens related to organization role */}
             </OrganizationStack.Navigator>

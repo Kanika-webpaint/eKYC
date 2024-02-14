@@ -5,7 +5,7 @@
  * @format
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     SafeAreaView,
     StyleSheet,
@@ -15,6 +15,7 @@ import {
     ScrollView,
     TouchableOpacity,
     ToastAndroid,
+    ActivityIndicator,
 } from 'react-native';
 import colors from '../../common/colors';
 import { back, checked, plan_select, unchecked } from '../../common/images';
@@ -22,19 +23,26 @@ import { useNavigation } from '@react-navigation/native';
 import { items } from '../../common/PlansList';
 import { fonts } from '../../common/fonts';
 import Status from '../../components/Status';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useDispatch } from 'react-redux';
 
 function ChoosePlan() {
     const [selectedItem, setSelectedItem] = useState(items[0]);
     const navigation = useNavigation();
     const [selectedEnterprise, setSelectEnterprise] = useState(false)
-
-    const showAlert = (message) => {
-        if (Platform.OS === 'android') {
-            ToastAndroid.show(message, ToastAndroid.SHORT);
-        } else {
-            AlertIOS.alert(message);
-        }
-    };
+    const [token, setAuthToken] = useState('')
+    const [isLoading, setIsLoading] = useState(false);
+    const dispatch = useDispatch()
+    useEffect(() => {
+        AsyncStorage.getItem("authToken").then((value) => {
+            if (value) {
+                setAuthToken(value)
+            }
+        })
+            .then(res => {
+                //do something else
+            });
+    }, [token]);
 
     const handleSelection = (item) => {
         setSelectEnterprise(false)
@@ -49,8 +57,7 @@ function ChoosePlan() {
     const selectEnterprise = () => {
         setSelectEnterprise(true)
         setSelectedItem('')
-        showAlert('We have recieved your request.Kindly check your mail.')
-        // call API here
+        navigation.navigate('ContactUs')
     }
 
     return (

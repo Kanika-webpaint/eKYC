@@ -423,7 +423,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: colors.white,
     textDecorationLine: 'underline',
-    fontFamily: fonts.medium
+    fontFamily: fonts.regular
   }
 });
 

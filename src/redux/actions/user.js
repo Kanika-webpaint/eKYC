@@ -2,7 +2,7 @@
 import axios from 'axios'
 import { API_URL } from "@env"
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { createUserSlice, getOrgDetailsslice, getUserListSlice, getUserSlice, phoneNumberslice, registerAdminslice, verifyCodeslice } from '../slices/user';
+import { contactUsSlice, createUserSlice, getOrgDetailsslice, getUserListSlice, getUserSlice, phoneNumberslice, registerAdminslice, verifyCodeslice } from '../slices/user';
 import { Platform, ToastAndroid } from 'react-native';
 
 
@@ -51,7 +51,7 @@ export const RegisterAdminAction =
             if (res?.status === 201) {
                 setIsLoading(false)
                 showAlert(res?.data)
-                navigation.navigate('SuccessScreen') // send amount from here to show on success screen
+                navigation.navigate('SuccessScreen', { invoiceDetail: data }) // send amount from here to show on success screen
             } else {
                 showAlert(res?.data)
             }
@@ -230,3 +230,33 @@ export const VerifyCodeAction =
             }
         }
 
+export const ContactUsAction =
+    (
+        data,
+        token,
+        navigation,
+        setIsLoading
+    ) =>
+        async (dispatch) => {
+            try {
+                const config = {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `${token}`,
+                    },
+                }
+                const api_url = `${API_URL}/contactorganization`
+                const res = await axios.post(api_url, data, config)
+                if (res.status === 200) {
+                    showAlert(res?.data?.message)
+                    setTimeout(() => navigation.navigate('Plan'), 1000)
+                    setIsLoading(false)
+                } else {
+                    showAlert(res?.data?.message)
+                }
+                await dispatch(contactUsSlice(res))
+            } catch (e) {
+                setIsLoading(false)
+                showAlert('You already made request')
+            }
+        }
