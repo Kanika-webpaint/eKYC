@@ -58,7 +58,7 @@ export const RegisterAdminAction =
             await dispatch(registerAdminslice(res))
         } catch (e) {
             setIsLoading(false)
-            showAlert('Organization with this email already exists')
+            showAlert('Try again later!')
         }
     }
 

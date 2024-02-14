@@ -7,6 +7,7 @@ import { getUsersListAction } from '../../redux/actions/user';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useDispatch, useSelector } from 'react-redux';
 import Status from '../../components/Status';
+import { fonts } from '../../common/fonts';
 
 const UserList = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -97,11 +98,17 @@ const UserList = () => {
                 )}
 
               </View>
-              <FlatList
-                data={searchQuery ? filteredUsers : usersListing} // Render filtered users if search query exists, otherwise render all users
-                renderItem={renderItem}
-                keyExtractor={item => item?.id.toString()}
-              />
+              {usersListing && usersListing?.length > 0 ?
+                <FlatList
+                  data={searchQuery ? filteredUsers : usersListing} // Render filtered users if search query exists, otherwise render all users
+                  renderItem={renderItem}
+                  keyExtractor={item => item?.id.toString()}
+                />
+                :
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                  <Text style={{ fontFamily: fonts.regular }}>No users found!</Text>
+                </View>
+              }
             </View>
           }
         </View>

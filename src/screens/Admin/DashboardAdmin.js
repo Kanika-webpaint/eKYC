@@ -17,7 +17,7 @@ import {
     FlatList,
 } from 'react-native';
 import colors from '../../common/colors';
-import { plan_select, plus, team } from '../../common/images';
+import { logout, plan_select, plus, team } from '../../common/images';
 import { useNavigation } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux'
 import { getOrgDetailsAction } from '../../redux/actions/user';
@@ -58,7 +58,6 @@ function DashboardAdmin() {
 
 
     const onPressItem = (selectedItem) => {
-        console.log(selectedItem, "sellllllllllll")
         if (selectedItem?.item?.id === 0) {
             navigation.navigate('UsersList')
         } else {
@@ -67,6 +66,29 @@ function DashboardAdmin() {
 
     }
 
+
+    const logoutAccount = () => {
+        clearAll()
+    }
+
+    const showAlert = (message) => {
+        if (Platform.OS === 'android') {
+            ToastAndroid.show(message, ToastAndroid.SHORT);
+        } else {
+            AlertIOS.alert(message);
+        }
+    };
+
+    clearAll = async () => {
+        try {
+            await AsyncStorage.clear()
+            navigation.navigate('MobileVerification')
+            showAlert('Logout successfully!')
+
+        } catch (e) {
+            // clear error
+        }
+    }
 
     const renderItem = (item) => (
         <TouchableOpacity style={styles.itemsView} onPress={() => onPressItem(item)}>
@@ -85,9 +107,15 @@ function DashboardAdmin() {
                         <Text style={styles.org}>{OrganizationHomeList?.organization?.name.replace(/[""]/g, '') || 'Organization'}</Text>
                         <Text style={styles.detailText}>Details</Text>
                     </View>
-                    <TouchableOpacity onPress={() => navigation.navigate('CreateUser')} style={styles.addView}>
-                        <Image source={plus} style={styles.plusIcon} />
-                    </TouchableOpacity>
+                    <View style={{ flexDirection: 'row' }}>
+                        <TouchableOpacity onPress={() => navigation.navigate('CreateUser')} style={styles.addView}>
+                            <Image source={plus} style={styles.plusIcon} />
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => logoutAccount()} style={styles.addView}>
+                            <Image source={logout} style={styles.plusIcon} />
+                        </TouchableOpacity>
+                    </View>
+
                 </View>
                 {isLoading ? <Loader /> :
                     <FlatList

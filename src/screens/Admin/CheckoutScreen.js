@@ -131,19 +131,23 @@ function CheckoutScreen({ route }) {
             //     expiryDate: userData?.expDate,
             //     transactionId: "2564",
             //     planPrice: route?.params?.amount || ''
+            
             // }
 
             // navigation.navigate('SuccessScreen')
 
             const requestData =
             {
-                name: "webpaint",
+                name:userData?.name,
                 email: userData?.email,
-                cardNumber: "123456789",
+                cardNumber: '4234',
                 expiryDate: "03-04-2024",
                 transactionId: "2564",
-                planPrice: "256"
-                // add other fields i.e address, city, state, country
+                planPrice: "256",
+                address: "1644",
+                country: "Nigeria",
+                state: "Abia",
+                city: "Burch"
             }
             setIsLoading(true)
 
@@ -215,7 +219,7 @@ function CheckoutScreen({ route }) {
                             <TouchableOpacity onPress={() => navigation.goBack()}>
                                 <Image source={back} style={styles.backArrow} />
                             </TouchableOpacity>
-                            <Text style={styles.title}>Payment</Text>
+                            <Text style={styles.title}>Checkout</Text>
                         </View>
                     </View>
                     <View style={{ marginTop: 30 }}>
@@ -508,7 +512,7 @@ const styles = StyleSheet.create({
         backgroundColor: colors.white,
         fontFamily: fonts.regular,
         marginBottom: 10,
-        width: 180
+        width: 150
     },
     inputCount: {
         color: colors.black,

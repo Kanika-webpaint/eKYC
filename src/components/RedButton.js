@@ -7,10 +7,12 @@
 
 import React from 'react';
 import {
+    Image,
     StyleSheet,
     Text,
     TouchableOpacity
 } from 'react-native';
+import { download } from '../common/images';
 
 
 function RedButton({ buttonContainerStyle, ButtonContent, contentStyle ,onPress}) {

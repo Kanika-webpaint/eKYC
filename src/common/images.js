@@ -25,5 +25,7 @@ export const padlock = require('./assets/padlock.png');
 export const view = require('./assets/view.png');
 export const hide = require('./assets/hide.png');
 export const contact = require('./assets/contact.png');
+export const download = require('./assets/download.png');
+export const logout = require('./assets/logout.png');
 
 

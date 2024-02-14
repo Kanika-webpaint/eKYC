@@ -46,7 +46,7 @@ function LoginAdmin({ route }) {
 
     useEffect(() => {
         if (route?.params?.isOrgReg === true) {
-            setFormData({ ...userData, [field]: '' })
+            setFormData('')
         }
     }, [route?.params?.isOrgReg]);
 
