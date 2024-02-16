@@ -14,10 +14,10 @@ import {
 import { finger_print, validifyX } from '../common/images';
 
 
-function Logo({ fingerPrintStyle, logoStyle }) {
+function Logo({ fingerPrintStyle, logoStyle ,styleContainer}) {
     return (
         <>
-            <View style={styles.imageContainer}>
+            <View style={[styles.imageContainer, styleContainer]}>
                 <Image source={finger_print} style={[styles.backgroundImage, fingerPrintStyle]} />
                 <Image source={validifyX} style={[styles.logo, logoStyle]} />
             </View>

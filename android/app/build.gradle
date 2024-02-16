@@ -117,7 +117,11 @@ implementation 'com.google.firebase:firebase-analytics'
   implementation("com.google.firebase:firebase-appcheck-playintegrity:17.1.1")
   implementation "androidx.browser:browser:1.2.0"
 //   implementation("com.google.firebase:firebase-appcheck-safetynet:16.1.2")
-  
+  implementation("com.withpersona.sdk2:nfc-impl:2.10.9")
+
+    // include this line if integrating with the webrtc module. note that the webrtc-impl
+    // version MUST match the version of the main sdk module.
+    implementation("com.withpersona.sdk2:webrtc-impl:2.10.9")
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")
     } else {

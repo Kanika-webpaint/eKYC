@@ -186,8 +186,8 @@ export const PhoneNumberAction =
     ) =>
         async (dispatch) => {
             try {
-                // const api_url = `${API_URL}/sendOTP`
-                const api_url = 'http://192.168.1.14:5000/api/sendOTP'
+                const api_url = `${API_URL}/sendOTP`
+                // const api_url = 'http://192.168.1.14:5000/api/sendOTP'
                 const res = await axios.post(api_url, data)
                 console.log(res, "response send OTP")
                 if (res?.status === 200) {

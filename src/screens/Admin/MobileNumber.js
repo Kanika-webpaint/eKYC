@@ -256,9 +256,11 @@ function MobileNumber() {
   };
 
 
+
+
   return (
     <SafeAreaView style={styles.safeArea}>
-    <Status lightContent/>
+      <Status lightContent />
       <View style={{ flex: 1, backgroundColor: colors.app_blue }}>
 
         {/* <ImageBackground
@@ -324,6 +326,7 @@ function MobileNumber() {
           }} />
         </ScrollView>
       </View>
+
       {/* </ImageBackground> */}
       {/* remove later */}
       {/* <TouchableOpacity style={{ margin: 30, height: 50, width: 50, borderRadius: 25, backgroundColor: colors.app_red, justifyContent: 'center', alignItems: 'center' }} onPress={() => setOpenLogs(!openLogs)}>
@@ -353,7 +356,7 @@ const styles = StyleSheet.create({
     flex: 1, // Ensure the TextInput fills the available space
     borderWidth: 0,
     fontSize: 16,
-    color: colors.grey,
+    color: colors.white,
     fontFamily: fonts.regular
   },
   buttonContainer: {

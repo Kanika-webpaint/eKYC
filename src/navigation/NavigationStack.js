@@ -71,14 +71,14 @@ const NavigationStack = () => {
 
     const UserHomeStack = () => {
         return (
-            <UserStack.Navigator initialRouteName="Home" headerMode="false">
+            <UserStack.Navigator initialRouteName="IdScreen" headerMode="false">
+                <UserStack.Screen name="MobileVerification" component={routeNames.MobileVerification} />
+                <UserStack.Screen name="IdScreen" component={routeNames.IdScreen} />
                 <UserStack.Screen name="HomeUser" component={routeNames.HomeUser} />
                 {/* Add more screens related to user role */}
             </UserStack.Navigator>
         );
     };
-
-
 
     const MainStackScreen = () => {
         return (
