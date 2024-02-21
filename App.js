@@ -1,11 +1,4 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   SafeAreaView,
   StyleSheet,
@@ -17,8 +10,7 @@ import NavigationStack from './src/navigation/NavigationStack';
 import colors from './src/common/colors';
 import { validifyX_logo, x_logo } from './src/common/images';
 
-
-function App(): React.JSX.Element {
+function App() {
   const [showSplash, setShowSplash] = useState(true);
 
   useEffect(() => {
@@ -26,23 +18,26 @@ function App(): React.JSX.Element {
       setShowSplash(false);
     }, 3000); // 3000 milliseconds (3 seconds) timeout
 
-    // Cleanup function to clear the timeout in case the component unmounts
     return () => clearTimeout(splashTimeout);
   }, []); // Empty dependency array to run the effect only once on mount
 
-  return (
-    <SafeAreaView style={styles.safeArea}>
-      <StatusBar
-        backgroundColor={colors.app_blue}
-      />
-      {showSplash ? (
+  const renderNavigation = useCallback(() => {
+    if (showSplash) {
+      return (
         <View style={styles.splashContainer}>
           <Image source={x_logo} style={styles.backgroundImage} />
           <Image source={validifyX_logo} style={styles.logo} />
         </View>
-      ) : (
-        <NavigationStack />
-      )}
+      );
+    } else {
+      return <NavigationStack />;
+    }
+  }, [showSplash]);
+
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <StatusBar backgroundColor={colors.app_blue} />
+      {renderNavigation()}
     </SafeAreaView>
   );
 }

@@ -2,8 +2,9 @@
 import axios from 'axios'
 import { API_URL } from "@env"
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { contactUsSlice, createUserSlice, getOrgDetailsslice, getUserListSlice, getUserSlice, phoneNumberslice, registerAdminslice, verifyCodeslice } from '../slices/user';
+import { contactUsSlice, createUserSlice, getOrgDetailsslice, getUserListSlice, getUserSlice, loginAdminslice, phoneNumberslice, registerAdminslice, verifyCodeslice } from '../slices/user';
 import { Platform, ToastAndroid } from 'react-native';
+import DashboardAdmin from '../../screens/Admin/DashboardAdmin';
 
 
 const showAlert = (message) => {
@@ -14,30 +15,85 @@ const showAlert = (message) => {
     }
 };
 
-export const LoginAdminAction =
-    (data,
-        navigation,
-        setIsLoading
-    ) => async (dispatch) => {
-        try {
-            const api_url = `${API_URL}/loginorganization`
-            // const api_url = 'http://192.168.1.26:5000/api/loginorganization'
-            const res = await axios.post(api_url, data)
-            console.log(res, api_url, "response login ADMIN")
-            if (res?.status === 200) {
-                setIsLoading(false)
-                showAlert("Logged in successfully", res)
-                AsyncStorage.setItem('authToken', res?.data?.token)
-                navigation.navigate('OrganizationHomeStack')
-            } else {
-                showAlert(res?.data?.message)
+export const LoginAdminAction = (data, setIsLoading, setLoggedIn) => async (dispatch) => {
+    try {
+        const api_url = `${API_URL}/loginorganization`;
+        const res = await axios.post(api_url, data);
+        // console.log(res)
+        if (res?.status == 200) {
+            console.log("success", res)
+            setIsLoading(false);
+
+            await AsyncStorage.setItem('token', res?.data?.token);
+            await AsyncStorage.setItem('role', "organization");
+
+            const storedToken = await AsyncStorage.getItem('token');
+            const storedRole = await AsyncStorage.getItem('role');
+
+            if (storedRole && storedToken) {
+                // Redirect to the dashboard screen after successful login
+                // setLoggedIn(true);
+                await dispatch(loginAdminslice({ data: res.data, setLoggedIn }));
+
             }
-            await dispatch(loginAdminslice(res))
-        } catch (e) {
-            setIsLoading(false)
-            showAlert('Organization not found')
+        }
+    } catch (e) {
+        if (e?.response?.status === 404) {
+            setIsLoading(false);
+            showAlert('Organization Not found.');
+        } else if (e?.response?.status === 401) {
+            setIsLoading(false);
+            showAlert('Invalid email and password.');
+        } else {
+            showAlert('Try again later!')
+            setIsLoading(false);
         }
     }
+};
+
+
+export const VerifyCodeAction =
+    (
+        data,
+        setIsLoading,
+        setLoggedIn
+    ) =>
+        async (dispatch) => {
+            try {
+                console.log(API_URL, "validateOTP")
+                const api_url = `${API_URL}/validateOTP`
+                const res = await axios.post(api_url, data)
+                console.log(res, "response verify OTP")
+                if (res?.status == 200) {
+                    console.log("success", res)
+
+                    setIsLoading(false);
+
+                    // await AsyncStorage.setItem('tokenUser', res?.data?.token);
+                    await AsyncStorage.setItem('roleUser', "user");
+
+                    // const storedToken = await AsyncStorage.getItem('tokenUser');
+                    const storedRole = await AsyncStorage.getItem('roleUser');
+                    // console.log("storedToken", storedToken)
+                    console.log("storedRole", storedRole)
+
+                    if (storedRole) {
+                        console.log("alllll settttt")
+                        navigation.navigate('IdScreen')
+                        // Redirect to the dashboard screen after successful login
+                        // setLoggedIn(true);
+                        await dispatch(verifyCodeslice({ data: res.data, setLoggedIn }));
+
+                        // navigation.replace("DashboardAdmin");
+                    } else {
+                        showAlert(res?.data?.message)
+                    }
+                }
+            } catch (e) {
+                setIsLoading(false)
+                showAlert(e?.response?.data?.message)
+            }
+        }
 
 
 export const RegisterAdminAction =
@@ -46,6 +102,7 @@ export const RegisterAdminAction =
         setIsLoading
     ) => async (dispatch) => {
         try {
+            console.log(API_URL, "createorganization")
             const api_url = `${API_URL}/createorganization`
             const res = await axios.post(api_url, data)
             if (res?.status === 201) {
@@ -58,7 +115,7 @@ export const RegisterAdminAction =
             await dispatch(registerAdminslice(res))
         } catch (e) {
             setIsLoading(false)
-            showAlert('Try again later!')
+            showAlert(e?.response?.data?.message)
         }
     }
 
@@ -70,6 +127,7 @@ export const getOrgDetailsAction = (token, setIsLoading) => async (dispatch) => 
                 Authorization: `${token}`,
             },
         }
+        console.log(API_URL, "getorganizationdetails")
         const api_url = `${API_URL}/getorganizationdetails`
         const res = await axios.get(api_url, config)
         console.log(res, "response org detailss")
@@ -84,7 +142,7 @@ export const getOrgDetailsAction = (token, setIsLoading) => async (dispatch) => 
         }
     } catch (e) {
         setIsLoading(false)
-        showAlert('Network error')
+        showAlert(e?.response?.data?.message)
     }
 }
 
@@ -97,6 +155,7 @@ export const getUsersListAction = (token, setIsLoading) => async (dispatch) => {
                 Authorization: `${token}`,
             },
         }
+        console.log(API_URL, "users")
         const api_url = `${API_URL}/users`
         // const api_url = 'http://192.168.1.26:5000/api/users'
         const res = await axios.get(api_url, config)
@@ -110,7 +169,7 @@ export const getUsersListAction = (token, setIsLoading) => async (dispatch) => {
         }
     } catch (e) {
         setIsLoading(false)
-        showAlert('Network error')
+        showAlert(e?.response?.data?.message)
     }
 }
 
@@ -124,6 +183,7 @@ export const CreateUserAction =
     ) =>
         async (dispatch) => {
             try {
+                console.log(API_URL, "createuser")
                 const config = {
                     headers: {
                         'Content-Type': 'application/json',
@@ -143,7 +203,7 @@ export const CreateUserAction =
                 await dispatch(createUserSlice(res))
             } catch (e) {
                 setIsLoading(false)
-                showAlert('User already exists')
+                showAlert(e?.response?.data?.message)
             }
         }
 
@@ -155,6 +215,7 @@ export const getUserByIdAction =
     ) =>
         async (dispatch) => {
             try {
+                console.log(API_URL, "users by id")
                 const config = {
                     headers: {
                         'Content-Type': 'application/json',
@@ -173,7 +234,7 @@ export const getUserByIdAction =
                 await dispatch(getUserSlice(res))
             } catch (e) {
                 setIsLoading(false)
-                showAlert('Unable to fetch details')
+                showAlert(e?.response?.data?.message)
             }
         }
 
@@ -186,11 +247,14 @@ export const PhoneNumberAction =
     ) =>
         async (dispatch) => {
             try {
+                console.log(data, "dataa in action")
+                console.log(API_URL, "sendOTP")
                 const api_url = `${API_URL}/sendOTP`
                 // const api_url = 'http://192.168.1.14:5000/api/sendOTP'
                 const res = await axios.post(api_url, data)
                 console.log(res, "response send OTP")
                 if (res?.status === 200) {
+                    console.log(res.status, "response status")
                     setIsLoading(false)
                     showAlert(res?.data?.message)
                     setShowOTP(true)
@@ -200,35 +264,36 @@ export const PhoneNumberAction =
                 await dispatch(phoneNumberslice(res))
             } catch (e) {
                 setIsLoading(false)
-                showAlert('Mobile number not registered')
+                showAlert(e?.response?.data?.message)
             }
         }
 
-export const VerifyCodeAction =
-    (
-        data,
-        navigation,
-        setIsLoading
-    ) =>
-        async (dispatch) => {
-            try {
-                const api_url = `${API_URL}/validateOTP`
-                const res = await axios.post(api_url, data)
-                console.log(res, "response verify OTP")
-                if (res.status === 200) {
-                    setIsLoading(false)
-                    showAlert(res?.data?.message)
-                    navigation.navigate('HomeUser')
-                    // navigation.navigate('UserStackScreen')
-                } else {
-                    showAlert(res?.data?.message)
-                }
-                await dispatch(verifyCodeslice(res))
-            } catch (e) {
-                setIsLoading(false)
-                showAlert('Network error')
-            }
-        }
+// export const VerifyCodeAction =
+//     (
+//         data,
+//         navigation,
+//         setIsLoading
+//     ) =>
+//         async (dispatch) => {
+//             try {
+//                 console.log(API_URL, "validateOTP")
+//                 const api_url = `${API_URL}/validateOTP`
+//                 const res = await axios.post(api_url, data)
+//                 console.log(res, "response verify OTP")
+//                 if (res.status === 200) {
+//                     setIsLoading(false)
+//                     showAlert(res?.data?.message)
+//                     navigation.navigate('AuthStack')
+//                     // navigation.navigate('UserStackScreen')
+//                 } else {
+//                     showAlert(res?.data?.message)
+//                 }
+//                 await dispatch(verifyCodeslice(res))
+//             } catch (e) {
+//                 setIsLoading(false)
+//                 showAlert(e?.response?.data?.message)
+//             }
+//         }
 
 export const ContactUsAction =
     (
@@ -239,6 +304,7 @@ export const ContactUsAction =
     ) =>
         async (dispatch) => {
             try {
+                console.log(API_URL, "contactorganization")
                 const config = {
                     headers: {
                         'Content-Type': 'application/json',
@@ -257,6 +323,6 @@ export const ContactUsAction =
                 await dispatch(contactUsSlice(res))
             } catch (e) {
                 setIsLoading(false)
-                showAlert('You already made request')
+                showAlert(e?.response?.data?.message)
             }
         }

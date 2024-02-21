@@ -43,8 +43,9 @@ function PlanDetails({ route }) {
         setIsLoading(true)
         setTimeout(() => {
             navigation.navigate('Checkout', { amount: route?.params?.amount || '' })
+            setIsLoading(false)
         }, 1000)
-
+       
     }
 
     return (
@@ -68,7 +69,7 @@ function PlanDetails({ route }) {
                 <View style={styles.mainView}>
                     <Image source={plan_select} style={styles.imagePlanSelect} />
                     <Text style={styles.amount}>{route?.params?.amount + " / " + 'verification' || ''}</Text>
-                    <FlatList data={route?.params?.plan === 'Basic' ?
+                    <FlatList scrollEnabled={false} data={route?.params?.plan === 'Basic' ?
                         BasicPlanData : route?.params?.plan === 'Premium' ?
                             PreminumPlanData : EnterprisePlanData}
                         renderItem={(item) => renderPlanItem(item)}

@@ -11,7 +11,9 @@ const authSlice = createSlice({
         userCreateAdmin: [],
         getUsersList: [],
         getUser: [],
-        contact: []
+        contact: [],
+        isLogged:false,
+        isLoggedUser:false
     },
 
     reducers: {
@@ -20,9 +22,11 @@ const authSlice = createSlice({
         },
         verifyCodeslice: (state, action) => {
             state.verifyCode = action?.payload?.data
+            state.isLoggedUser = true;
         },
         loginAdminslice: (state, action) => {
-            state.adminLogin = action?.payload?.data
+            state.adminLogin = action?.payload?.data;
+            state.isLogged = true;
         },
         registerAdminslice: (state, action) => {
             state.adminRegister = action?.payload?.data

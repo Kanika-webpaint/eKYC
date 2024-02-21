@@ -25,6 +25,8 @@ import Loader from '../../components/ActivityIndicator';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { fonts } from '../../common/fonts';
 import Status from '../../components/Status';
+import { CommonActions } from "@react-navigation/native";
+
 
 function DashboardAdmin() {
     const [isLoading, setIsLoading] = useState(false);
@@ -67,8 +69,15 @@ function DashboardAdmin() {
     }
 
 
-    const logoutAccount = () => {
-        clearAll()
+    const logoutAccount = async() => {
+        try {
+            await AsyncStorage.clear()
+            navigation.navigate("MobileVerification")
+            showAlert('Logout successfully!')
+
+        } catch (e) {
+            // clear error
+        }
     }
 
     const showAlert = (message) => {
@@ -79,16 +88,6 @@ function DashboardAdmin() {
         }
     };
 
-    clearAll = async () => {
-        try {
-            await AsyncStorage.clear()
-            navigation.navigate('MobileVerification')
-            showAlert('Logout successfully!')
-
-        } catch (e) {
-            // clear error
-        }
-    }
 
     const renderItem = (item) => (
         <TouchableOpacity style={styles.itemsView} onPress={() => onPressItem(item)}>
@@ -111,9 +110,9 @@ function DashboardAdmin() {
                         <TouchableOpacity onPress={() => navigation.navigate('CreateUser')} style={styles.addView}>
                             <Image source={plus} style={styles.plusIcon} />
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={() => logoutAccount()} style={styles.addView}>
+                        {/* <TouchableOpacity onPress={() => logoutAccount()} style={styles.addView}>
                             <Image source={logout} style={styles.plusIcon} />
-                        </TouchableOpacity>
+                        </TouchableOpacity> */}
                     </View>
 
                 </View>

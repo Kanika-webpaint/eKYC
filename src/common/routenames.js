@@ -35,5 +35,5 @@ export const routeNames = {
     SuccessScreen:SuccessScreen,
     UserProfile:UserProfile,
     ContactUs:ContactUs,
-    IdScreen:IdScreen
+    IdScreen:IdScreen 
 }

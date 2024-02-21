@@ -1,62 +1,40 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
-import React, { useEffect, useState } from 'react';
-import {
-    SafeAreaView,
-    StyleSheet,
-    View,
-    TextInput,
-    Image,
-    Text,
-    ImageBackground,
-    ScrollView,
-    TouchableOpacity,
-} from 'react-native';
-import colors from '../../common/colors';
-import RedButton from '../../components/RedButton';
-import { hide, mail, padlock, view } from '../../common/images';
+import React, { useState, useEffect } from 'react';
+import { SafeAreaView, StyleSheet, View, TextInput, Image, Text, ScrollView, TouchableOpacity, Keyboard } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { useDispatch, useSelector } from 'react-redux'
-import { LoginAction, LoginAdminAction } from '../../redux/actions/user';
+import { useDispatch } from 'react-redux';
+import { LoginAdminAction } from '../../redux/actions/user'; // Import the login action
 import Loader from '../../components/ActivityIndicator';
-import Logo from '../../components/Logo';
 import ErrorMessage from '../../components/ErrorMsg';
+import { mail, padlock, view, hide } from '../../common/images';
+import colors from '../../common/colors';
+import Logo from '../../components/Logo';
 import SignInUp from '../../components/SignInUp';
 import { fonts } from '../../common/fonts';
 import Status from '../../components/Status';
+import RedButton from '../../components/RedButton';
 
-function LoginAdmin({ route }) {
+const LoginAdmin = ({ route }) => {
     const navigation = useNavigation();
-    const [userData, setFormData] = useState({
-        email: '',
-        password: '',
-    });
-    const [errorMessages, setErrorMessages] = useState({
-        email: '',
-        password: '',
-    });
+    const dispatch = useDispatch();
+
+    const [userData, setUserData] = useState({ email: '', password: '' });
+    const [errorMessages, setErrorMessages] = useState({ email: '', password: '' });
     const [isLoading, setIsLoading] = useState(false);
-    const dispatch = useDispatch()
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
     useEffect(() => {
         if (route?.params?.isOrgReg === true) {
-            setFormData('')
+            setUserData({ email: '', password: '' });
         }
     }, [route?.params?.isOrgReg]);
 
     const handleInputChange = (field, value) => {
-        setFormData({ ...userData, [field]: value });
+        setUserData({ ...userData, [field]: value });
         setErrorMessages({ ...errorMessages, [field]: '' });
     };
 
     const handleLogin = () => {
-        // Basic validation
+        Keyboard.dismiss();
         const newErrorMessages = {};
 
         if (!userData.email) {
@@ -71,14 +49,13 @@ function LoginAdmin({ route }) {
             setErrorMessages(newErrorMessages);
             return;
         } else {
-            setIsLoading(true)
-            const requestData = {
-                email: userData?.email,
-                password: userData?.password
-            };
-            dispatch(LoginAdminAction(requestData, navigation, setIsLoading))
+            console.log(userData, "user dataaa")
+            setIsLoading(true);
+            dispatch(LoginAdminAction(userData, setIsLoading));
+
         }
     };
+
 
     const togglePasswordVisibility = () => {
         setIsPasswordVisible(!isPasswordVisible);
@@ -89,10 +66,6 @@ function LoginAdmin({ route }) {
             <Status lightContent />
             <View style={{ flex: 1, backgroundColor: colors.app_blue }}>
 
-                {/* <ImageBackground
-                source={background_image}
-                style={{ flex: 1 }}
-            > */}
                 <ScrollView keyboardShouldPersistTaps='handled'>
                     <Logo />
                     <View >
@@ -131,10 +104,10 @@ function LoginAdmin({ route }) {
                     </View>
                 </ScrollView>
             </View>
-            {/* </ImageBackground> */}
+      
         </SafeAreaView>
     );
-}
+};
 
 const styles = StyleSheet.create({
     safeArea: {
@@ -188,5 +161,3 @@ const styles = StyleSheet.create({
 });
 
 export default LoginAdmin;
-
-

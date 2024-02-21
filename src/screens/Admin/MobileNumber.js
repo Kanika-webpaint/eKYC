@@ -141,40 +141,40 @@ function MobileNumber() {
   // }
 
   const handleSendCode = () => {
-    setShowOTP(true)
-    // if (mobileNumber === '') {
-    //   setIsLoading(true)
-    //   setShowError(true)
-    //   setIsLoading(false)
-    // } else {
-    //   setIsLoading(true)
-    //   let mobileNumberCode = countryCode ? countryCode : '+91'
-    //   console.log(mobileNumberCode + mobileNumber, "mobileee")
-    //   setNumberWithCode(mobileNumberCode + mobileNumber)
-    //   const requestData = {
-    //     phoneNumber: mobileNumberCode + mobileNumber
-    //   };
-    //   console.log(requestData,">>>>>>>>>>>>")
-    //   dispatch(PhoneNumberAction(requestData, navigation, setShowOTP, setIsLoading))
-    // };
+    // setShowOTP(true)
+    if (mobileNumber === '') {
+      setIsLoading(true)
+      setShowError(true)
+      setIsLoading(false)
+    } else {
+      setIsLoading(true)
+      let mobileNumberCode = countryCode ? countryCode : '+91'
+      console.log(mobileNumberCode + mobileNumber, "mobileee")
+      setNumberWithCode(mobileNumberCode + mobileNumber)
+      const requestData = {
+        phoneNumber: mobileNumberCode + mobileNumber
+      };
+      dispatch(PhoneNumberAction(requestData, navigation, setShowOTP, setIsLoading))
+    };
   }
 
 
   const handleVerifyCode = useCallback(() => {
-    navigation.navigate('UserStackScreen')
+    // navigation.navigate('IdScreen')
     // Request for OTP verification
-    // setIsLoading(true)
-    // console.log(value, "length of value")
-    // if (value.length == 6) {
-    //   const requestData = {
-    //     phoneNumber: numberWithCode,
-    //     receivedotp: value
-    //   };
-    //   dispatch(VerifyCodeAction(requestData, navigation, setIsLoading))
-    // } else {
-    //   setIsLoading(false)
-    //   showAlert('Please enter a 6 digit OTP code.')
-    // }
+    setIsLoading(true)
+    console.log(value, "length of value")
+    if (value.length == 6) {
+      const requestData = {
+        phoneNumber: numberWithCode,
+        receivedotp: value
+      };
+      // dispatch(VerifyCodeAction(requestData))
+      dispatch(VerifyCodeAction(requestData, navigation, setIsLoading))
+    } else {
+      setIsLoading(false)
+      showAlert('Please enter a 6 digit OTP code.')
+    }
   }, [numberWithCode, value])
 
 
@@ -328,12 +328,12 @@ function MobileNumber() {
       </View>
 
       {/* </ImageBackground> */}
-      {/* remove later */}
-      {/* <TouchableOpacity style={{ margin: 30, height: 50, width: 50, borderRadius: 25, backgroundColor: colors.app_red, justifyContent: 'center', alignItems: 'center' }} onPress={() => setOpenLogs(!openLogs)}>
+
+      <TouchableOpacity style={{ margin: 30, height: 50, width: 50, borderRadius: 25, backgroundColor: colors.app_red, justifyContent: 'center', alignItems: 'center' }} onPress={() => setOpenLogs(!openLogs)}>
         <Text style={{ alignSelf: 'center', color: colors.white }}>Logs</Text>
       </TouchableOpacity>
-      {openLogs && <NetworkLogger />} */}
-      {/* remove later */}
+      {openLogs && <NetworkLogger />}
+
     </SafeAreaView>
   );
 }

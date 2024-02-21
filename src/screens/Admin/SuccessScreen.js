@@ -40,44 +40,26 @@ const SuccessScreen = ({ route }) => {
 
     const downloadInvoice = async () => {
         setIsLoading(true);
+        const invoiceContent = {
+            planPrice: route?.params?.invoiceDetail?.planPrice,
+            cardNumber: route?.params?.invoiceDetail?.cardNumber || '',
+            email: route?.params?.invoiceDetail?.email,
+            name: route?.params?.invoiceDetail?.name,
+            address: route?.params?.invoiceDetail?.address,
+            city: route?.params?.invoiceDetail?.city,
+            state: route?.params?.invoiceDetail?.state
+        };
 
-        try {
-            // Request permission to read and write files
-            const granted = await PermissionsAndroid.requestMultiple([
-                PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-                PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
-            ]);
-
-            if (
-                granted['android.permission.READ_EXTERNAL_STORAGE'] === PermissionsAndroid.RESULTS.GRANTED &&
-                granted['android.permission.WRITE_EXTERNAL_STORAGE'] === PermissionsAndroid.RESULTS.GRANTED
-            ) {
-                // Permissions granted, proceed with downloading invoice
-                const invoiceContent = {
-                    planPrice: route?.params?.invoiceDetail?.planPrice,
-                    cardNumber: route?.params?.invoiceDetail?.cardNumber || '',
-                    email: route?.params?.invoiceDetail?.email,
-                    name: route?.params?.invoiceDetail?.name,
-                    address: route?.params?.invoiceDetail?.address,
-                    city: route?.params?.invoiceDetail?.city,
-                    state: route?.params?.invoiceDetail?.state
-                };
-
-                const csvContent = Object.keys(invoiceContent).map(key => `${key},${invoiceContent[key]}`).join('\n');
-                const path = RNFS.DownloadDirectoryPath + '/invoice.txt';
-                await RNFS.writeFile(path, csvContent, 'utf8');
-                showAlert('Invoice Downloaded successfully!!');
-            } else {
-                // Permissions not granted, handle accordingly (e.g., show an error message)
-                showAlert('Permissions denied. Unable to download invoice.');
-            }
-        } catch (error) {
-            console.error('Error generating invoice: ', error);
-        } finally {
+        const csvContent = Object.keys(invoiceContent).map(key => `${key},${invoiceContent[key]}`).join('\n');
+        const path = RNFS.DownloadDirectoryPath + '/invoiceee.txt';
+        await RNFS.writeFile(path, csvContent, 'utf8');
+        showAlert('Invoice Downloaded successfully!!');
+        setTimeout(() => {
             setIsLoading(false);
-        }
+            showInvoiceDetail(false);
+        }, 1000)
     };
-    
+
     return (
         <SafeAreaView style={styles.safeArea}>
             <Status isLight />
@@ -87,7 +69,7 @@ const SuccessScreen = ({ route }) => {
                     <Text style={styles.pay}>Payment Successful!</Text>
                     <Text style={styles.confirmText}>The payment of N1000 has successfully been done.</Text>
                     <RedButton buttonContainerStyle={styles.buttonContainer} ButtonContent={isLoading ? <Loader /> : 'CONTINUE'} contentStyle={styles.buttonText} onPress={() => onPressContinue()} />
-                    <RedButton buttonContainerStyle={styles.buttonContainer} ButtonContent={isLoading ? <Loader /> : 'INVOICE'} contentStyle={styles.buttonText} onPress={() => onPressInvoice()} />
+                    {/* <RedButton buttonContainerStyle={styles.buttonContainer} ButtonContent={isLoading ? <Loader /> : 'INVOICE'} contentStyle={styles.buttonText} onPress={() => onPressInvoice()} /> */}
                 </View>
                 <View style={styles.container}>
                     <Modal
