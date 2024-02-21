@@ -21,7 +21,6 @@ export const LoginAdminAction = (data, setIsLoading, setLoggedIn) => async (disp
         const res = await axios.post(api_url, data);
         // console.log(res)
         if (res?.status == 200) {
-            console.log("success", res)
             setIsLoading(false);
 
             await AsyncStorage.setItem('token', res?.data?.token);

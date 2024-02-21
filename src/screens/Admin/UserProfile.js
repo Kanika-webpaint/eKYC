@@ -38,7 +38,7 @@ function UserProfile({ route }) {
     const dispatch = useDispatch()
 
     useEffect(() => {
-        AsyncStorage.getItem("authToken").then((value) => {
+        AsyncStorage.getItem("token").then((value) => {
             if (value) {
                 dispatch(getUserByIdAction(route?.params?.id, value, setIsLoading))
             }

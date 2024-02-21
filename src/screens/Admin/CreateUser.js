@@ -53,7 +53,7 @@ function CreateUser() {
     };
 
     useEffect(() => {
-        AsyncStorage.getItem("authToken").then((value) => {
+        AsyncStorage.getItem("token").then((value) => {
             if (value) {
                 setAuthToken(value)
             }

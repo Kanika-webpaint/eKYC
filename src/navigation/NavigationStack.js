@@ -65,7 +65,7 @@ const NavigationStack = () => {
                         <Stack.Screen name="IdScreen" component={routeNames.IdScreen} />
                     ) : (
                         <>
-                            <Stack.Screen name="MobileVerification" key="MobileVerificationAdmin" component={routeNames.MobileVerification} />
+                            <Stack.Screen name="MobileVerification" component={routeNames.MobileVerification} />
                             <Stack.Screen name="LoginAdmin" component={routeNames.LoginAdmin} />
                             <Stack.Screen name="Plan" component={routeNames.Plan} />
                             <Stack.Screen name="Checkout" component={routeNames.Checkout} />

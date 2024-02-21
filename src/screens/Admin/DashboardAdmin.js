@@ -5,7 +5,7 @@
  * @format
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
     SafeAreaView,
     StyleSheet,
@@ -15,6 +15,7 @@ import {
     ScrollView,
     TouchableOpacity,
     FlatList,
+    ToastAndroid,
 } from 'react-native';
 import colors from '../../common/colors';
 import { logout, plan_select, plus, team } from '../../common/images';
@@ -26,6 +27,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { fonts } from '../../common/fonts';
 import Status from '../../components/Status';
 import { CommonActions } from "@react-navigation/native";
+import { loginAdminslice } from '../../redux/slices/user';
 
 
 function DashboardAdmin() {
@@ -48,7 +50,7 @@ function DashboardAdmin() {
     ]
 
     useEffect(() => {
-        AsyncStorage.getItem("authToken").then((value) => {
+        AsyncStorage.getItem("token").then((value) => {
             if (value) {
                 dispatch(getOrgDetailsAction(value, setIsLoading))
             }
@@ -69,17 +71,12 @@ function DashboardAdmin() {
     }
 
 
-    const logoutAccount = async() => {
-        try {
-            await AsyncStorage.clear()
-            navigation.navigate("MobileVerification")
-            showAlert('Logout successfully!')
-
-        } catch (e) {
-            // clear error
-        }
-    }
-
+    const logoutAccount = useCallback(async () => {
+        await AsyncStorage.clear();
+        dispatch(loginAdminslice(false));
+        showAlert('Logout successfully!');
+    }, [dispatch]);
+    
     const showAlert = (message) => {
         if (Platform.OS === 'android') {
             ToastAndroid.show(message, ToastAndroid.SHORT);
@@ -110,9 +107,9 @@ function DashboardAdmin() {
                         <TouchableOpacity onPress={() => navigation.navigate('CreateUser')} style={styles.addView}>
                             <Image source={plus} style={styles.plusIcon} />
                         </TouchableOpacity>
-                        {/* <TouchableOpacity onPress={() => logoutAccount()} style={styles.addView}>
+                        <TouchableOpacity onPress={() => logoutAccount()} style={styles.addView}>
                             <Image source={logout} style={styles.plusIcon} />
-                        </TouchableOpacity> */}
+                        </TouchableOpacity>
                     </View>
 
                 </View>

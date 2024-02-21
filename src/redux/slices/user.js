@@ -26,7 +26,7 @@ const authSlice = createSlice({
         },
         loginAdminslice: (state, action) => {
             state.adminLogin = action?.payload?.data;
-            state.isLogged = true;
+            state.isLogged = action.payload
         },
         registerAdminslice: (state, action) => {
             state.adminRegister = action?.payload?.data
@@ -45,7 +45,7 @@ const authSlice = createSlice({
         },
         contactUsSlice: (state, action) => {
             state.contact = action?.payload?.data
-        }
+        },
         //add more slices here
     }
 })
