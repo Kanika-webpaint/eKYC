@@ -55,7 +55,7 @@ function UserProfile({ route }) {
                 <View style={{ margin: 20, justifyContent: 'center' }}>
                     <View style={styles.containerHeader}>
                         <View style={styles.header}>
-                            <TouchableOpacity onPress={() => navigation.navigate('UsersList')}  >
+                            <TouchableOpacity onPress={() => navigation.navigate('UsersList')} hitSlop={{ top: 50, bottom: 50, left: 50, right: 50 }}>
                                 <Image source={back} style={styles.backArrow} />
                             </TouchableOpacity>
                             <Text style={styles.title}>Profile</Text>

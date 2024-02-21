@@ -27,6 +27,7 @@ import Loader from '../../components/ActivityIndicator';
 import { back } from '../../common/images';
 import { fonts } from '../../common/fonts';
 import Status from '../../components/Status';
+import CountryPick from '../../components/CountryPicker';
 
 
 function CreateUser() {
@@ -40,8 +41,10 @@ function CreateUser() {
     });
     const navigation = useNavigation();
     const [isLoading, setIsLoading] = useState(false);
+    const [show, setShow] = useState(false)
     const [token, setAuthToken] = useState('')
     const dispatch = useDispatch()
+    const [countryCode, setCountryCode] = useState('')
     const OrganizationHomeList = useSelector((state) => state?.login?.orgDetails)
 
     const handleInputChange = (field, value) => {
@@ -78,15 +81,20 @@ function CreateUser() {
             return;
         } else {
             setIsLoading(true)
+            let countryCodeSelected = countryCode ? countryCode : '+91'
             const requestData =
             {
                 username: userData?.username,
-                phoneNumber: userData?.phoneNo,
+                phoneNumber: countryCodeSelected + userData?.phoneNo,
                 organizationId: OrganizationHomeList?.organization?.id || ''
             }
             dispatch(CreateUserAction(requestData, token, navigation, setIsLoading))
         }
     };
+
+    const onChangeCountryCode = () => {
+        setShow(true)
+    }
 
     return (
         <SafeAreaView style={styles.safeArea}>
@@ -107,27 +115,32 @@ function CreateUser() {
                         </Text>
                         <TextInput
                             value={userData?.username}
-                            style={styles.input}
-                            placeholder=" Enter username here"
-                            placeholderTextColor={colors.light_grey}
+                            style={styles.usernameinput}
                             onChangeText={(text) => handleInputChange('username', text)}
                             keyboardType="email-address"
                         />
-                        <ErrorMessage errorMessageText={errorMessages.username} />
+                        <ErrorMessage errorMessageText={errorMessages.username} style={{ marginLeft: 5 }} />
                         <Text style={{ margin: 5, color: colors.grey }}>
                             Phone number
                         </Text>
-                        <TextInput
-                            value={userData?.phoneNo}
-                            style={styles.input}
-                            placeholder=" Enter phone number here"
-                            placeholderTextColor={colors.light_grey}
-                            onChangeText={(text) => handleInputChange('phoneNo', text)}
-                            keyboardType="email-address"
-                        />
-                        <ErrorMessage errorMessageText={errorMessages.phoneNo} />
+                        <View style={styles.input}>
+                            <TouchableOpacity style={{ height: 30, width: 50, marginRight: 10, marginTop: 10, justifyContent: 'center', alignItems: 'center' }} onPress={() => onChangeCountryCode()}>
+                                <Text style={{ color: colors.black, alignSelf: 'center' }}>{countryCode ? countryCode : '+91'}</Text>
+                            </TouchableOpacity>
+                            <TextInput
+                                style={{ width: '80%' }}
+                                value={userData?.phoneNo}
+                                onChangeText={(text) => handleInputChange('phoneNo', text)}
+                                keyboardType="email-address"
+                            />
+                        </View>
+                        <ErrorMessage errorMessageText={errorMessages.phoneNo} style={{ marginLeft: 5 }} />
                     </View>
                     <RedButton buttonContainerStyle={styles.buttonContainer} ButtonContent={isLoading ? <Loader /> : 'CREATE USER'} contentStyle={styles.buttonText} onPress={() => handleCreateUser()} />
+                    <CountryPick show={show} onBackdropPress={() => setShow(false)} pickerButtonOnPress={(item) => {
+                        setCountryCode(item.dial_code);
+                        setShow(false);
+                    }} />
                 </View>
             </ScrollView>
         </SafeAreaView>
@@ -147,7 +160,7 @@ const styles = StyleSheet.create({
     input: {
         height: 50,
         borderWidth: 1,
-        paddingLeft: 8,
+        flexDirection: 'row',
         borderRadius: 5,
         color: colors.black,
         borderWidth: 1,
@@ -156,6 +169,20 @@ const styles = StyleSheet.create({
         borderColor: colors.white,
         backgroundColor: colors.white,
         fontFamily: fonts.regular
+    },
+    usernameinput: {
+        height: 50,
+        borderWidth: 1,
+        flexDirection: 'row',
+        borderRadius: 5,
+        color: colors.black,
+        borderWidth: 1,
+        width: '100%',
+        fontSize: 16,
+        borderColor: colors.white,
+        backgroundColor: colors.white,
+        fontFamily: fonts.regular,
+        paddingLeft: 15
     },
     buttonContainer: {
         marginTop: 50,

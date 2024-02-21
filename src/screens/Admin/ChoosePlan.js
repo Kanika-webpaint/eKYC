@@ -84,7 +84,7 @@ function ChoosePlan() {
                                     onPress={() => handleSelection(item)}
                                 >
                                     {selectedItem?.id === item?.id ? <Image style={styles.selectedImg} source={checked} /> : <Image style={styles.selectedImg} source={unchecked} />}
-                                    <View style={{ flexDirection: 'column', marginTop: -8 }}>
+                                    <View key={item?.id} style={{ flexDirection: 'column', marginTop: -8 }}>
                                         <Text style={styles.itemsLabel}>{item?.label}</Text>
                                         <Text style={styles.itemsDescription}>{item?.description}</Text>
                                     </View>
