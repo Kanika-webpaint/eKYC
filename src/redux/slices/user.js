@@ -22,7 +22,7 @@ const authSlice = createSlice({
         },
         verifyCodeslice: (state, action) => {
             state.verifyCode = action?.payload?.data
-            state.isLoggedUser = true;
+            state.isLoggedUser = true
         },
         loginAdminslice: (state, action) => {
             state.adminLogin = action?.payload?.data;

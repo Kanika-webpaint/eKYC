@@ -12,7 +12,7 @@ import { startNetworkLogging } from 'react-native-network-logger';
 const ReduxApp = () => (
     <Provider store={store}>
         <App />
-    </Provider>
+    </Provider>  
 );
 startNetworkLogging();
 AppRegistry.registerComponent(appName, () => ReduxApp);

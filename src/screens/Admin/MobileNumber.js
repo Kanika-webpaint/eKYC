@@ -159,7 +159,7 @@ function MobileNumber() {
   }
 
 
-  const handleVerifyCode = useCallback(() => {
+  const handleVerifyCode = useCallback(async (setLoggedIn) => {
     // navigation.navigate('IdScreen')
     // Request for OTP verification
     setIsLoading(true)
@@ -169,7 +169,6 @@ function MobileNumber() {
         phoneNumber: numberWithCode,
         receivedotp: value
       };
-      // dispatch(VerifyCodeAction(requestData))
       dispatch(VerifyCodeAction(requestData, navigation, setIsLoading))
     } else {
       setIsLoading(false)
@@ -262,11 +261,6 @@ function MobileNumber() {
     <SafeAreaView style={styles.safeArea}>
       <Status lightContent />
       <View style={{ flex: 1, backgroundColor: colors.app_blue }}>
-
-        {/* <ImageBackground
-        source={background_image}
-        style={{ flex: 1 }}
-      > */}
         <ScrollView style={{ marginBottom: 10 }} keyboardShouldPersistTaps='handled'>
           <Logo />
           <MobileNumberCodeVerification verificationImageSource={verification} textFirst={'To begin, Please enter your'} textMiddle={showOTP ? 'Unique Registration code' : 'Mobile Number'} textLast={showOTP ? '(Received by SMS)' : '(Receive an OTP by SMS)'} />
@@ -327,12 +321,6 @@ function MobileNumber() {
         </ScrollView>
       </View>
 
-      {/* </ImageBackground> */}
-
-      <TouchableOpacity style={{ margin: 30, height: 50, width: 50, borderRadius: 25, backgroundColor: colors.app_red, justifyContent: 'center', alignItems: 'center' }} onPress={() => setOpenLogs(!openLogs)}>
-        <Text style={{ alignSelf: 'center', color: colors.white }}>Logs</Text>
-      </TouchableOpacity>
-      {openLogs && <NetworkLogger />}
 
     </SafeAreaView>
   );

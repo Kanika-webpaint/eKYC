@@ -67,7 +67,8 @@ const SuccessScreen = ({ route }) => {
                 <View style={styles.mainView}>
                     <Image source={success} style={styles.succesImg} />
                     <Text style={styles.pay}>Payment Successful!</Text>
-                    <Text style={styles.confirmText}>The payment of N1000 has successfully been done.</Text>
+                    <Text style={styles.confirmText}>The payment of N1000 has successfully been done.</Text> 
+                    {/* make the amount dynamic later */}
                     <RedButton buttonContainerStyle={styles.buttonContainer} ButtonContent={isLoading ? <Loader /> : 'CONTINUE'} contentStyle={styles.buttonText} onPress={() => onPressContinue()} />
                     {/* <RedButton buttonContainerStyle={styles.buttonContainer} ButtonContent={isLoading ? <Loader /> : 'INVOICE'} contentStyle={styles.buttonText} onPress={() => onPressInvoice()} /> */}
                 </View>

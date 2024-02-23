@@ -76,8 +76,8 @@ function ChoosePlan() {
                     <Text style={styles.midTitle}>Select a subscription plan to unlock the{'\n'}functionality of the application.</Text>
                     <Image source={plan_select} style={styles.imagePlanSelect} />
                     <View style={{ marginTop: 35 }}>
-                        {items?.map((item) => (
-                            <View style={styles.itemsView}>
+                        {items?.map((item) => ( 
+                            <View key={item?.id} style={styles.itemsView}>
                                 <TouchableOpacity
                                     key={item?.id}
                                     style={styles.radioButton}

@@ -5,7 +5,7 @@
  * @format
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     SafeAreaView,
     StyleSheet,
@@ -15,21 +15,23 @@ import {
     Text,
     ScrollView,
     TouchableOpacity,
-    Modal,
     FlatList,
+    ToastAndroid,
 } from 'react-native';
 import colors from '../../common/colors';
 import RedButton from '../../components/RedButton';
 import { back, down } from '../../common/images';
 import { useNavigation } from '@react-navigation/native';
-import { useDispatch } from 'react-redux'
-import { RegisterAdminAction } from '../../redux/actions/user';
 import Loader from '../../components/ActivityIndicator';
-import ErrorMessage from '../../components/ErrorMsg';
 import { fonts } from '../../common/fonts';
 import { Country, State, City } from 'country-state-city';
 import ErrorMessageCheckout from '../../components/ErrorMsgCheckout';
 import Status from '../../components/Status';
+import { CardField, createToken } from '@stripe/stripe-react-native';
+import { PUBLISH_KEY, API_URL } from '@env'
+import { StripeProvider, confirmPayment } from '@stripe/stripe-react-native';
+import axios from 'axios';
+
 
 function CheckoutScreen({ route }) {
     const [userData, setFormData] = useState({
@@ -42,15 +44,11 @@ function CheckoutScreen({ route }) {
     });
     const [errorMessages, setErrorMessages] = useState({
         email: '',
-        cardNo: '',
-        expDate: '',
-        cvv: '',
         name: '',
         address: '',
         country: ''
     });
     const navigation = useNavigation();
-    const dispatch = useDispatch()
     const [isLoading, setIsLoading] = useState(false);
     const [showOptions, setShowOptions] = useState(false);
     const [showState, setShowState] = useState(false);
@@ -64,6 +62,7 @@ function CheckoutScreen({ route }) {
     const [cityData, setCitiesData] = useState();
     const [showCity, setShowCity] = useState();
     const [selectedCity, setSelectedCity] = useState(null);
+    const [cardDetails, setCardDetails] = useState()
 
     useEffect(() => {
         const nigeriaData = Country && Country?.getCountryByCode('NG');
@@ -79,81 +78,14 @@ function CheckoutScreen({ route }) {
         }
     }, []);
 
-    const handleLogin = () => {
 
-        const newErrorMessages = {};
-
-        if (!userData.name) {
-            newErrorMessages.name = 'Name is required';
-        }
-        if (!userData.email) {
-            newErrorMessages.email = 'Email is required';
-        }
-        if (!userData.cardNo) {
-            newErrorMessages.cardNo = 'Card No is required';
-        }
-        if (!userData.expDate) {
-            newErrorMessages.expDate = 'ExpDate is required';
-        }
-        if (!userData.cvv) {
-            newErrorMessages.cvv = 'CVV is required';
-        }
-        if (!userData.address) {
-            newErrorMessages.address = 'Address is required';
-        }
-        if (selectedOption === null) {
-            setCountryErrorMsg(true)
-        }
-        if (selectedState === null) {
-            setStateErrorMsg(true)
-        }
-        if (selectedCity === null) {
-            setCityErrorMsg(true)
-        }
-
-        if (Object.keys(newErrorMessages).length > 0) {
-            setErrorMessages(newErrorMessages);
-            if (selectedOption !== null && selectedOption.length > 0) {
-                setCountryErrorMsg(false)
-            }
-            if (selectedState !== null) {
-                setStateErrorMsg(false)
-            }
-            if (selectedCity !== null) {
-                setCityErrorMsg(false)
-            }
-            return;
+    const showAlert = (message) => {
+        if (Platform.OS === 'android') {
+            ToastAndroid.show(message, ToastAndroid.SHORT);
         } else {
-            // const requestData = {
-            //     name: userData?.name,
-            //     email: userData?.email,
-            //     cardNumber: userData?.cardNo,
-            //     expiryDate: userData?.expDate,
-            //     transactionId: "2564",
-            //     planPrice: route?.params?.amount || ''
-            
-            // }
-
-            // navigation.navigate('SuccessScreen')
-
-            const requestData =
-            {
-                name:userData?.name,
-                email: userData?.email,
-                cardNumber: '4234',
-                expiryDate: "03-04-2024",
-                transactionId: "2564",
-                planPrice: "256",
-                address: "1644",
-                country: "Nigeria",
-                state: "Abia",
-                city: "Burch"
-            }
-            setIsLoading(true)
-
-            dispatch(RegisterAdminAction(requestData, navigation, setIsLoading))
+            AlertIOS.alert(message);
         }
-    }
+    };
 
     const handleInputChange = (field, value) => {
         setFormData({ ...userData, [field]: value });
@@ -193,6 +125,155 @@ function CheckoutScreen({ route }) {
         )
     }
 
+    const fetchCardDetails = (cardDetails) => {
+        if (cardDetails?.complete) {
+            setCardDetails(cardDetails)
+        } else {
+            setCardDetails(null)
+        }
+    }
+
+    const creatPaymentIntent = (data) => {
+        return new Promise((resolve, reject) => {
+            axios.post(`${API_URL}/stripecheckout`, data).then(function (res) {
+                resolve(res)
+            }).catch(function (error) {
+                reject(error)
+            })
+        })
+    }
+
+    // const handleLogin = async () => {
+    //     if (!cardDetails || !cardDetails.complete) {
+    //         showAlert('Please enter valid card details');
+    //         return;
+    //     } else {
+    //         try {
+    //             const resToken = await createToken({ ...cardDetails, type: 'Card' })
+    //             const requestData =
+    //             {
+    //                 name: userData?.name,
+    //                 email: userData?.email,
+    //                 currency: 'usd',
+    //                 amount: "234",
+    //                 address: "1644",
+    //                 country: "India",
+    //                 state: "Abia",
+    //                 city: "Burch",
+    //                 userId: 1,
+    //                 zip: '123',
+    //                 token: resToken?.token?.id
+    //             }
+    //             console.log(requestData, "requestData")
+    //             try {
+    //                 const res = await creatPaymentIntent(requestData)
+    //                 console.log("payment intent create succesfully...!!!", res)
+
+    //                 if (res?.data?.clientSecret) {
+    //                     let confirmPaymentIntent = await confirmPayment(res?.data?.clientSecret, { paymentMethodType: 'Card' })
+    //                     console.log("confirmPaymentIntent res++++", confirmPaymentIntent)
+    //                     alert("Payment succesfully...!!!")
+    //                 }
+    //             } catch (error) {
+    //                 console.log("Error rasied during payment intent", error)
+    //             }
+    //         } catch (error) {
+    //             console.error('Error generating token:', error);
+    //             Alert.alert('Error', 'Something went wrong. Please try again later.');
+    //         }
+    //     }
+    // };
+
+    const handleLogin = async () => {
+
+        const newErrorMessages = {};
+
+        if (!userData.name) {
+            newErrorMessages.name = 'Name is required';
+        }
+        if (!userData.email) {
+            newErrorMessages.email = 'Email is required';
+        }
+        if (!userData.address) {
+            newErrorMessages.address = 'Address is required';
+        }
+
+        if (!cardDetails) {
+            showAlert('Enter card details')
+        }
+        if (selectedOption === null) {
+            setCountryErrorMsg(true)
+        }
+        if (selectedState === null) {
+            setStateErrorMsg(true)
+        }
+        if (selectedCity === null) {
+            setCityErrorMsg(true)
+        }
+
+        if (Object.keys(newErrorMessages).length > 0) {
+            setErrorMessages(newErrorMessages);
+            if (selectedOption !== null && selectedOption.length > 0) {
+                setCountryErrorMsg(false)
+            }
+            if (selectedState !== null) {
+                setStateErrorMsg(false)
+            }
+            if (selectedCity !== null) {
+                setCityErrorMsg(false)
+            }
+            return;
+        } else {
+            if (!cardDetails || !cardDetails.complete) {
+                showAlert('Please enter valid card details');
+                return;
+            } else {
+                try {
+                    setIsLoading(true)
+                    const resToken = await createToken({ ...cardDetails, type: 'Card' })
+                    const requestData =
+                    {
+                        name: userData?.name,
+                        email: userData?.email,
+                        currency: 'usd',
+                        amount: "457",
+                        // amount: route?.params?.amount || 0,
+                        address: userData?.address,
+                        country: selectedOption,
+                        state: selectedState,
+                        city: selectedCity,
+                        userId: 1, //will update it later
+                        zip: '123', // make it dynamic later
+                        token: resToken?.token?.id   // stripe token
+                    }
+                    console.log(requestData, "requestData")
+                    try {
+                        const res = await creatPaymentIntent(requestData)
+                        console.log("payment intent create succesfully...!!!", res)
+
+                        if (res?.data?.clientSecret) {
+                            let confirmPaymentIntent = await confirmPayment(res?.data?.clientSecret, { paymentMethodType: 'Card' })
+                            console.log("confirmPaymentIntent res++++", confirmPaymentIntent)
+                            if (confirmPaymentIntent) {
+                                setIsLoading(false)
+                                navigation.navigate('SuccessScreen')
+                            } else {
+                                setIsLoading(false)
+                                showAlert('Payment failed, please try again!!')
+                            }
+                        }
+                    } catch (error) {
+                        console.log("Error rasied during payment intent", error)
+                    }
+                } catch (error) {
+                    console.error('Error generating token:', error);
+                    showAlert('Error', 'Something went wrong. Please try again later.');
+                }
+            }
+        }
+    }
+
+
     const onPressStateItem = (item) => {
         return (
             <TouchableOpacity onPress={() => handleStatePress(item)}>
@@ -211,228 +292,211 @@ function CheckoutScreen({ route }) {
 
     return (
         <SafeAreaView style={styles.safeArea}>
-            <Status isLight />
-            <ScrollView keyboardShouldPersistTaps='handled'>
-                <View style={{ margin: 20 }}>
-                    <View style={styles.containerHeader}>
-                        <View style={styles.header}>
-                            <TouchableOpacity onPress={() => navigation.goBack()}>
-                                <Image source={back} style={styles.backArrow} />
-                            </TouchableOpacity>
-                            <Text style={styles.title}>Checkout</Text>
-                        </View>
-                    </View>
-                    <View style={{ marginTop: 30 }}>
-                        <Text style={styles.titleText}>
-                            Name
-                        </Text>
-                        <TextInput
-                            value={userData?.name}
-                            style={styles.input}
-                            placeholder="Enter name here"
-                            placeholderTextColor={colors.light_grey}
-                            onChangeText={(text) => handleInputChange('name', text)}
-                            keyboardType="email-address"
-                        />
-                        <ErrorMessageCheckout errorMessageText={errorMessages.name} />
-                        <Text style={styles.titleText}>
-                            Email
-                        </Text>
-                        <TextInput
-                            value={userData?.email}
-                            style={styles.input}
-                            placeholder="Enter email here"
-                            placeholderTextColor={colors.light_grey}
-                            onChangeText={(text) => handleInputChange('email', text)}
-                            keyboardType="email-address"
-                        />
-                        <ErrorMessageCheckout errorMessageText={errorMessages.email} />
-                        <View style={{ marginBottom: 10 }}>
-                            <Text style={styles.titleText}>Country</Text>
-                            <View style={styles.addressField}>
-                                <TextInput
-                                    value={selectedOption}
-                                    editable={false}
-                                    style={styles.inputCount}
-                                    placeholder="Select country"
-                                    placeholderTextColor={colors.light_grey}
-                                // onChangeText={(text) => handleInputChange('address', text)}
-                                />
-                                <TouchableOpacity onPress={() => setShowOptions(!showOptions)} style={{ marginRight: 20 }}>
-                                    <Image
-                                        source={down} // Change the path to your dropdown icon
-                                        style={{ width: 20, height: 20 }}
-                                    />
+            <StripeProvider
+                publishableKey={PUBLISH_KEY}
+            >
+                <Status isLight />
+                <ScrollView keyboardShouldPersistTaps='handled'>
+                    <View style={{ margin: 20 }}>
+                        <View style={styles.containerHeader}>
+                            <View style={styles.header}>
+                                <TouchableOpacity onPress={() => navigation.goBack()}>
+                                    <Image source={back} style={styles.backArrow} />
                                 </TouchableOpacity>
+                                <Text style={styles.title}>Checkout</Text>
                             </View>
-                            {countryErrMsg && <Text style={styles.errorMessageStyle}>{'Country is required'}</Text>}
-                            {showOptions && (
-                                <View style={{
-                                    backgroundColor: colors.white,
-                                    borderRadius: 5,
-                                    color: '#fff',
-                                    shadowColor: '#000',
-                                    shadowOffset: { width: 0, height: 1 },
-                                    shadowOpacity: 0.8,
-                                    shadowRadius: 2,
-                                    elevation: 5
-                                }}>
-                                    <FlatList
-                                        style={{ color: 'red', padding: 10 }}
-                                        data={countryData && countryData}
-                                        renderItem={({ item }) => onPressCountryItem(item)}
-                                        keyExtractor={(item) => item.code}
+                        </View>
+                        <View style={{ marginTop: 30 }}>
+                            <Text style={styles.titleText}>
+                                Name
+                            </Text>
+                            <TextInput
+                                value={userData?.name}
+                                style={styles.input}
+                                placeholder="Enter name here"
+                                placeholderTextColor={colors.light_grey}
+                                onChangeText={(text) => handleInputChange('name', text)}
+                                keyboardType="email-address"
+                            />
+                            <ErrorMessageCheckout errorMessageText={errorMessages.name} />
+                            <Text style={styles.titleText}>
+                                Email
+                            </Text>
+                            <TextInput
+                                value={userData?.email}
+                                style={styles.input}
+                                placeholder="Enter email here"
+                                placeholderTextColor={colors.light_grey}
+                                onChangeText={(text) => handleInputChange('email', text)}
+                                keyboardType="email-address"
+                            />
+                            <ErrorMessageCheckout errorMessageText={errorMessages.email} />
+                            <View style={{ marginBottom: 10 }}>
+                                <Text style={styles.titleText}>Country</Text>
+                                <View style={styles.addressField}>
+                                    <TextInput
+                                        value={selectedOption}
+                                        editable={false}
+                                        style={styles.inputCount}
+                                        placeholder="Select country"
+                                        placeholderTextColor={colors.light_grey}
+                                    // onChangeText={(text) => handleInputChange('address', text)}
                                     />
+                                    <TouchableOpacity onPress={() => setShowOptions(!showOptions)} style={{ marginRight: 20 }}>
+                                        <Image
+                                            source={down} // Change the path to your dropdown icon
+                                            style={{ width: 20, height: 20 }}
+                                        />
+                                    </TouchableOpacity>
+                                </View>
+                                {countryErrMsg && <Text style={styles.errorMessageStyle}>{'Country is required'}</Text>}
+                                {showOptions && (
+                                    <View style={{
+                                        backgroundColor: colors.white,
+                                        borderRadius: 5,
+                                        color: '#fff',
+                                        shadowColor: '#000',
+                                        shadowOffset: { width: 0, height: 1 },
+                                        shadowOpacity: 0.8,
+                                        shadowRadius: 2,
+                                        elevation: 5
+                                    }}>
+                                        <FlatList
+                                            style={{ color: 'red', padding: 10 }}
+                                            data={countryData && countryData}
+                                            renderItem={({ item }) => onPressCountryItem(item)}
+                                            keyExtractor={(item) => item.code}
+                                        />
+                                    </View>
+                                )}
+                            </View>
+                            {selectedOption && (
+                                <View>
+                                    <Text style={styles.titleText}>State</Text>
+                                    <View style={styles.addressField}>
+                                        <TextInput
+                                            value={selectedState}
+                                            editable={false}
+                                            style={styles.inputCount}
+                                            placeholder="Select State"
+                                            placeholderTextColor={colors.light_grey}
+                                        // onChangeText={(text) => handleInputChange('address', text)}
+                                        />
+                                        <TouchableOpacity onPress={() => setShowState(!showState)} style={{ marginRight: 20 }}>
+                                            <Image
+                                                source={down} // Change the path to your dropdown icon
+                                                style={{ width: 20, height: 20 }}
+                                            />
+                                        </TouchableOpacity>
+                                    </View>
+                                    {stateErrMsg && <Text style={styles.errorMessageStyle}>{'State is required'}</Text>}
+                                    {showState && (
+                                        <View style={{
+                                            backgroundColor: colors.white,
+                                            borderRadius: 5,
+                                            shadowColor: '#000',
+                                            shadowOffset: { width: 0, height: 1 },
+                                            shadowOpacity: 0.8,
+                                            shadowRadius: 2,
+                                            elevation: 5,
+                                            height: 200,
+                                            flex: 1 // Allow the container to expand
+                                        }}>
+                                            <FlatList
+                                                nestedScrollEnabled
+                                                contentContainerStyle={{ flexGrow: 1 }}
+                                                style={{ padding: 10 }}
+                                                data={statesData && statesData}
+                                                renderItem={({ item }) => onPressStateItem(item)}
+                                                keyExtractor={(item) => item.code}
+                                            />
+                                        </View>
+                                    )}
                                 </View>
                             )}
-                        </View>
-                        {selectedOption && (
-                            <View>
-                                <Text style={styles.titleText}>State</Text>
-                                <View style={styles.addressField}>
-                                    <TextInput
-                                        value={selectedState}
-                                        editable={false}
-                                        style={styles.inputCount}
-                                        placeholder="Select State"
-                                        placeholderTextColor={colors.light_grey}
-                                    // onChangeText={(text) => handleInputChange('address', text)}
-                                    />
-                                    <TouchableOpacity onPress={() => setShowState(!showState)} style={{ marginRight: 20 }}>
-                                        <Image
-                                            source={down} // Change the path to your dropdown icon
-                                            style={{ width: 20, height: 20 }}
-                                        />
-                                    </TouchableOpacity>
-                                </View>
-                                {stateErrMsg && <Text style={styles.errorMessageStyle}>{'State is required'}</Text>}
-                                {showState && (
-                                    <View style={{
-                                        backgroundColor: colors.white,
-                                        borderRadius: 5,
-                                        shadowColor: '#000',
-                                        shadowOffset: { width: 0, height: 1 },
-                                        shadowOpacity: 0.8,
-                                        shadowRadius: 2,
-                                        elevation: 5,
-                                        height: 200,
-                                        flex: 1 // Allow the container to expand
-                                    }}>
-                                        <FlatList
-                                            nestedScrollEnabled
-                                            contentContainerStyle={{ flexGrow: 1 }}
-                                            style={{ padding: 10 }}
-                                            data={statesData && statesData}
-                                            renderItem={({ item }) => onPressStateItem(item)}
-                                            keyExtractor={(item) => item.code}
-                                        />
-                                    </View>
-                                )}
-                            </View>
-                        )}
 
-                        {selectedOption && selectedState && (
-                            <View>
-                                <Text style={styles.titleText}>City</Text>
-                                <View style={styles.addressField}>
-                                    <TextInput
-                                        value={selectedCity}
-                                        editable={false}
-                                        style={styles.inputCount}
-                                        placeholder="Select City"
-                                        placeholderTextColor={colors.light_grey}
-                                    // onChangeText={(text) => handleInputChange('address', text)}
-                                    />
-                                    <TouchableOpacity onPress={() => setShowCity(!showCity)} style={{ marginRight: 20 }}>
-                                        <Image
-                                            source={down} // Change the path to your dropdown icon
-                                            style={{ width: 20, height: 20 }}
+                            {selectedOption && selectedState && (
+                                <View>
+                                    <Text style={styles.titleText}>City</Text>
+                                    <View style={styles.addressField}>
+                                        <TextInput
+                                            value={selectedCity}
+                                            editable={false}
+                                            style={styles.inputCount}
+                                            placeholder="Select City"
+                                            placeholderTextColor={colors.light_grey}
+                                        // onChangeText={(text) => handleInputChange('address', text)}
                                         />
-                                    </TouchableOpacity>
-                                </View>
-                                {cityErrMsg && <Text style={styles.errorMessageStyle}>{'City is required'}</Text>}
-                                {showCity && (
-                                    <View style={{
-                                        backgroundColor: colors.white,
-                                        borderRadius: 5,
-                                        shadowColor: '#000',
-                                        shadowOffset: { width: 0, height: 1 },
-                                        shadowOpacity: 0.8,
-                                        shadowRadius: 2,
-                                        elevation: 5,
-                                        height: 200,
-                                        flex: 1 // Allow the container to expand
-                                    }}>
-                                        <FlatList
-                                            nestedScrollEnabled
-                                            contentContainerStyle={{ flexGrow: 1 }}
-                                            style={{ padding: 10 }}
-                                            data={cityData && cityData}
-                                            renderItem={({ item }) => onPressCityItem(item)}
-                                            keyExtractor={(item) => item.code}
-                                        />
+                                        <TouchableOpacity onPress={() => setShowCity(!showCity)} style={{ marginRight: 20 }}>
+                                            <Image
+                                                source={down} // Change the path to your dropdown icon
+                                                style={{ width: 20, height: 20 }}
+                                            />
+                                        </TouchableOpacity>
                                     </View>
-                                )}
-                            </View>
-                        )}
-                        <Text style={styles.titleText}>
-                            Address
-                        </Text>
-                        <TextInput
-                            value={userData?.address}
-                            style={styles.input}
-                            placeholder="Enter address here"
-                            placeholderTextColor={colors.light_grey}
-                            onChangeText={(text) => handleInputChange('address', text)}
-                        />
-                        <ErrorMessageCheckout errorMessageText={errorMessages.address} />
-                        <Text style={styles.titleText}>
-                            Card number
-                        </Text>
-                        <TextInput
-                            value={userData?.cardNo}
-                            style={styles.input}
-                            placeholder="Enter card number here"
-                            placeholderTextColor={colors.light_grey}
-                            onChangeText={(text) => handleInputChange('cardNo', text)}
-                            keyboardType="numeric"
-                        />
-                        <ErrorMessageCheckout errorMessageText={errorMessages.cardNo} styleMsg={{ marginLeft: 0 }} />
-                        <View style={styles.fileds}>
-                            <View >
-                                <Text style={styles.titleText}>
-                                    Exp date
-                                </Text>
-                                <TextInput
-                                    // value={userData?.expDate}
-                                    style={styles.inputSmall}
-                                    placeholder="DD/MM"
-                                    placeholderTextColor={colors.light_grey}
-                                    onChangeText={(text) => handleInputChange('expDate', text)}
-                                    keyboardType="numeric"
-                                />
-                                <ErrorMessageCheckout errorMessageText={errorMessages.expDate} />
-                            </View>
-                            <View>
-                                <Text style={styles.titleText}>
-                                    CVV
-                                </Text>
-                                <TextInput
-                                    value={userData?.cvv}
-                                    style={styles.inputSmall}
-                                    placeholder="Enter cvv"
-                                    placeholderTextColor={colors.light_grey}
-                                    onChangeText={(text) => handleInputChange('cvv', text)}
-                                    keyboardType="numeric"
-                                />
-                                <ErrorMessageCheckout errorMessageText={errorMessages.cvv} />
-                            </View>
+                                    {cityErrMsg && <Text style={styles.errorMessageStyle}>{'City is required'}</Text>}
+                                    {showCity && (
+                                        <View style={{
+                                            backgroundColor: colors.white,
+                                            borderRadius: 5,
+                                            shadowColor: '#000',
+                                            shadowOffset: { width: 0, height: 1 },
+                                            shadowOpacity: 0.8,
+                                            shadowRadius: 2,
+                                            elevation: 5,
+                                            height: 200,
+                                            flex: 1 // Allow the container to expand
+                                        }}>
+                                            <FlatList
+                                                nestedScrollEnabled
+                                                contentContainerStyle={{ flexGrow: 1 }}
+                                                style={{ padding: 10 }}
+                                                data={cityData && cityData}
+                                                renderItem={({ item }) => onPressCityItem(item)}
+                                                keyExtractor={(item) => item.code}
+                                            />
+                                        </View>
+                                    )}
+                                </View>
+                            )}
+                            <Text style={styles.titleText}>
+                                Address
+                            </Text>
+                            <TextInput
+                                value={userData?.address}
+                                style={styles.input}
+                                placeholder="Enter address here"
+                                placeholderTextColor={colors.light_grey}
+                                onChangeText={(text) => handleInputChange('address', text)}
+                            />
+                            <ErrorMessageCheckout errorMessageText={errorMessages.address} />
+                            <CardField
+                                postalCodeEnabled={true}
+                                placeholders={{
+                                    number: 'Enter card number',
+                                }}
+                                cardStyle={{
+                                    backgroundColor: '#FFFFFF',
+                                    textColor: '#000000',
 
+                                }}
+                                style={{
+                                    marginTop:15,
+                                    height: 50, 
+                                }}
+                                onCardChange={(cardDetails) => {
+                                    console.log('cardDetails', cardDetails);
+                                    fetchCardDetails(cardDetails)
+                                }}
+                                onFocus={(focusedField) => {
+                                    console.log('focusField', focusedField);
+                                }}
+                            />
                         </View>
+                        <RedButton buttonContainerStyle={styles.buttonContainer} ButtonContent={isLoading ? <Loader /> : route?.params?.amount + ' ' + 'PAY NOW'} contentStyle={styles.buttonText} onPress={() => handleLogin()} />
                     </View>
-                    <RedButton buttonContainerStyle={styles.buttonContainer} ButtonContent={isLoading ? <Loader /> : route?.params?.amount + ' ' + 'PAY NOW'} contentStyle={styles.buttonText} onPress={() => handleLogin()} />
-                </View>
-            </ScrollView>
+                </ScrollView>
+            </StripeProvider>
         </SafeAreaView>
     );
 }

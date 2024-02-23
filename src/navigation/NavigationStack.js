@@ -1,11 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { routeNames } from '../common/routenames';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { LoginAdminAction } from '../redux/actions/user';
 import { useDispatch, useSelector } from 'react-redux';
-import LoginAdmin from '../screens/Admin/LoginAdmin';
 import { loginAdminslice, verifyCodeslice } from '../redux/slices/user';
 
 const NavigationStack = () => {
@@ -36,7 +34,6 @@ const NavigationStack = () => {
         const checkAuthenticationUser = async () => {
             // const storedTokenUser = await AsyncStorage.getItem('tokenUser');
             const storedRoleUser = await AsyncStorage.getItem('roleUser');
-
             if (storedRoleUser) {
                 // Dispatch the loginAdminslice action with true to indicate user is logged in
                 dispatch(verifyCodeslice(true));
@@ -53,27 +50,27 @@ const NavigationStack = () => {
     return (
         <NavigationContainer>
             <Stack.Navigator headerMode="none">
-               
-                    {isLogged ? (
-                        <>
-                            <Stack.Screen name="DashboardAdmin" component={routeNames.DashboardAdmin} />
-                            <Stack.Screen name="CreateUser" component={routeNames.CreateUser} />
-                            <Stack.Screen name="UsersList" component={routeNames.UserList} />
-                            <Stack.Screen name="UserProfile" component={routeNames.UserProfile} />
-                        </>
-                    ) : isLoggedUser ? (
-                        <Stack.Screen name="IdScreen" component={routeNames.IdScreen} />
-                    ) : (
-                        <>
-                            <Stack.Screen name="MobileVerification" component={routeNames.MobileVerification} />
-                            <Stack.Screen name="LoginAdmin" component={routeNames.LoginAdmin} />
-                            <Stack.Screen name="Plan" component={routeNames.Plan} />
-                            <Stack.Screen name="Checkout" component={routeNames.Checkout} />
-                            <Stack.Screen name="PlanDetails" component={routeNames.PlanDetails} />
-                            <Stack.Screen name="SuccessScreen" component={routeNames.SuccessScreen} />
-                            <Stack.Screen name="ContactUs" component={routeNames.ContactUs} />
-                        </>
-                    )}      
+
+                {isLogged ? (
+                    <>
+                        <Stack.Screen name="DashboardAdmin" component={routeNames.DashboardAdmin} />
+                        <Stack.Screen name="CreateUser" component={routeNames.CreateUser} />
+                        <Stack.Screen name="UsersList" component={routeNames.UserList} />
+                        <Stack.Screen name="UserProfile" component={routeNames.UserProfile} />
+                    </>
+                ) : isLoggedUser ? (
+                    <Stack.Screen name="IdScreen" component={routeNames.IdScreen} />
+                ) : (
+                    <>
+                        <Stack.Screen name="MobileVerification" component={routeNames.MobileVerification} />
+                        <Stack.Screen name="LoginAdmin" component={routeNames.LoginAdmin} />
+                        <Stack.Screen name="Plan" component={routeNames.Plan} />
+                        <Stack.Screen name="Checkout" component={routeNames.Checkout} />
+                        <Stack.Screen name="PlanDetails" component={routeNames.PlanDetails} />
+                        <Stack.Screen name="SuccessScreen" component={routeNames.SuccessScreen} />
+                        <Stack.Screen name="ContactUs" component={routeNames.ContactUs} />
+                    </>
+                )}
             </Stack.Navigator>
         </NavigationContainer>
     );
