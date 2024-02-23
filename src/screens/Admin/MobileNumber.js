@@ -12,7 +12,6 @@ import {
   View,
   Image,
   Text,
-  ImageBackground,
   TextInput,
   ScrollView,
   TouchableOpacity,
@@ -23,7 +22,7 @@ import {
   Keyboard,
 } from 'react-native';
 import colors from '../../common/colors';
-import { background_image, verification } from '../../common/images';
+import {  verification } from '../../common/images';
 import MobileNumberCodeVerification from '../../components/MobileNumberCodeVerification';
 import {
   CodeField,
@@ -39,7 +38,6 @@ import Logo from '../../components/Logo';
 import CountryPick from '../../components/CountryPicker';
 import { PhoneNumberAction, VerifyCodeAction } from '../../redux/actions/user';
 import { useDispatch } from 'react-redux';
-import NetworkLogger from 'react-native-network-logger';
 import { fonts, regular, thin } from '../../common/fonts';
 import Status from '../../components/Status';
 
@@ -215,10 +213,12 @@ function MobileNumber() {
 
 
   const submitMobileNumber = () => {
+    Keyboard.dismiss();
     handleSendCode()
   }
 
   const submitOTP = () => {
+    Keyboard.dismiss();
     handleVerifyCode()
   }
 
@@ -302,7 +302,7 @@ function MobileNumber() {
                 />
               </View>
               {showError && (
-                <View style={{ marginLeft: 35 }}>
+                <View style={{ marginLeft: 33,marginTop:5 }}>
                   <Text style={{ color: colors.app_red }}>Mobile number is required.</Text>
                 </View>
               )}

@@ -5,7 +5,7 @@ import { useDispatch } from 'react-redux';
 import { LoginAdminAction } from '../../redux/actions/user'; // Import the login action
 import Loader from '../../components/ActivityIndicator';
 import ErrorMessage from '../../components/ErrorMsg';
-import { mail, padlock, view, hide } from '../../common/images';
+import { mail, padlock, view, hide, back_arow } from '../../common/images';
 import colors from '../../common/colors';
 import Logo from '../../components/Logo';
 import SignInUp from '../../components/SignInUp';
@@ -67,6 +67,9 @@ const LoginAdmin = ({ route }) => {
             <View style={{ flex: 1, backgroundColor: colors.app_blue }}>
 
                 <ScrollView keyboardShouldPersistTaps='handled'>
+                    <TouchableOpacity onPress={()=>navigation.goBack()}>
+                        <Image source={back_arow} style={{ height: 20, width: 20, margin: 20, resizeMode: 'contain' }} />
+                    </TouchableOpacity>
                     <Logo />
                     <View >
                         <Text style={styles.title}>Login with your Admin (Portal) Details</Text>
@@ -104,7 +107,7 @@ const LoginAdmin = ({ route }) => {
                     </View>
                 </ScrollView>
             </View>
-      
+
         </SafeAreaView>
     );
 };

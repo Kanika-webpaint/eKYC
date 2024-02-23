@@ -14,7 +14,7 @@ import {
 import { finger_print, validifyX } from '../common/images';
 
 
-function Logo({ fingerPrintStyle, logoStyle ,styleContainer}) {
+function Logo({ fingerPrintStyle, logoStyle, styleContainer }) {
     return (
         <>
             <View style={[styles.imageContainer, styleContainer]}>
@@ -27,7 +27,8 @@ function Logo({ fingerPrintStyle, logoStyle ,styleContainer}) {
 
 const styles = StyleSheet.create({
     imageContainer: {
-        marginLeft: '10%',
+        width: '100%',
+        marginLeft: '16%',
         marginTop: '30%',
         justifyContent: 'center',
     },
@@ -37,9 +38,10 @@ const styles = StyleSheet.create({
         width: 70,
     },
     logo: {
-        height: 50,
-        marginLeft: 18,
-        width: '85%',
+        height: 70,
+        marginLeft: -10,
+        width: '80%',
+        resizeMode: 'contain'
     },
 });
 
