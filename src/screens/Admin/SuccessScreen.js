@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, TextInput, PermissionsAndroid, FlatList, Text, Image, StyleSheet, ScrollView, TouchableOpacity, Alert, Button, Linking, Modal, ToastAndroid } from 'react-native';
+import { View, TextInput, PermissionsAndroid, FlatList, Text, Image, StyleSheet, ScrollView, TouchableOpacity, Alert, Button, Linking, Modal, ToastAndroid, Animated, Easing } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { back, close, download, profile, success } from '../../common/images';
 import { useNavigation } from '@react-navigation/native';
@@ -19,12 +19,36 @@ const SuccessScreen = ({ route }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [invoiceShow, showInvoiceDetail] = useState(false);
     const dispatch = useDispatch()
-
+    const [spinValue] = useState(new Animated.Value(0));
 
     const onPressContinue = () => {
         navigation.navigate('LoginAdmin', { isOrgReg: true })
     }
 
+
+    useEffect(() => {
+        const animateSpin = Animated.timing(
+            spinValue,
+            {
+                toValue: 1,
+                duration: 1000,
+                easing: Easing.linear,
+                useNativeDriver: true
+            }
+        );
+
+        animateSpin.start();
+
+        return () => {
+            // Clean up animation on unmount if necessary
+            animateSpin.stop();
+        };
+    }, [spinValue]);
+
+    const spin = spinValue.interpolate({
+        inputRange: [0, 1],
+        outputRange: ['0deg', '360deg']
+    });
 
     const onPressInvoice = () => {
         showInvoiceDetail(true)
@@ -65,86 +89,24 @@ const SuccessScreen = ({ route }) => {
             <Status isLight />
             <ScrollView keyboardShouldPersistTaps='handled'>
                 <View style={styles.mainView}>
-                    <Image source={success} style={styles.succesImg} />
+                    <Animated.View
+                        style={{
+                            transform: [{ rotate: spin }]
+                        }}
+                    >
+                        <Image
+                            source={success} // Specify your image path here
+                            style={styles.succesImg} // Set width and height as per your image size
+                        />
+                    </Animated.View>
+                    {/* <Image source={success} style={styles.succesImg} /> */}
                     <Text style={styles.pay}>Payment Successful!</Text>
-                    <Text style={styles.confirmText}>The payment of N1000 has successfully been done.</Text> 
+                    <Text style={styles.confirmText}>The payment of N1000 has successfully been done.</Text>
                     {/* make the amount dynamic later */}
                     <RedButton buttonContainerStyle={styles.buttonContainer} ButtonContent={isLoading ? <Loader /> : 'CONTINUE'} contentStyle={styles.buttonText} onPress={() => onPressContinue()} />
                     {/* <RedButton buttonContainerStyle={styles.buttonContainer} ButtonContent={isLoading ? <Loader /> : 'INVOICE'} contentStyle={styles.buttonText} onPress={() => onPressInvoice()} /> */}
                 </View>
-                <View style={styles.container}>
-                    <Modal
-                        animationType="slide"
-                        transparent={true}
-                        visible={invoiceShow}
-                        onRequestClose={() => {
-                            showInvoiceDetail(false);
-                        }}
-                    >
-                        <View style={styles.modalContainer}>
-                            <View style={styles.modalContent}>
-                                <Text style={styles.titleHead}>
-                                    Invoice Detail
-                                </Text>
-                                <TouchableOpacity style={styles.closeImg} onPress={() => showInvoiceDetail(false)}>
-                                    <Image style={{ height: 20, width: 20 }} source={close} />
-                                </TouchableOpacity>
-                                <View style={styles.viewMain}>
-                                    <Text style={styles.amountPaid}>Amount</Text>
-                                    <Text style={styles.pay}>{route?.params?.invoiceDetail?.planPrice || ''}</Text>
-                                    <View style={styles.itemView}>
-                                        <View style={{ flex: 0.5 }}>
-                                            <Text>Name</Text>
-                                            <Text>{route?.params?.invoiceDetail?.name || ''}</Text>
-                                        </View>
-                                        <View style={styles.viewItem}>
-                                            <Text>email</Text>
-                                            <Text>{route?.params?.invoiceDetail?.email || ''}</Text>
-                                        </View>
-                                    </View>
-                                    <View style={styles.midView}>
-                                        <View style={{ flex: 0.5 }}>
-                                            <Text>Card Number</Text>
-                                            <Text>{route?.params?.invoiceDetail?.cardNumber || ''}</Text>
-                                        </View>
-                                        <View style={styles.viewItem}>
-                                            <Text>Expiry Date</Text>
-                                            <Text>{route?.params?.invoiceDetail?.expiryDate || ''}</Text>
-                                        </View>
-                                    </View>
-                                    <View style={styles.midView}>
-                                        <View style={{ flex: 0.5 }}>
-                                            <Text>Address</Text>
-                                            <Text>{route?.params?.invoiceDetail?.address || ''}</Text>
-                                        </View>
-                                        <View style={styles.viewItem}>
-                                            <Text>Country</Text>
-                                            <Text>{route?.params?.invoiceDetail?.country || ''}</Text>
-                                        </View>
-                                    </View>
-                                    <View style={styles.midView}>
-                                        <View style={{ flex: 0.5 }}>
-                                            <Text>State</Text>
-                                            <Text>{route?.params?.invoiceDetail?.state || ''}</Text>
-                                        </View>
-                                        <View style={styles.viewItem}>
-                                            <Text>City</Text>
-                                            <Text>{route?.params?.invoiceDetail?.city || ''}</Text>
-                                        </View>
-                                    </View>
-                                    <TouchableOpacity style={styles.buttonContain} onPress={() => downloadInvoice()}>
-                                        {isLoading ? <Loader /> :
-                                            <>
-                                                <Image source={download} style={{ height: 20, width: 20, marginRight: 10 }}></Image>
-                                                <Text style={styles.buttonText}>{'INVOICE'}</Text>
-                                            </>}
-
-                                    </TouchableOpacity>
-                                </View>
-                            </View>
-                        </View>
-                    </Modal>
-                </View>
+            
             </ScrollView>
         </SafeAreaView>
     );
@@ -156,51 +118,12 @@ const styles = StyleSheet.create({
         backgroundColor: colors.light_purple,
         justifyContent: 'center',
     },
-    titleHead: {
-        fontFamily: fonts.bold,
-        color: colors.grey,
-        fontSize: 20,
-        marginTop: 20,
-        marginLeft: 20
-    },
-    closeImg: {
-        position: 'absolute',
-        top: 20,
-        right: 20
-    },
-    viewMain: {
-        backgroundColor: colors.light_purple,
-        height: 100,
-        margin: 10,
-        marginTop: 30
-    },
-    amountPaid: {
-        alignSelf: 'center',
-        margin: 5,
-        fontFamily: fonts.bold,
-        fontSize: 18
-    },
     pay: {
         alignSelf: 'center',
         margin: 10,
         fontFamily: fonts.bold,
         fontSize: 25,
         color: colors.black
-    },
-    itemView: {
-        padding: 10,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginTop: 20
-    },
-    midView: {
-        padding: 10,
-        flexDirection: 'row',
-        justifyContent: 'space-between'
-    },
-    viewItem: {
-        marginLeft: 20,
-        flex: 0.5
     },
     succesImg: {
         height: 150,
@@ -252,18 +175,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         marginTop: '30%'
-    },
-    modalContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    modalContent: {
-        backgroundColor: 'white',
-        height: '80%',
-        width: '90%',
-        borderRadius: 10,
-        elevation: 5,
     },
     container: {
         flex: 1,

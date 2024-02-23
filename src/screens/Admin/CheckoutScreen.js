@@ -230,42 +230,49 @@ function CheckoutScreen({ route }) {
             } else {
                 try {
                     setIsLoading(true)
-                    const resToken = await createToken({ ...cardDetails, type: 'Card' })
-                    const requestData =
-                    {
-                        name: userData?.name,
-                        email: userData?.email,
-                        currency: 'usd',
-                        amount: "457",
-                        // amount: route?.params?.amount || 0,
-                        address: userData?.address,
-                        country: selectedOption,
-                        state: selectedState,
-                        city: selectedCity,
-                        userId: 1, //will update it later
-                        zip: '123', // make it dynamic later
-                        token: resToken?.token?.id   // stripe token
-                    }
-                    console.log(requestData, "requestData")
-                    try {
-                        const res = await creatPaymentIntent(requestData)
-                        console.log("payment intent create succesfully...!!!", res)
-
-                        if (res?.data?.clientSecret) {
-                            let confirmPaymentIntent = await confirmPayment(res?.data?.clientSecret, { paymentMethodType: 'Card' })
-                            console.log("confirmPaymentIntent res++++", confirmPaymentIntent)
-                            if (confirmPaymentIntent) {
-                                setIsLoading(false)
-                                navigation.navigate('SuccessScreen')
-                            } else {
-                                setIsLoading(false)
-                                showAlert('Payment failed, please try again!!')
-                            }
+                    const resToken = await createToken({ ...cardDetails, type: 'Card' })                    
+                    if (resToken) {
+                        const requestData =
+                        {
+                            name: userData?.name,
+                            email: userData?.email,
+                            currency: 'NGN', // Set currency to NGN for Nigerian Naira
+                            amount: route?.params?.amount === 'N1000' ? '1000' : '1500',
+                            // currency: 'usd',
+                            // amount: "200",
+                            address: userData?.address,
+                            country: selectedOption,
+                            state: selectedState,
+                            city: selectedCity,
+                            userId: 1, //will update it later
+                            zip: '123', // make it dynamic later
+                            token: resToken?.token?.id   // stripe token
                         }
-                    } catch (error) {
-                        console.log("Error rasied during payment intent", error)
+                        console.log(requestData, "requestData")
+                        try {
+                            const res = await creatPaymentIntent(requestData)
+                            console.log("payment intent create succesfully...!!!", res)
+
+                            if (res?.data?.clientSecret) {
+                                let confirmPaymentIntent = await confirmPayment(res?.data?.clientSecret, { paymentMethodType: 'Card' })
+                                console.log("confirmPaymentIntent res++++", confirmPaymentIntent)
+                                if (confirmPaymentIntent) {
+                                    //set payment method id here and send it to backend to store the transaction for future.
+                                    setIsLoading(false)
+                                    navigation.navigate('SuccessScreen')
+                                } else {
+                                    setIsLoading(false)
+                                    showAlert('Payment failed, please try again!!')
+                                }
+                            }
+                        } catch (error) {
+                            setIsLoading(false)
+                            console.log("Error rasied during payment intent", error)
+                        }
                     }
+
                 } catch (error) {
+                    setIsLoading(false)
                     console.error('Error generating token:', error);
                     showAlert('Error', 'Something went wrong. Please try again later.');
                 }
@@ -471,7 +478,7 @@ function CheckoutScreen({ route }) {
                             />
                             <ErrorMessageCheckout errorMessageText={errorMessages.address} />
                             <CardField
-                                postalCodeEnabled={true}
+                                postalCodeEnabled={false}
                                 placeholders={{
                                     number: 'Enter card number',
                                 }}
@@ -481,8 +488,8 @@ function CheckoutScreen({ route }) {
 
                                 }}
                                 style={{
-                                    marginTop:15,
-                                    height: 50, 
+                                    marginTop: 15,
+                                    height: 50,
                                 }}
                                 onCardChange={(cardDetails) => {
                                     console.log('cardDetails', cardDetails);
