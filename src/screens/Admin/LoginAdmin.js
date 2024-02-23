@@ -16,8 +16,8 @@ import RedButton from '../../components/RedButton';
 const LoginAdmin = ({ route }) => {
     const navigation = useNavigation();
     const dispatch = useDispatch();
-
     const [userData, setUserData] = useState({ email: '', password: '' });
+    // const [userData, setUserData] = useState({ email: '', password:, role: 'organization' '', role: 'organization' });   // uncomment it when role field added from bacakend.
     const [errorMessages, setErrorMessages] = useState({ email: '', password: '' });
     const [isLoading, setIsLoading] = useState(false);
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -49,13 +49,10 @@ const LoginAdmin = ({ route }) => {
             setErrorMessages(newErrorMessages);
             return;
         } else {
-            console.log(userData, "user dataaa")
             setIsLoading(true);
             dispatch(LoginAdminAction(userData, setIsLoading));
-
         }
     };
-
 
     const togglePasswordVisibility = () => {
         setIsPasswordVisible(!isPasswordVisible);
@@ -67,7 +64,7 @@ const LoginAdmin = ({ route }) => {
             <View style={{ flex: 1, backgroundColor: colors.app_blue }}>
 
                 <ScrollView keyboardShouldPersistTaps='handled'>
-                    <TouchableOpacity onPress={()=>navigation.goBack()}>
+                    <TouchableOpacity onPress={() => navigation.goBack()}>
                         <Image source={back_arow} style={{ height: 20, width: 20, margin: 20, resizeMode: 'contain' }} />
                     </TouchableOpacity>
                     <Logo />

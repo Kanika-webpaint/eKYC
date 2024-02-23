@@ -3,11 +3,9 @@ import { View, TextInput, PermissionsAndroid, FlatList, Text, Image, StyleSheet,
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { back, close, download, profile, success } from '../../common/images';
 import { useNavigation } from '@react-navigation/native';
-import { getUsersListAction } from '../../redux/actions/user';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useDispatch, useSelector } from 'react-redux';
 import { fonts } from '../../common/fonts';
-import { collection } from 'firebase/firestore';
 import colors from '../../common/colors';
 import RedButton from '../../components/RedButton';
 import Status from '../../components/Status';
@@ -102,11 +100,12 @@ const SuccessScreen = ({ route }) => {
                     {/* <Image source={success} style={styles.succesImg} /> */}
                     <Text style={styles.pay}>Payment Successful!</Text>
                     <Text style={styles.confirmText}>The payment of N1000 has successfully been done.</Text>
+                    <Text style={styles.confirmText}>Continue to sign in.</Text>
                     {/* make the amount dynamic later */}
                     <RedButton buttonContainerStyle={styles.buttonContainer} ButtonContent={isLoading ? <Loader /> : 'CONTINUE'} contentStyle={styles.buttonText} onPress={() => onPressContinue()} />
                     {/* <RedButton buttonContainerStyle={styles.buttonContainer} ButtonContent={isLoading ? <Loader /> : 'INVOICE'} contentStyle={styles.buttonText} onPress={() => onPressInvoice()} /> */}
                 </View>
-            
+
             </ScrollView>
         </SafeAreaView>
     );

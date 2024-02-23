@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
     imageContainer: {
         width: '100%',
         marginLeft: '16%',
-        marginTop: '30%',
+        marginTop: '20%',
         justifyContent: 'center',
     },
     backgroundImage: {

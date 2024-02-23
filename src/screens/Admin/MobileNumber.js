@@ -18,7 +18,6 @@ import {
   Platform,
   AlertIOS,
   ToastAndroid,
-  Alert,
   Keyboard,
 } from 'react-native';
 import colors from '../../common/colors';
@@ -38,7 +37,7 @@ import Logo from '../../components/Logo';
 import CountryPick from '../../components/CountryPicker';
 import { PhoneNumberAction, VerifyCodeAction } from '../../redux/actions/user';
 import { useDispatch } from 'react-redux';
-import { fonts, regular, thin } from '../../common/fonts';
+import { fonts } from '../../common/fonts';
 import Status from '../../components/Status';
 
 
@@ -158,10 +157,8 @@ function MobileNumber() {
 
 
   const handleVerifyCode = useCallback(async (setLoggedIn) => {
-    // navigation.navigate('IdScreen')
     // Request for OTP verification
     setIsLoading(true)
-    console.log(value, "length of value")
     if (value.length == 6) {
       const requestData = {
         phoneNumber: numberWithCode,
@@ -254,15 +251,12 @@ function MobileNumber() {
     );
   };
 
-
-
-
   return (
     <SafeAreaView style={styles.safeArea}>
       <Status lightContent />
       <View style={{ flex: 1, backgroundColor: colors.app_blue }}>
         <ScrollView style={{ marginBottom: 10 }} keyboardShouldPersistTaps='handled'>
-          <Logo />
+          <Logo styleContainer={{marginTop:'30%'}}/>
           <MobileNumberCodeVerification verificationImageSource={verification} textFirst={'To begin, Please enter your'} textMiddle={showOTP ? 'Unique Registration code' : 'Mobile Number'} textLast={showOTP ? '(Received by SMS)' : '(Receive an OTP by SMS)'} />
           {showOTP ?
             <View style={styles.codeSection}>
@@ -320,8 +314,6 @@ function MobileNumber() {
           }} />
         </ScrollView>
       </View>
-
-
     </SafeAreaView>
   );
 }

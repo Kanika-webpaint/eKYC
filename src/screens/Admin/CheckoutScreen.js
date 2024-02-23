@@ -63,6 +63,8 @@ function CheckoutScreen({ route }) {
     const [showCity, setShowCity] = useState();
     const [selectedCity, setSelectedCity] = useState(null);
     const [cardDetails, setCardDetails] = useState()
+    const [cardDetailsErrMsg, setCardDetailsErrMsg] = useState(false)
+
 
     useEffect(() => {
         const nigeriaData = Country && Country?.getCountryByCode('NG');
@@ -199,7 +201,7 @@ function CheckoutScreen({ route }) {
         }
 
         if (!cardDetails) {
-            showAlert('Enter card details')
+            setCardDetailsErrMsg(true)
         }
         if (selectedOption === null) {
             setCountryErrorMsg(true)
@@ -230,7 +232,7 @@ function CheckoutScreen({ route }) {
             } else {
                 try {
                     setIsLoading(true)
-                    const resToken = await createToken({ ...cardDetails, type: 'Card' })                    
+                    const resToken = await createToken({ ...cardDetails, type: 'Card' })
                     if (resToken) {
                         const requestData =
                         {
@@ -482,15 +484,9 @@ function CheckoutScreen({ route }) {
                                 placeholders={{
                                     number: 'Enter card number',
                                 }}
-                                cardStyle={{
-                                    backgroundColor: '#FFFFFF',
-                                    textColor: '#000000',
-
-                                }}
-                                style={{
-                                    marginTop: 15,
-                                    height: 50,
-                                }}
+                                placeholderTextColor={'#CCD0D4'}
+                                cardStyle={styles.cardStyling}
+                                style={styles.cardStripe}
                                 onCardChange={(cardDetails) => {
                                     console.log('cardDetails', cardDetails);
                                     fetchCardDetails(cardDetails)
@@ -499,8 +495,16 @@ function CheckoutScreen({ route }) {
                                     console.log('focusField', focusedField);
                                 }}
                             />
+                            {cardDetailsErrMsg && <Text style={styles.errorText}>
+                                Card details are required
+                            </Text>}
                         </View>
-                        <RedButton buttonContainerStyle={styles.buttonContainer} ButtonContent={isLoading ? <Loader /> : route?.params?.amount + ' ' + 'PAY NOW'} contentStyle={styles.buttonText} onPress={() => handleLogin()} />
+                        <RedButton
+                            buttonContainerStyle={styles.buttonContainer}
+                            ButtonContent={isLoading ? <Loader /> : route?.params?.amount + ' ' + 'PAY NOW'}
+                            contentStyle={styles.buttonText}
+                            onPress={() => handleLogin()}
+                        />
                     </View>
                 </ScrollView>
             </StripeProvider>
@@ -618,6 +622,20 @@ const styles = StyleSheet.create({
         marginTop: 5,
         fontFamily: fonts.regular
     },
+    errorText: {
+        color: colors.app_red,
+        fontFamily: fonts.regular,
+        marginTop: 10
+    },
+    cardStyling: {
+        backgroundColor: '#FFFFFF',
+        textColor: '#000000',
+        borderRadius: 5,
+    },
+    cardStripe: {
+        marginTop: 10,
+        height: 50,
+    }
 });
 
 export default CheckoutScreen;
