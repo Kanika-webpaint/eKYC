@@ -3,23 +3,25 @@ import axios from 'axios'
 import { API_URL } from "@env"
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { contactUsSlice, createUserSlice, getOrgDetailsslice, getUserListSlice, getUserSlice, loginAdminslice, phoneNumberslice, registerAdminslice, verifyCodeslice } from '../slices/user';
-import { Platform, ToastAndroid } from 'react-native';
+import { Alert, Platform, ToastAndroid } from 'react-native';
 import DashboardAdmin from '../../screens/Admin/DashboardAdmin';
 
 
 const showAlert = (message) => {
     if (Platform.OS === 'android') {
-        ToastAndroid.show(message, ToastAndroid.SHORT);
+        ToastAndroid.show(message, ToastAndroid.SHORT);     
     } else {
-        AlertIOS.alert(message);
+        Alert.alert(message);
+        
     }
 };
 
-console.log(API_URL,"APIII URLLLL")
+console.log(API_URL, "APIII URLLLL")
 
 export const LoginAdminAction = (data, setIsLoading, setLoggedIn) => async (dispatch) => {
-  
+
     try {
+        console.log(API_URL, "APIII URLLLL")
         const api_url = `${API_URL}/loginorganization`;
         const res = await axios.post(api_url, data);
         // console.log(res)
@@ -228,38 +230,51 @@ export const PhoneNumberAction =
 
 export const VerifyCodeAction =
     (
-        data,
-        setIsLoading,
+
         setLoggedIn
     ) =>
         async (dispatch) => {
             try {
-                console.log(API_URL, "validateOTP")
-                const api_url = `${API_URL}/validateOTP`
-                const res = await axios.post(api_url, data)
-                if (res?.status == 200) {
-                    console.log("success", res)
-
-                    setIsLoading(false);
-
-                    // await AsyncStorage.setItem('tokenUser', res?.data?.token);
-                    await AsyncStorage.setItem('roleUser', "user");
-
-                    // const storedToken = await AsyncStorage.getItem('tokenUser');
-                    const storedRole = await AsyncStorage.getItem('roleUser');
-                    if (storedRole) {
-
-                        await dispatch(verifyCodeslice({ data: res?.data, setLoggedIn }));
-                    } else {
-                        setIsLoading(false);
-                        showAlert(res?.data?.message)
-                    }
-                }
+                await dispatch(verifyCodeslice({ data: '', setLoggedIn }));
             } catch (e) {
-                setIsLoading(false)
-                showAlert(e?.response?.data?.message)
+                showAlert('try again later!')
             }
         }
+
+// export const VerifyCodeAction =
+//     (
+//         data,
+//         setIsLoading,
+//         setLoggedIn
+//     ) =>
+//         async (dispatch) => {
+//             try {
+//                 console.log(API_URL, "validateOTP")
+//                 const api_url = `${API_URL}/validateOTP`
+//                 const res = await axios.post(api_url, data)
+//                 if (res?.status == 200) {
+//                     console.log("success", res)
+
+//                     setIsLoading(false);
+
+//                     // await AsyncStorage.setItem('tokenUser', res?.data?.token);
+//                     await AsyncStorage.setItem('roleUser', "user");
+
+//                     // const storedToken = await AsyncStorage.getItem('tokenUser');
+//                     const storedRole = await AsyncStorage.getItem('roleUser');
+//                     if (storedRole) {
+
+//                         await dispatch(verifyCodeslice({ data: res?.data, setLoggedIn }));
+//                     } else {
+//                         setIsLoading(false);
+//                         showAlert(res?.data?.message)
+//                     }
+//                 }
+//             } catch (e) {
+//                 setIsLoading(false)
+//                 showAlert(e?.response?.data?.message)
+//             }
+//         }
 
 
 

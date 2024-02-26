@@ -55,7 +55,7 @@ const SuccessScreen = ({ route }) => {
         if (Platform.OS === 'android') {
             ToastAndroid.show(message, ToastAndroid.SHORT);
         } else {
-            AlertIOS.alert(message);
+            Alert.alert(message);
         }
     };
 

@@ -19,9 +19,10 @@ import {
   AlertIOS,
   ToastAndroid,
   Keyboard,
+  Alert,
 } from 'react-native';
 import colors from '../../common/colors';
-import {  verification } from '../../common/images';
+import { verification } from '../../common/images';
 import MobileNumberCodeVerification from '../../components/MobileNumberCodeVerification';
 import {
   CodeField,
@@ -79,7 +80,7 @@ function MobileNumber() {
     if (Platform.OS === 'android') {
       ToastAndroid.show(message, ToastAndroid.SHORT);
     } else {
-      AlertIOS.alert(message);
+      Alert.alert(message);
     }
     Keyboard.dismiss();
   };
@@ -138,37 +139,39 @@ function MobileNumber() {
   // }
 
   const handleSendCode = () => {
-    // setShowOTP(true)
-    if (mobileNumber === '') {
-      setIsLoading(true)
-      setShowError(true)
-      setIsLoading(false)
-    } else {
-      setIsLoading(true)
-      let mobileNumberCode = countryCode ? countryCode : '+91'
-      console.log(mobileNumberCode + mobileNumber, "mobileee")
-      setNumberWithCode(mobileNumberCode + mobileNumber)
-      const requestData = {
-        phoneNumber: mobileNumberCode + mobileNumber
-      };
-      dispatch(PhoneNumberAction(requestData, navigation, setShowOTP, setIsLoading))
-    };
+    setShowOTP(true)
+    // if (mobileNumber === '') {
+    //   setIsLoading(true)
+    //   setShowError(true)
+    //   setIsLoading(false)
+    // } else {
+    //   setIsLoading(true)
+    //   let mobileNumberCode = countryCode ? countryCode : '+91'
+    //   console.log(mobileNumberCode + mobileNumber, "mobileee")
+    //   setNumberWithCode(mobileNumberCode + mobileNumber)
+    //   const requestData = {
+    //     phoneNumber: mobileNumberCode + mobileNumber
+    //   };
+    //   dispatch(PhoneNumberAction(requestData, navigation, setShowOTP, setIsLoading))
+    // };
   }
 
 
   const handleVerifyCode = useCallback(async (setLoggedIn) => {
+    dispatch(VerifyCodeAction(setLoggedIn))
+
     // Request for OTP verification
-    setIsLoading(true)
-    if (value.length == 6) {
-      const requestData = {
-        phoneNumber: numberWithCode,
-        receivedotp: value
-      };
-      dispatch(VerifyCodeAction(requestData, navigation, setIsLoading))
-    } else {
-      setIsLoading(false)
-      showAlert('Please enter a 6 digit OTP code.')
-    }
+    // setIsLoading(true)
+    // if (value.length == 6) {
+    //   const requestData = {
+    //     phoneNumber: numberWithCode,
+    //     receivedotp: value
+    //   };
+    //   dispatch(VerifyCodeAction(requestData, navigation, setIsLoading))
+    // } else {
+    //   setIsLoading(false)
+    //   showAlert('Please enter a 6 digit OTP code.')
+    // }
   }, [numberWithCode, value])
 
 
@@ -256,7 +259,7 @@ function MobileNumber() {
       <Status lightContent />
       <View style={{ flex: 1, backgroundColor: colors.app_blue }}>
         <ScrollView style={{ marginBottom: 10 }} keyboardShouldPersistTaps='handled'>
-          <Logo styleContainer={{marginTop:'30%'}}/>
+          <Logo styleContainer={{ marginTop: '30%' }} />
           <MobileNumberCodeVerification verificationImageSource={verification} textFirst={'To begin, Please enter your'} textMiddle={showOTP ? 'Unique Registration code' : 'Mobile Number'} textLast={showOTP ? '(Received by SMS)' : '(Receive an OTP by SMS)'} />
           {showOTP ?
             <View style={styles.codeSection}>
@@ -296,7 +299,7 @@ function MobileNumber() {
                 />
               </View>
               {showError && (
-                <View style={{ marginLeft: 33,marginTop:5 }}>
+                <View style={{ marginLeft: 33, marginTop: 5 }}>
                   <Text style={{ color: colors.app_red }}>Mobile number is required.</Text>
                 </View>
               )}

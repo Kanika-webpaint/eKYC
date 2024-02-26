@@ -16,6 +16,7 @@ import {
     TouchableOpacity,
     FlatList,
     ToastAndroid,
+    Alert,
 } from 'react-native';
 import colors from '../../common/colors';
 import { logout, plan_select, plus, team } from '../../common/images';
@@ -81,7 +82,7 @@ function DashboardAdmin() {
         if (Platform.OS === 'android') {
             ToastAndroid.show(message, ToastAndroid.SHORT);
         } else {
-            AlertIOS.alert(message);
+            Alert.alert(message);
         }
     };
 

@@ -17,6 +17,7 @@ import {
     TouchableOpacity,
     FlatList,
     ToastAndroid,
+    Alert,
 } from 'react-native';
 import colors from '../../common/colors';
 import RedButton from '../../components/RedButton';
@@ -85,7 +86,7 @@ function CheckoutScreen({ route }) {
         if (Platform.OS === 'android') {
             ToastAndroid.show(message, ToastAndroid.SHORT);
         } else {
-            AlertIOS.alert(message);
+            Alert.alert(message);
         }
     };
 
