@@ -113,6 +113,7 @@ function ChoosePlan() {
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
+        backgroundColor:colors.light_purple
     },
     container: {
         marginTop: 30,

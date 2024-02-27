@@ -9,10 +9,10 @@ import DashboardAdmin from '../../screens/Admin/DashboardAdmin';
 
 const showAlert = (message) => {
     if (Platform.OS === 'android') {
-        ToastAndroid.show(message, ToastAndroid.SHORT);     
+        ToastAndroid.show(message, ToastAndroid.SHORT);
     } else {
         Alert.alert(message);
-        
+
     }
 };
 
@@ -23,6 +23,7 @@ export const LoginAdminAction = (data, setIsLoading, setLoggedIn) => async (disp
     try {
         console.log(API_URL, "APIII URLLLL")
         const api_url = `${API_URL}/loginorganization`;
+        // const api_url = 'http://192.168.1.18:5000/api/loginorganization'
         const res = await axios.post(api_url, data);
         // console.log(res)
         if (res?.status == 200) {
@@ -48,6 +49,9 @@ export const LoginAdminAction = (data, setIsLoading, setLoggedIn) => async (disp
         } else if (e?.response?.status === 401) {
             setIsLoading(false);
             showAlert('Invalid email and password.');
+        } else if (e?.response?.status === 400) {
+            setIsLoading(false);
+            showAlert('Organization with this email already exists');
         } else {
             showAlert('Try again later!')
             setIsLoading(false);
@@ -186,7 +190,7 @@ export const getUserByIdAction =
                     },
                 }
                 const api_url = `${API_URL}/users/${id}`
-                // const api_url = `http://192.168.1.26:5000/api/users/${id}`;
+                // const api_url = `http://192.168.1.18:5000/api/users/${id}`;
                 const res = await axios.get(api_url, config)
                 console.log(res, "get particular user detail:::")
                 if (res.status === 200) {
@@ -230,17 +234,27 @@ export const PhoneNumberAction =
 
 export const VerifyCodeAction =
     (
-
+        data,
+        setIsLoading,
         setLoggedIn
     ) =>
         async (dispatch) => {
             try {
-                await dispatch(verifyCodeslice({ data: '', setLoggedIn }));
+
+                if (data?.receivedotp == '123456') {
+                    setIsLoading(false)
+                    await dispatch(verifyCodeslice({ data: '', setLoggedIn }));
+                } else {
+                    showAlert('Please enter valid otp.')
+                }
             } catch (e) {
                 showAlert('try again later!')
             }
         }
 
+
+
+// UNCOMMENT ME
 // export const VerifyCodeAction =
 //     (
 //         data,
@@ -252,8 +266,9 @@ export const VerifyCodeAction =
 //                 console.log(API_URL, "validateOTP")
 //                 const api_url = `${API_URL}/validateOTP`
 //                 const res = await axios.post(api_url, data)
+//                 console.log("res::::::::::", res)
 //                 if (res?.status == 200) {
-//                     console.log("success", res)
+//                     console.log("successss>>>>", res)
 
 //                     setIsLoading(false);
 
@@ -262,8 +277,9 @@ export const VerifyCodeAction =
 
 //                     // const storedToken = await AsyncStorage.getItem('tokenUser');
 //                     const storedRole = await AsyncStorage.getItem('roleUser');
-//                     if (storedRole) {
 
+//                     //check store token and code 1234 should be equals
+//                     if (storedRole && res?.data?.otp === 123456) {
 //                         await dispatch(verifyCodeslice({ data: res?.data, setLoggedIn }));
 //                     } else {
 //                         setIsLoading(false);

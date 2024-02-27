@@ -146,6 +146,16 @@ function CheckoutScreen({ route }) {
         })
     }
 
+    // const creatPaymentIntent = (data) => {
+    //     return new Promise((resolve, reject) => {
+    //         axios.post('http://192.168.1.10:5000/api/stripecheckout', data).then(function (res) {
+    //             resolve(res)
+    //         }).catch(function (error) {
+    //             reject(error)
+    //         })
+    //     })
+    // }
+
     // const handleLogin = async () => {
     //     if (!cardDetails || !cardDetails.complete) {
     //         showAlert('Please enter valid card details');
@@ -240,18 +250,17 @@ function CheckoutScreen({ route }) {
                             name: userData?.name,
                             email: userData?.email,
                             currency: 'NGN', // Set currency to NGN for Nigerian Naira
-                            amount: route?.params?.amount === 'N1000' ? '1000' : '1500',
+                            // amount: route?.params?.amount === 'N1000' ? '123' : '123',   // CONFIRM THE AMOUNT LATER
                             // currency: 'usd',
-                            // amount: "200",
+                            amount: 1000,
                             address: userData?.address,
                             country: selectedOption,
                             state: selectedState,
                             city: selectedCity,
-                            userId: 1, //will update it later
+                            // userId: '', //will update it later
                             zip: '123', // make it dynamic later
                             token: resToken?.token?.id   // stripe token
                         }
-                        console.log(requestData, "requestData")
                         try {
                             const res = await creatPaymentIntent(requestData)
                             console.log("payment intent create succesfully...!!!", res)
@@ -272,6 +281,9 @@ function CheckoutScreen({ route }) {
                             setIsLoading(false)
                             console.log("Error rasied during payment intent", error)
                         }
+                    } else {
+                        showAlert('Something went wrong. Please try again later.');
+
                     }
 
                 } catch (error) {
@@ -480,6 +492,9 @@ function CheckoutScreen({ route }) {
                                 onChangeText={(text) => handleInputChange('address', text)}
                             />
                             <ErrorMessageCheckout errorMessageText={errorMessages.address} />
+                            <Text style={styles.titleText}>
+                                Card details
+                            </Text>
                             <CardField
                                 postalCodeEnabled={false}
                                 placeholders={{
@@ -502,7 +517,7 @@ function CheckoutScreen({ route }) {
                         </View>
                         <RedButton
                             buttonContainerStyle={styles.buttonContainer}
-                            ButtonContent={isLoading ? <Loader /> : route?.params?.amount + ' ' + 'PAY NOW'}
+                            ButtonContent={isLoading ? <Loader /> : route?.params?.amount === 'N1000' ? 'N2821 PAY NOW' : 'N4231 PAY NOW'}
                             contentStyle={styles.buttonText}
                             onPress={() => handleLogin()}
                         />

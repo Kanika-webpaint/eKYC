@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
   logo: {
     height: 40,
     width: '50%',
-    marginLeft: '22%',
+    marginLeft: '12%',
   },
   fingerPrint: {
     position: 'absolute',

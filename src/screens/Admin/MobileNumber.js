@@ -139,39 +139,46 @@ function MobileNumber() {
   // }
 
   const handleSendCode = () => {
-    setShowOTP(true)
-    // if (mobileNumber === '') {
-    //   setIsLoading(true)
-    //   setShowError(true)
-    //   setIsLoading(false)
-    // } else {
-    //   setIsLoading(true)
-    //   let mobileNumberCode = countryCode ? countryCode : '+91'
-    //   console.log(mobileNumberCode + mobileNumber, "mobileee")
-    //   setNumberWithCode(mobileNumberCode + mobileNumber)
-    //   const requestData = {
-    //     phoneNumber: mobileNumberCode + mobileNumber
-    //   };
-    //   dispatch(PhoneNumberAction(requestData, navigation, setShowOTP, setIsLoading))
-    // };
+    // setShowOTP(true)
+    if (mobileNumber === '') {
+      setIsLoading(true)
+      setShowError(true)
+      setIsLoading(false)
+    } else {
+      setIsLoading(true)
+      let mobileNumberCode = countryCode ? countryCode : '+91'
+      console.log(mobileNumberCode + mobileNumber, "mobileee")
+      setNumberWithCode(mobileNumberCode + mobileNumber)
+      const requestData = {
+        phoneNumber: mobileNumberCode + mobileNumber
+      };
+      dispatch(PhoneNumberAction(requestData, navigation, setShowOTP, setIsLoading))
+    };
   }
 
 
   const handleVerifyCode = useCallback(async (setLoggedIn) => {
-    dispatch(VerifyCodeAction(setLoggedIn))
+    // dispatch(VerifyCodeAction(setLoggedIn))
 
     // Request for OTP verification
-    // setIsLoading(true)
-    // if (value.length == 6) {
-    //   const requestData = {
-    //     phoneNumber: numberWithCode,
-    //     receivedotp: value
-    //   };
-    //   dispatch(VerifyCodeAction(requestData, navigation, setIsLoading))
-    // } else {
-    //   setIsLoading(false)
-    //   showAlert('Please enter a 6 digit OTP code.')
-    // }
+    setIsLoading(true)
+    if (value.length == 6) {
+      // const requestData = {
+      //   phoneNumber: numberWithCode,
+      //   receivedotp: value ? value : '1234'  //value should be '1234' for now, will check with static data
+      //   role:'user'
+      // };
+      const requestData = {
+        phoneNumber: numberWithCode,
+        receivedotp: value ? value : 123456 //value should be '1234' for now, will check with static data
+      };
+      dispatch(VerifyCodeAction(requestData, setIsLoading, setLoggedIn))
+
+      // dispatch(VerifyCodeAction(requestData, setIsLoading, setLoggedIn))
+    } else {
+      setIsLoading(false)
+      showAlert('Please enter a 6 digit OTP code.')
+    }
   }, [numberWithCode, value])
 
 
