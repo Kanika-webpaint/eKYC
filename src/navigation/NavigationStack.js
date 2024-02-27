@@ -59,7 +59,10 @@ const NavigationStack = () => {
                         <Stack.Screen name="UserProfile" component={routeNames.UserProfile} />
                     </>
                 ) : isLoggedUser ? (
-                    <Stack.Screen name="IdScreen" component={routeNames.IdScreen} />
+                    <>
+                     <Stack.Screen name="IdScreen" component={routeNames.IdScreen} />
+                    <Stack.Screen name="HomeUser" component={routeNames.HomeUser} />
+                    </>
                 ) : (
                     <>
                         <Stack.Screen name="MobileVerification" component={routeNames.MobileVerification} />
