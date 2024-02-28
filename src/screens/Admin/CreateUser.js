@@ -15,19 +15,22 @@ import {
     TextInput,
     TouchableOpacity,
     Image,
+    ToastAndroid,
+    Alert,
 } from 'react-native';
 import colors from '../../common/colors';
 import RedButton from '../../components/RedButton';
 import { useNavigation } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
 import ErrorMessage from '../../components/ErrorMsg';
-import { CreateUserAction } from '../../redux/actions/user';
+import { CreateUserAction, getUsersListAction } from '../../redux/actions/user';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Loader from '../../components/ActivityIndicator';
 import { back } from '../../common/images';
 import { fonts } from '../../common/fonts';
 import Status from '../../components/Status';
 import CountryPick from '../../components/CountryPicker';
+import showAlert from '../../components/showAlert';
 
 
 function CreateUser() {
@@ -46,6 +49,10 @@ function CreateUser() {
     const dispatch = useDispatch()
     const [countryCode, setCountryCode] = useState('')
     const OrganizationHomeList = useSelector((state) => state?.login?.orgDetails)
+    const getUsersList = useSelector(state => state?.login?.getUsersList);
+    const adminDataList = useSelector(state => state?.login?.adminLogin?.data);
+
+
 
     const handleInputChange = (field, value) => {
         setFormData({ ...userData, [field]: value });
@@ -56,6 +63,7 @@ function CreateUser() {
         AsyncStorage.getItem("token").then((value) => {
             if (value) {
                 setAuthToken(value)
+                dispatch(getUsersListAction(value, setIsLoading))
             }
         })
             .then(res => {
@@ -63,7 +71,9 @@ function CreateUser() {
             });
     }, [token]);
 
+  
 
+    console.log(adminDataList?.amount,getUsersList?.length, "amountttt")
     const handleCreateUser = () => {
         // Basic validation
         const newErrorMessages = {};
@@ -88,9 +98,25 @@ function CreateUser() {
                 phoneNumber: countryCodeSelected + userData?.phoneNo,
                 organizationId: OrganizationHomeList?.organization?.id || ''
             }
-            dispatch(CreateUserAction(requestData, token, navigation, setIsLoading))
+   
+
+            if (adminDataList?.amount === '4999' && getUsersList?.length <= 49) {
+                dispatch(CreateUserAction(requestData, token, navigation, setIsLoading));
+            } else if (adminDataList?.amount === '4499' && getUsersList?.length <= 199) {
+                dispatch(CreateUserAction(requestData, token, navigation, setIsLoading));
+            } else {
+                if (adminDataList?.amount === '4999') {
+                    setIsLoading(false)
+                    showAlert('Please purchase premium plan to add more users.');
+                } else if (adminDataList?.amount === '4499') {
+                    setIsLoading(false)
+                    showAlert('Please purchase enterprise plan to add more users.');
+                }
+            }   
+            
         }
     };
+
 
     const onChangeCountryCode = () => {
         setShow(true)
@@ -185,14 +211,16 @@ const styles = StyleSheet.create({
         paddingLeft: 15
     },
     buttonContainer: {
-        marginTop: 50,
+        marginTop: '15%',
         backgroundColor: colors.app_red,
-        paddingVertical: 12,
+        paddingVertical: 10,
         paddingHorizontal: 20,
         borderRadius: 8,
         alignItems: 'center',
         width: '100%',
-        height: 50
+        height: 50,
+        justifyContent:'center',
+        alignItems:'center'
     },
     buttonText: {
         color: colors.white,

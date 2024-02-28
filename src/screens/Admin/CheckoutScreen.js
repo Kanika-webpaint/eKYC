@@ -6,19 +6,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import {
-    SafeAreaView,
-    StyleSheet,
-    View,
-    TextInput,
-    Image,
-    Text,
-    ScrollView,
-    TouchableOpacity,
-    FlatList,
-    ToastAndroid,
-    Alert,
-} from 'react-native';
+import { SafeAreaView, StyleSheet, View, Text, TouchableOpacity, Image, ScrollView, TextInput, FlatList, ToastAndroid, Alert } from 'react-native';
 import colors from '../../common/colors';
 import RedButton from '../../components/RedButton';
 import { back, down } from '../../common/images';
@@ -28,10 +16,11 @@ import { fonts } from '../../common/fonts';
 import { Country, State, City } from 'country-state-city';
 import ErrorMessageCheckout from '../../components/ErrorMsgCheckout';
 import Status from '../../components/Status';
-import { CardField, createToken } from '@stripe/stripe-react-native';
+import { CardField, CardForm, createToken } from '@stripe/stripe-react-native';
 import { PUBLISH_KEY, API_URL } from '@env'
 import { StripeProvider, confirmPayment } from '@stripe/stripe-react-native';
 import axios from 'axios';
+import showAlert from '../../components/showAlert';
 
 
 function CheckoutScreen({ route }) {
@@ -81,14 +70,10 @@ function CheckoutScreen({ route }) {
         }
     }, []);
 
+  
 
-    const showAlert = (message) => {
-        if (Platform.OS === 'android') {
-            ToastAndroid.show(message, ToastAndroid.SHORT);
-        } else {
-            Alert.alert(message);
-        }
-    };
+
+  
 
     const handleInputChange = (field, value) => {
         setFormData({ ...userData, [field]: value });
@@ -156,46 +141,6 @@ function CheckoutScreen({ route }) {
     //     })
     // }
 
-    // const handleLogin = async () => {
-    //     if (!cardDetails || !cardDetails.complete) {
-    //         showAlert('Please enter valid card details');
-    //         return;
-    //     } else {
-    //         try {
-    //             const resToken = await createToken({ ...cardDetails, type: 'Card' })
-    //             const requestData =
-    //             {
-    //                 name: userData?.name,
-    //                 email: userData?.email,
-    //                 currency: 'usd',
-    //                 amount: "234",
-    //                 address: "1644",
-    //                 country: "India",
-    //                 state: "Abia",
-    //                 city: "Burch",
-    //                 userId: 1,
-    //                 zip: '123',
-    //                 token: resToken?.token?.id
-    //             }
-    //             console.log(requestData, "requestData")
-    //             try {
-    //                 const res = await creatPaymentIntent(requestData)
-    //                 console.log("payment intent create succesfully...!!!", res)
-
-    //                 if (res?.data?.clientSecret) {
-    //                     let confirmPaymentIntent = await confirmPayment(res?.data?.clientSecret, { paymentMethodType: 'Card' })
-    //                     console.log("confirmPaymentIntent res++++", confirmPaymentIntent)
-    //                     alert("Payment succesfully...!!!")
-    //                 }
-    //             } catch (error) {
-    //                 console.log("Error rasied during payment intent", error)
-    //             }
-    //         } catch (error) {
-    //             console.error('Error generating token:', error);
-    //             Alert.alert('Error', 'Something went wrong. Please try again later.');
-    //         }
-    //     }
-    // };
 
     const handleLogin = async () => {
 
@@ -250,9 +195,7 @@ function CheckoutScreen({ route }) {
                             name: userData?.name,
                             email: userData?.email,
                             currency: 'NGN', // Set currency to NGN for Nigerian Naira
-                            // amount: route?.params?.amount === 'N1000' ? '123' : '123',   // CONFIRM THE AMOUNT LATER
-                            // currency: 'usd',
-                            amount: 1000,
+                            amount: route?.params?.amount === 'N4999' ? '4999' : '4499',
                             address: userData?.address,
                             country: selectedOption,
                             state: selectedState,
@@ -271,7 +214,7 @@ function CheckoutScreen({ route }) {
                                 if (confirmPaymentIntent) {
                                     //set payment method id here and send it to backend to store the transaction for future.
                                     setIsLoading(false)
-                                    navigation.navigate('SuccessScreen')
+                                    navigation.navigate('SuccessScreen', { purchasedPlanAmount: confirmPaymentIntent?.paymentIntent?.amount })
                                 } else {
                                     setIsLoading(false)
                                     showAlert('Payment failed, please try again!!')
@@ -511,13 +454,17 @@ function CheckoutScreen({ route }) {
                                     console.log('focusField', focusedField);
                                 }}
                             />
+
+                            {/* <CardForm
+                                style={{height:170,width:'90%'}}
+                            /> */}
                             {cardDetailsErrMsg && <Text style={styles.errorText}>
                                 Card details are required
                             </Text>}
                         </View>
                         <RedButton
                             buttonContainerStyle={styles.buttonContainer}
-                            ButtonContent={isLoading ? <Loader /> : route?.params?.amount === 'N1000' ? 'N2821 PAY NOW' : 'N4231 PAY NOW'}
+                            ButtonContent={isLoading ? <Loader /> : route?.params?.amount === 'N4999' ? 'N4999 PAY NOW' : 'N4499 PAY NOW'}
                             contentStyle={styles.buttonText}
                             onPress={() => handleLogin()}
                         />
@@ -531,51 +478,47 @@ function CheckoutScreen({ route }) {
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
-        backgroundColor: colors.light_purple
+        backgroundColor: colors.light_purple,
     },
     buttonContainer: {
-        marginTop: '10%',
+        marginTop: '20%', // Adjusted for spacing
         backgroundColor: colors.app_red,
-        paddingVertical: 10,
+        paddingVertical: 10, // Adjusted for spacing
         borderRadius: 8,
         alignSelf: 'center',
         alignItems: 'center',
-        marginHorizontal: 30,
-        width: '100%'
+        width: '100%', // Adjusted for better responsiveness
+        marginBottom: 20, // Adjusted for spacing
     },
     buttonText: {
         color: colors.white,
         fontSize: 16,
-        alignSelf: 'center',
-        fontFamily: fonts.bold
+        fontFamily: fonts.bold,
     },
     containerHeader: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
+        alignItems: 'center', // Centering horizontally
     },
     header: {
         flexDirection: 'row',
         backgroundColor: colors.light_purple,
-        padding: 5,
-        alignItems: 'center', // Vertical alignment
-        width: '100%', // Take full width of the screen
+        paddingVertical: 10, // Adjusted for better spacing
+        alignItems: 'center',
+        width: '100%',
     },
     backArrow: {
         height: 25,
         width: 25,
-        marginRight: 10, // Add some space between back arrow and text
+        marginRight: 10,
     },
     title: {
-        flex: 1, // Allow text to take remaining space
-        textAlign: 'center', // Center the text horizontally
+        flex: 1,
+        textAlign: 'center',
         fontSize: 20,
         fontFamily: fonts.bold,
-        color: 'black', // Assuming text color
+        color: colors.black,
     },
     container: {
         flex: 1,
-        justifyContent: 'center',
         padding: 16,
     },
     input: {
@@ -584,75 +527,65 @@ const styles = StyleSheet.create({
         paddingLeft: 8,
         borderRadius: 5,
         color: colors.black,
-        borderWidth: 1,
-        width: '100%',
-        fontSize: 18,
-        borderColor: colors.white,
-        backgroundColor: colors.white,
-        fontFamily: fonts.regular,
-        marginBottom: 10
-    },
-    inputSmall: {
-        height: 50,
-        borderWidth: 1,
-        borderRadius: 5,
-        color: colors.black,
-        borderWidth: 1,
-        fontSize: 18,
         borderColor: colors.white,
         backgroundColor: colors.white,
         fontFamily: fonts.regular,
         marginBottom: 10,
-        width: 150
+        fontSize: 16,
+        width: '100%', // Adjusted for full width
     },
     inputCount: {
+        flex: 1, // Adjusted to fill available space
         color: colors.black,
-        fontSize: 18,
+        fontSize: 16,
         fontFamily: fonts.regular,
     },
     titleText: {
-        margin: 5,
+        marginVertical: 2, // Adjusted for spacing
         color: colors.grey,
-        fontFamily: fonts.regular
-    },
-    fileds: {
-        flexDirection: 'row',
-        justifyContent: 'space-between'
+        fontFamily: fonts.regular,
     },
     addressField: {
         flexDirection: 'row',
         alignItems: 'center',
+        justifyContent: 'space-between',
+        width: '100%', // Adjusted for full width
         height: 50,
         borderWidth: 1,
         paddingLeft: 8,
         borderRadius: 5,
-        borderWidth: 1,
-        width: '100%',
+        color: colors.black,
         borderColor: colors.white,
         backgroundColor: colors.white,
+        fontFamily: fonts.regular,
         marginBottom: 10,
-        justifyContent: 'space-between'
+        fontSize: 16,
     },
     errorMessageStyle: {
         color: colors.app_red,
-        marginTop: 5,
-        fontFamily: fonts.regular
+        fontFamily: fonts.regular,
+        marginLeft: 5
     },
     errorText: {
+        marginTop: 5,
+        marginLeft: 5,
         color: colors.app_red,
         fontFamily: fonts.regular,
-        marginTop: 10
     },
     cardStyling: {
         backgroundColor: '#FFFFFF',
         textColor: '#000000',
         borderRadius: 5,
+        fontFamily: fonts.regular,
+        fontSize: 16
     },
     cardStripe: {
-        marginTop: 10,
+        marginTop: 2,
         height: 50,
-    }
+        width: '100%', // Adjusted for full width
+    },
 });
+
 
 export default CheckoutScreen;
 

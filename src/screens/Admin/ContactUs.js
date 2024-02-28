@@ -159,84 +159,86 @@ function ContactUs() {
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
-        backgroundColor: colors.light_purple
+        backgroundColor: colors.light_purple,
     },
     containerHeader: {
-        flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+        paddingHorizontal: 20,
+        paddingTop: 20,
     },
     header: {
         flexDirection: 'row',
         backgroundColor: colors.light_purple,
-        padding: 20,
-        alignItems: 'center', // Vertical alignment
-        width: '100%', // Take full width of the screen
+        paddingVertical: 10,
+        alignItems: 'center',
+        width: '100%',
     },
     backArrow: {
         height: 25,
         width: 25,
-        marginRight: 10, // Add some space between back arrow and text
+        marginRight: 10,
     },
     title: {
-        flex: 1, // Allow text to take remaining space
-        textAlign: 'center', // Center the text horizontally
+        flex: 1,
+        textAlign: 'center',
         fontSize: 20,
-        color: 'black', // Assuming text color
-        fontFamily: fonts.bold
+        color: 'black',
+        fontFamily: fonts.bold,
     },
     imagePlanSelect: {
-        margin: 20,
+        marginVertical: 20,
         height: 100,
         width: 100,
         alignSelf: 'center',
-        resizeMode: 'contain'
+        resizeMode: 'contain',
     },
     midTitle: {
         color: colors.grey,
         fontSize: 17,
-        alignSelf: 'center',
         textAlign: 'center',
         marginBottom: 10,
-        fontFamily: fonts.regular
+        marginTop:10,
+        fontFamily: fonts.regular,
     },
     mainView: {
         flex: 1,
-        padding: 10,
+        paddingHorizontal: 20,
     },
     buttonContainer: {
-        marginTop: '10%',
+        marginTop: 20,
         backgroundColor: colors.app_red,
-        paddingVertical: 10,
+        paddingVertical: 12,
         borderRadius: 8,
-        alignSelf: 'center',
         alignItems: 'center',
-        marginHorizontal: 30,
-        width: '100%'
     },
     buttonText: {
         color: colors.white,
         fontSize: 16,
-        alignSelf: 'center',
-        fontFamily: fonts.bold
+        fontFamily: fonts.bold,
     },
     input: {
         borderWidth: 0.8,
         borderRadius: 5,
         marginTop: 10,
         marginBottom: 10,
-        padding: 10
+        paddingVertical: 8,
+        paddingHorizontal: 12,
+        fontSize: 16,
     },
     text: {
         fontFamily: fonts.regular,
+        fontSize: 16,
     },
     err: {
         marginLeft: 0,
         marginTop: -5,
         marginBottom: 5,
-        fontFamily: fonts.regular
-    }
+        fontFamily: fonts.regular,
+        color: 'red',
+    },
 });
+
 
 export default ContactUs;
 

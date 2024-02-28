@@ -1,10 +1,3 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
 import React, { useState, useEffect } from 'react';
 import {
     SafeAreaView,
@@ -14,8 +7,7 @@ import {
     Text,
     ScrollView,
     TouchableOpacity,
-    ToastAndroid,
-    ActivityIndicator,
+    Platform,
 } from 'react-native';
 import colors from '../../common/colors';
 import { back, checked, plan_select, unchecked } from '../../common/images';
@@ -27,30 +19,28 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useDispatch } from 'react-redux';
 
 function ChoosePlan() {
-    const [selectedItem, setSelectedItem] = useState(items[0]);
+    const [selectedItem, setSelectedItem] = useState();
     const navigation = useNavigation();
     const [selectedEnterprise, setSelectEnterprise] = useState(false)
     const [token, setAuthToken] = useState('')
     const [isLoading, setIsLoading] = useState(false);
     const dispatch = useDispatch()
+    
     useEffect(() => {
         AsyncStorage.getItem("token").then((value) => {
             if (value) {
                 setAuthToken(value)
             }
         })
-            .then(res => {
-                //do something else
-            });
-    }, [token]);
+    }, []);
 
     const handleSelection = (item) => {
         setSelectEnterprise(false)
-        setSelectedItem(item?.id === selectedItem?.id ? null : item);
+        setSelectedItem(prevItem => prevItem?.id === item?.id ? null : item);
         if (item?.id === 1) {
-            navigation.navigate('PlanDetails', { plan: 'Basic', amount: 'N1500' })
+            navigation.navigate('PlanDetails', { plan: 'Basic', amount: 'N4999' })
         } else {
-            navigation.navigate('PlanDetails', { plan: 'Premium', amount: 'N1000' })
+            navigation.navigate('PlanDetails', { plan: 'Premium', amount: 'N4499' })
         }
     };
 
@@ -63,46 +53,42 @@ function ChoosePlan() {
     return (
         <SafeAreaView style={styles.safeArea}>
             <Status isLight />
-            <ScrollView>
+            <ScrollView contentContainerStyle={styles.scrollViewContent}>
                 <View style={styles.containerHeader}>
                     <View style={styles.header}>
                         <TouchableOpacity onPress={() => navigation.goBack()}>
                             <Image source={back} style={styles.backArrow} />
                         </TouchableOpacity>
-                        <Text style={styles.title}>Choose Your Plan</Text>
+                        <Text style={styles.title}>Choose a Subscription Plan</Text>
                     </View>
                 </View>
                 <View style={styles.mainView}>
-                    <Text style={styles.midTitle}>Select a subscription plan to unlock the{'\n'}functionality of the application.</Text>
+                    <Text style={styles.midTitle}>Choose a subscription plan to unlock full access to the application's features.</Text>
                     <Image source={plan_select} style={styles.imagePlanSelect} />
-                    <View style={{ marginTop: 35 }}>
+                    <View style={styles.itemsContainer}>
                         {items?.map((item) => ( 
-                            <View key={item?.id} style={styles.itemsView}>
-                                <TouchableOpacity
-                                    key={item?.id}
-                                    style={styles.radioButton}
-                                    onPress={() => handleSelection(item)}
-                                >
-                                    {selectedItem?.id === item?.id ? <Image style={styles.selectedImg} source={checked} /> : <Image style={styles.selectedImg} source={unchecked} />}
-                                    <View key={item?.id} style={{ flexDirection: 'column', marginTop: -8 }}>
-                                        <Text style={styles.itemsLabel}>{item?.label}</Text>
-                                        <Text style={styles.itemsDescription}>{item?.description}</Text>
-                                    </View>
-                                </TouchableOpacity>
-                            </View>
-                        ))}
-                        <View style={styles.itemsView}>
                             <TouchableOpacity
-                                style={styles.radioButton}
-                                onPress={() => selectEnterprise()}
+                                key={item?.id}
+                                style={[styles.radioButton, selectedItem?.id === item?.id && styles.selectedItem]}
+                                onPress={() => handleSelection(item)}
                             >
-                                {selectedEnterprise ? <Image style={styles.selectedImg} source={checked} /> : <Image style={styles.selectedImg} source={unchecked} />}
-                                <View style={{ flexDirection: 'column', marginTop: -8 }}>
-                                    <Text style={styles.itemsLabel}>{'Enterprise'}</Text>
-                                    <Text style={styles.itemsDescription}>{'200+ contact us'}</Text>
+                                <Image style={styles.selectedImg} source={selectedItem?.id === item?.id ? checked : unchecked} />
+                                <View style={styles.itemTextContainer}>
+                                    <Text style={styles.itemsLabel}>{item?.label}</Text>
+                                    <Text style={styles.itemsDescription}>{item?.description}</Text>
                                 </View>
                             </TouchableOpacity>
-                        </View>
+                        ))}
+                        <TouchableOpacity
+                            style={[styles.radioButton, selectedEnterprise && styles.selectedItem]}
+                            onPress={() => selectEnterprise()}
+                        >
+                            <Image style={styles.selectedImg} source={selectedEnterprise ? checked : unchecked} />
+                            <View style={styles.itemTextContainer}>
+                                <Text style={styles.itemsLabel}>Enterprise</Text>
+                                <Text style={styles.itemsDescription}>Contact us for (200+) users</Text>
+                            </View>
+                        </TouchableOpacity>
                     </View>
                 </View>
             </ScrollView>
@@ -113,77 +99,83 @@ function ChoosePlan() {
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
-        backgroundColor:colors.light_purple
+        backgroundColor: colors.light_purple
     },
-    container: {
-        marginTop: 30,
-    },
-    radioButton: {
-        flexDirection: 'row',
-        padding: 15
+    scrollViewContent: {
+        flexGrow: 1,
     },
     containerHeader: {
-        flex: 1,
-        justifyContent: 'center',
         alignItems: 'center',
     },
     header: {
         flexDirection: 'row',
         backgroundColor: colors.light_purple,
         padding: 20,
-        alignItems: 'center', // Vertical alignment
-        width: '100%', // Take full width of the screen
+        alignItems: 'center',
     },
     backArrow: {
         height: 25,
         width: 25,
-        marginRight: 10, // Add some space between back arrow and text
+        marginRight: 10,
     },
     title: {
-        flex: 1, // Allow text to take remaining space
-        textAlign: 'center', // Center the text horizontally
+        flex: 1,
+        textAlign: 'center',
         fontSize: 20,
-        color: 'black', // Assuming text color
+        color: 'black',
         fontFamily: fonts.bold
+    },
+    mainView: {
+        flex: 1,
+        padding: 10,
+        marginVertical:30,
+        alignItems: 'center',
+        backgroundColor: colors.light_purple,
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20
+    },
+    midTitle: {
+        color: colors.grey,
+        fontSize: 16,
+        textAlign: 'center',
+        marginBottom: 10,
+        marginTop: 0, // Adjusted marginTop to 0
+        fontFamily: fonts.regular
     },
     imagePlanSelect: {
         height: 150,
         width: 150,
         alignSelf: 'center',
-        resizeMode: 'contain'
+        resizeMode: 'contain',
+        marginBottom:25,
     },
-    itemsView: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.8,
-        shadowRadius: 2,
-        elevation: 5,
+    itemsContainer: {
+        width: '100%',
+        alignItems: 'center',
+    },
+    radioButton: {
+        flexDirection: 'row',
+        padding: 15,
+        width: '90%',
         backgroundColor: colors.white,
-        width: 350,
         borderRadius: 5,
-        height: 100,
         marginBottom: 20,
-        justifyContent: 'center',
+        alignItems: 'center',
     },
-    midTitle: {
-        color: colors.grey,
-        fontSize: 17,
-        alignSelf: 'center',
-        textAlign: 'center',
-        marginBottom: 10,
-        fontFamily: fonts.regular
-    },
-    itemsDescription: {
-        color: colors.grey,
-        fontSize: 14,
-        marginLeft: 10,
-        fontFamily: fonts.medium
-    },
-    itemsLabel: {
-        fontSize: 16,
-        color: colors.black,
-        marginLeft: 10,
-        fontFamily: fonts.bold
+    selectedItem: {
+        backgroundColor: colors.white, // Changed background color for selected item
+        opacity: 0.8, // Added opacity
+        ...Platform.select({
+            ios: {
+                shadowColor: 'black',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.5,
+                shadowRadius: 4,
+            },
+            android: {
+                elevation: 5,
+            },
+        }),
     },
     selectedImg: {
         resizeMode: 'contain',
@@ -191,17 +183,21 @@ const styles = StyleSheet.create({
         width: 25,
         marginRight: 10
     },
-    mainView: {
+    itemTextContainer: {
         flex: 1,
-        padding: 10,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: colors.light_purple,
-        borderTopLeftRadius: 20,
-        borderTopRightRadius: 20
-    }
+        flexDirection: 'column',
+    },
+    itemsLabel: {
+        fontSize: 16,
+        color: colors.black,
+        fontFamily: fonts.bold,
+    },
+    itemsDescription: {
+        fontSize: 14,
+        color: colors.grey,
+        fontFamily: fonts.medium,
+        marginTop: 5,
+    },
 });
 
 export default ChoosePlan;
-
-

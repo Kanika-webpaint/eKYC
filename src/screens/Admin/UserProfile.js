@@ -131,6 +131,8 @@ const styles = StyleSheet.create({
         width: 25,
         marginRight: 10, // Add some space between back arrow and text
     },
+
+
 });
 
 export default UserProfile;

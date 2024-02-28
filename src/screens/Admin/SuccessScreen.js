@@ -1,28 +1,23 @@
 import React, { useEffect, useState } from 'react';
-import { View, TextInput, PermissionsAndroid, FlatList, Text, Image, StyleSheet, ScrollView, TouchableOpacity, Alert, Button, Linking, Modal, ToastAndroid, Animated, Easing } from 'react-native';
+import { View, Text, Image, StyleSheet, ScrollView, Animated, Easing, Platform, Alert, ToastAndroid } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { back, close, download, profile, success } from '../../common/images';
 import { useNavigation } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useDispatch, useSelector } from 'react-redux';
+import { success } from '../../common/images';
 import { fonts } from '../../common/fonts';
 import colors from '../../common/colors';
 import RedButton from '../../components/RedButton';
-import Status from '../../components/Status';
-import RNFS from 'react-native-fs';
 import Loader from '../../components/ActivityIndicator';
+import RNFS from 'react-native-fs';
+import showAlert from '../../components/showAlert';
 
 const SuccessScreen = ({ route }) => {
     const navigation = useNavigation();
     const [isLoading, setIsLoading] = useState(false);
-    const [invoiceShow, showInvoiceDetail] = useState(false);
-    const dispatch = useDispatch()
     const [spinValue] = useState(new Animated.Value(0));
-
+    const [invoiceShow, showInvoiceDetail] = useState(false);
     const onPressContinue = () => {
         navigation.navigate('LoginAdmin', { isOrgReg: true })
     }
-
 
     useEffect(() => {
         const animateSpin = Animated.timing(
@@ -48,18 +43,6 @@ const SuccessScreen = ({ route }) => {
         outputRange: ['0deg', '360deg']
     });
 
-    const onPressInvoice = () => {
-        showInvoiceDetail(true)
-    }
-    const showAlert = (message) => {
-        if (Platform.OS === 'android') {
-            ToastAndroid.show(message, ToastAndroid.SHORT);
-        } else {
-            Alert.alert(message);
-        }
-    };
-
-
     const downloadInvoice = async () => {
         setIsLoading(true);
         const invoiceContent = {
@@ -84,7 +67,6 @@ const SuccessScreen = ({ route }) => {
 
     return (
         <SafeAreaView style={styles.safeArea}>
-            <Status isLight />
             <ScrollView keyboardShouldPersistTaps='handled'>
                 <View style={styles.mainView}>
                     <Animated.View
@@ -94,18 +76,14 @@ const SuccessScreen = ({ route }) => {
                     >
                         <Image
                             source={success} // Specify your image path here
-                            style={styles.succesImg} // Set width and height as per your image size
+                            style={styles.successImg} // Set width and height as per your image size
                         />
                     </Animated.View>
-                    {/* <Image source={success} style={styles.succesImg} /> */}
                     <Text style={styles.pay}>Payment Successful!</Text>
-                    <Text style={styles.confirmText}>The payment of N1000 has successfully been done.</Text>
-                    <Text style={styles.confirmText}>Continue to sign in.</Text>
-                    {/* make the amount dynamic later */}
+                    <Text style={styles.confirmText}>Thank you for your payment of N{route?.params?.purchasedPlanAmount}. Your transaction has been successfully processed.</Text>
+                    <Text style={styles.confirmText}>Please proceed to sign in to access your account.</Text>
                     <RedButton buttonContainerStyle={styles.buttonContainer} ButtonContent={isLoading ? <Loader /> : 'CONTINUE'} contentStyle={styles.buttonText} onPress={() => onPressContinue()} />
-                    {/* <RedButton buttonContainerStyle={styles.buttonContainer} ButtonContent={isLoading ? <Loader /> : 'INVOICE'} contentStyle={styles.buttonText} onPress={() => onPressInvoice()} /> */}
                 </View>
-
             </ScrollView>
         </SafeAreaView>
     );
@@ -115,33 +93,32 @@ const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
         backgroundColor: colors.light_purple,
+    },
+    mainView: {
+        flex: 1,
         justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: '30%',
+        paddingHorizontal: 20,
     },
-    pay: {
-        alignSelf: 'center',
-        margin: 10,
-        fontFamily: fonts.bold,
-        fontSize: 25,
-        color: colors.black
-    },
-    succesImg: {
+    successImg: {
         height: 150,
         width: 150,
-        alignSelf: 'center',
-        resizeMode: 'contain'
+        resizeMode: 'contain',
     },
     pay: {
         fontSize: 25,
         fontFamily: fonts.bold,
-        alignSelf: 'center',
         color: colors.black,
-        marginTop: 30
+        marginTop: 30,
+        textAlign: 'center',
     },
     confirmText: {
         fontSize: 16,
         fontFamily: fonts.medium,
         color: colors.grey,
-        marginTop: 20
+        marginTop: 20,
+        textAlign: 'center',
     },
     buttonContainer: {
         marginTop: 50,
@@ -151,32 +128,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         width: '70%',
     },
-    buttonContain: {
-        marginTop: '10%',
-        flexDirection: 'row',
-        backgroundColor: colors.app_red,
-        paddingVertical: 10,
-        borderRadius: 8,
-        alignSelf: 'center',
-        justifyContent: 'center',
-        alignItems: 'center',
-        width: '70%',
-    },
     buttonText: {
         color: colors.white,
         fontSize: 16,
-        alignSelf: 'center',
-        fontFamily: fonts.bold
-    },
-    mainView: {
-        margin: 20,
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginTop: '30%'
-    },
-    container: {
-        flex: 1,
+        fontFamily: fonts.bold,
     },
 });
 

@@ -1,10 +1,3 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
 import React, { useState } from 'react';
 import {
     SafeAreaView,
@@ -45,12 +38,12 @@ function PlanDetails({ route }) {
             navigation.navigate('Checkout', { amount: route?.params?.amount || '' })
             setIsLoading(false)
         }, 1000)
-       
+
     }
 
     return (
         <SafeAreaView style={styles.safeArea}>
-              <Status isLight />
+            <Status isLight />
             <ScrollView style={{ backgroundColor: colors.light_purple }}>
                 <View style={styles.containerHeader}>
                     <View style={styles.header}>
@@ -58,17 +51,17 @@ function PlanDetails({ route }) {
                             <Image source={back} style={styles.backArrow} />
                         </TouchableOpacity>
                         {route?.params?.plan === 'Basic' ?
-                            <Text style={styles.title}>Basic Plan details</Text>
+                            <Text style={styles.title}>Basic Plan Details</Text>
                             : route?.params?.plan === 'Premium' ?
-                                <Text style={styles.title}>Premium Plan details</Text>
+                                <Text style={styles.title}>Premium Plan Details</Text>
                                 :
-                                <Text style={styles.title}>Enterprise Plan details</Text>
+                                <Text style={styles.title}>Enterprise Plan Details</Text>
                         }
                     </View>
                 </View>
                 <View style={styles.mainView}>
                     <Image source={plan_select} style={styles.imagePlanSelect} />
-                    <Text style={styles.amount}>{route?.params?.amount + " / " + 'verification' || ''}</Text>
+                    <Text style={styles.amount}>{'Pay ' + route?.params?.amount || ''}</Text>
                     <FlatList scrollEnabled={false} data={route?.params?.plan === 'Basic' ?
                         BasicPlanData : route?.params?.plan === 'Premium' ?
                             PreminumPlanData : EnterprisePlanData}
@@ -87,72 +80,72 @@ const styles = StyleSheet.create({
     },
     amount: {
         color: colors.app_red,
-        fontSize: 25,
+        fontSize: 22, // Adjusted font size
         fontFamily: fonts.bold,
-        marginTop: '20%',
+        marginTop: '10%',
         marginBottom: '5%'
     },
     containerHeader: {
-        flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
     },
     header: {
         flexDirection: 'row',
         backgroundColor: colors.light_purple,
-        padding: 20,
-        alignItems: 'center', // Vertical alignment
-        width: '100%', // Take full width of the screen
+        paddingVertical: 20, // Adjusted padding
+        paddingHorizontal: 10, // Adjusted padding
+        alignItems: 'center',
+        width: '100%',
     },
     backArrow: {
         height: 25,
         width: 25,
-        marginRight: 10, // Add some space between back arrow and text
+        marginRight: 10,
+        marginLeft:10
     },
     title: {
-        flex: 1, // Allow text to take remaining space
-        textAlign: 'center', // Center the text horizontally
+        flex: 1,
+        textAlign: 'center',
         fontSize: 20,
-        color: 'black', // Assuming text color
+        color: 'black',
         fontFamily: fonts.bold
     },
     imagePlanSelect: {
-        height: 150,
-        width: 150,
+        height: 200, // Adjusted height
+        width: 200, // Adjusted width
         alignSelf: 'center',
         resizeMode: 'contain'
     },
     buttonContainer: {
-        marginTop: '30%',
+        marginTop: '15%',
+        marginBottom: '3%',
         backgroundColor: colors.app_red,
-        paddingVertical: 12,
-        paddingHorizontal: 20,
+        paddingVertical: 10,
         borderRadius: 8,
         alignItems: 'center',
-        width: '80%',
-        height: 50
+        marginHorizontal: 30,
+        width:'85%'
     },
     buttonText: {
         color: colors.white,
-        fontSize: 16,
+        fontSize: 18, // Adjusted font size
         alignSelf: 'center',
         fontFamily: fonts.bold
     },
     itemText: {
         color: colors.black,
-        fontSize: 18,
+        fontSize: 16, // Adjusted font size
         alignSelf: 'center',
         fontFamily: fonts.regular
     },
     itemImage: {
-        height: 22,
-        width: 22,
+        height: 24, // Adjusted height
+        width: 24, // Adjusted width
         resizeMode: 'contain',
         alignSelf: 'center',
         marginRight: 20
     },
     mainView: {
-        flex: 1,
         marginTop: 20,
         justifyContent: 'center',
         alignItems: 'center',
@@ -161,5 +154,3 @@ const styles = StyleSheet.create({
 });
 
 export default PlanDetails;
-
-

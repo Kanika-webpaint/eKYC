@@ -5,16 +5,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { contactUsSlice, createUserSlice, getOrgDetailsslice, getUserListSlice, getUserSlice, loginAdminslice, phoneNumberslice, registerAdminslice, verifyCodeslice } from '../slices/user';
 import { Alert, Platform, ToastAndroid } from 'react-native';
 import DashboardAdmin from '../../screens/Admin/DashboardAdmin';
+import showAlert from '../../components/showAlert';
 
 
-const showAlert = (message) => {
-    if (Platform.OS === 'android') {
-        ToastAndroid.show(message, ToastAndroid.SHORT);
-    } else {
-        Alert.alert(message);
 
-    }
-};
 
 console.log(API_URL, "APIII URLLLL")
 
@@ -28,7 +22,7 @@ export const LoginAdminAction = (data, setIsLoading, setLoggedIn) => async (disp
         // console.log(res)
         if (res?.status == 200) {
             setIsLoading(false);
-
+            await dispatch(loginAdminslice( res, setLoggedIn ));
             await AsyncStorage.setItem('token', res?.data?.token);
             await AsyncStorage.setItem('role', "organization");
 
@@ -38,9 +32,10 @@ export const LoginAdminAction = (data, setIsLoading, setLoggedIn) => async (disp
             if (storedRole && storedToken) {
                 // Redirect to the dashboard screen after successful login
                 // setLoggedIn(true);
-                await dispatch(loginAdminslice({ data: res?.data, setLoggedIn }));
+                await dispatch(loginAdminslice( res, setLoggedIn ));
 
             }
+            
         }
     } catch (e) {
         if (e?.response?.status === 404) {

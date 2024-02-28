@@ -63,5 +63,20 @@
     "assets": [
       "./assets/fonts/"
     ]
+  }, 
+    "persona": {
+      "androidTheme": {
+        "backgroundColor": "#000000",
+        "primaryColor": "#00FF00",
+        "darkPrimaryColor": "#008000",
+        "accentColor": "#FF0000"
+      },
+      "iosTheme": {
+        "backgroundColor": "#FFFFFF",
+        "primaryColor": "#0000FF",
+        "darkPrimaryColor": "#000080",
+        "accentColor": "#FF0000"
+      }
+    
   }
 }

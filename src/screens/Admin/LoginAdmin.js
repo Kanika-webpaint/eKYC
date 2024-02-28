@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { SafeAreaView, StyleSheet, View, TextInput, Image, Text, ScrollView, TouchableOpacity, Keyboard } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useDispatch } from 'react-redux';
-import { LoginAdminAction } from '../../redux/actions/user'; // Import the login action
+import { LoginAdminAction } from '../../redux/actions/user';
 import Loader from '../../components/ActivityIndicator';
 import ErrorMessage from '../../components/ErrorMsg';
 import { mail, padlock, view, hide, back_arow } from '../../common/images';
@@ -17,7 +17,8 @@ const LoginAdmin = ({ route }) => {
     const navigation = useNavigation();
     const dispatch = useDispatch();
     const [userData, setUserData] = useState({ email: '', password: '' });
-    // const [userData, setUserData] = useState({ email: '', password:, role: 'organization' '', role: 'organization' });   // uncomment it when role field added from bacakend.
+        // const [userData, setUserData] = useState({ email: '', password:, role: 'organization' '', role: 'organization' });   // uncomment it when role field added from bacakend.
+
     const [errorMessages, setErrorMessages] = useState({ email: '', password: '' });
     const [isLoading, setIsLoading] = useState(false);
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -61,17 +62,16 @@ const LoginAdmin = ({ route }) => {
     return (
         <SafeAreaView style={styles.safeArea}>
             <Status lightContent />
-            <View style={{ flex: 1, backgroundColor: colors.app_blue }}>
-
+            <View style={styles.container}>
+                <TouchableOpacity onPress={() => navigation.goBack()}>
+                    <Image source={back_arow} style={styles.backArrow} />
+                </TouchableOpacity>
                 <ScrollView keyboardShouldPersistTaps='handled'>
-                    <TouchableOpacity onPress={() => navigation.goBack()}>
-                        <Image source={back_arow} style={{ height: 20, width: 20, margin: 20, resizeMode: 'contain' }} />
-                    </TouchableOpacity>
-                    <Logo />
-                    <View >
+                    <View style={styles.content}>
+                        <Logo />
                         <Text style={styles.title}>Login with your Admin (Portal) Details</Text>
-                        <View style={styles.container}>
-                            <Image source={mail} style={{ marginLeft: 10, marginRight: 10, height: 20, width: 20 }} />
+                        <View style={styles.inputContainer}>
+                            <Image source={mail} style={styles.icon} />
                             <TextInput
                                 value={userData?.email}
                                 style={styles.input}
@@ -82,8 +82,8 @@ const LoginAdmin = ({ route }) => {
                             />
                         </View>
                         <ErrorMessage errorMessageText={errorMessages.email} />
-                        <View style={styles.container}>
-                            <Image source={padlock} style={{ marginLeft: 10, marginRight: 10, height: 20, width: 20 }} />
+                        <View style={styles.inputContainer}>
+                            <Image source={padlock} style={styles.icon} />
                             <TextInput
                                 value={userData?.password}
                                 style={styles.input}
@@ -99,12 +99,14 @@ const LoginAdmin = ({ route }) => {
                             )}
                         </View>
                         <ErrorMessage errorMessageText={errorMessages.password} />
-                        <RedButton buttonContainerStyle={styles.buttonContainer} ButtonContent={isLoading ? <Loader /> : 'SIGN IN'} contentStyle={styles.buttonText} onPress={() => handleLogin()} />
-                        {route?.params?.isOrgReg === true ? null : <SignInUp signupContent={'Do not have an account?'} signUpText={' ' + 'Sign Up'} onPress={() => navigation.navigate('Plan')} />}
                     </View>
+                    <RedButton buttonContainerStyle={styles.buttonContainer} ButtonContent={isLoading ? <Loader /> : 'SIGN IN'} contentStyle={styles.buttonText} onPress={() => handleLogin()} />
+
+                    {route?.params?.isOrgReg === true ? null : <SignInUp signupContent={'Do not have an account?'} signUpText={' ' + 'Sign Up'} onPress={() => navigation.navigate('Plan')} />}
+
+
                 </ScrollView>
             </View>
-
         </SafeAreaView>
     );
 };
@@ -112,12 +114,56 @@ const LoginAdmin = ({ route }) => {
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
-        backgroundColor: '#06071A'
+        backgroundColor: colors.app_blue,
+    },
+    container: {
+        flex: 1,
+        backgroundColor: colors.app_blue,
+    },
+    backArrow: {
+        height: 20,
+        width: 20,
+        margin: 20,
+        resizeMode: 'contain',
+    },
+    content: {
+        flex: 1,
+        justifyContent: 'center',
+        // alignItems: 'center',
+    },
+    title: {
+        fontSize: 17,
+        color: colors.white,
+        fontFamily: fonts.regular,
+        marginTop: 20,
+        marginBottom: 50,
+        textAlign: 'center',
+    },
+    inputContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderBottomWidth: 1,
+        borderBottomColor: colors.white,
+        marginHorizontal: 30,
+    },
+    input: {
+        flex: 1,
+        fontSize: 16,
+        color: colors.white,
+        fontFamily: fonts.regular,
+        width: '100%',
+        marginLeft: 10,
+    },
+    icon: {
+        height: 20,
+        width: 20,
+        tintColor: colors.white,
     },
     buttonContainer: {
-        marginTop: '5%',
+        marginTop: '10%',
+        marginBottom: '3%',
         backgroundColor: colors.app_red,
-        paddingVertical: 10,
+        paddingVertical: 12,
         borderRadius: 8,
         alignItems: 'center',
         marginHorizontal: 30,
@@ -125,38 +171,7 @@ const styles = StyleSheet.create({
     buttonText: {
         color: colors.white,
         fontSize: 16,
-        alignSelf: 'center',
-        fontFamily: fonts.bold
-    },
-    title: {
-        alignSelf: 'center',
-        fontSize: 17,
-        color: colors.white,
-        padding: 20,
-        marginBottom: '10%',
-        fontFamily: fonts.regular
-    },
-    container: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: 'transparent',
-        borderWidth: 0,
-        borderBottomColor: colors.white,
-        borderBottomWidth: 1,
-        marginHorizontal: 30,
-    },
-    input: {
-        flex: 1, // Ensure the TextInput fills the available space
-        borderWidth: 0,
-        fontSize: 16,
-        color: colors.white,
-        fontFamily: fonts.regular,
-        width: '100%'
-    },
-    icon: {
-        height: 20,
-        width: 20,
-        marginHorizontal: 5,
+        fontFamily: fonts.bold,
     },
 });
 

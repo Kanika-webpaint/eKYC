@@ -40,6 +40,7 @@ import { PhoneNumberAction, VerifyCodeAction } from '../../redux/actions/user';
 import { useDispatch } from 'react-redux';
 import { fonts } from '../../common/fonts';
 import Status from '../../components/Status';
+import showAlert from '../../components/showAlert';
 
 
 function MobileNumber() {
@@ -74,15 +75,6 @@ function MobileNumber() {
     return (
       <RedButton buttonContainerStyle={styles.buttonContainer} ButtonContent={isLoading ? <Loader /> : 'SUBMIT'} contentStyle={styles.buttonText} onPress={() => submitOTP()} />
     );
-  };
-
-  const showAlert = (message) => {
-    if (Platform.OS === 'android') {
-      ToastAndroid.show(message, ToastAndroid.SHORT);
-    } else {
-      Alert.alert(message);
-    }
-    Keyboard.dismiss();
   };
 
 
@@ -225,6 +217,7 @@ function MobileNumber() {
   }
 
   const submitOTP = () => {
+
     Keyboard.dismiss();
     handleVerifyCode()
   }
@@ -238,6 +231,7 @@ function MobileNumber() {
   }
 
   const codeResend = useCallback(() => {
+ 
     setShowOTP(false)
     setMobileNumber('')
   }, [mobileNumber])
@@ -331,6 +325,7 @@ function MobileNumber() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
+    backgroundColor: colors.app_blue,
   },
   container: {
     flexDirection: 'row',
@@ -340,57 +335,59 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.white,
     borderBottomWidth: 1,
     marginHorizontal: 30,
-    marginTop: 20,
+    marginTop: '8%',
   },
   input: {
-    flex: 1, // Ensure the TextInput fills the available space
+    flex: 1,
     borderWidth: 0,
-    fontSize: 16,
+    fontSize: 18,
     color: colors.white,
-    fontFamily: fonts.regular
+    fontFamily: fonts.regular,
+    marginLeft: 10,
   },
   buttonContainer: {
     marginTop: '10%',
     marginBottom: '3%',
     backgroundColor: colors.app_red,
-    paddingVertical: 10,
+    paddingVertical: 12,
     borderRadius: 8,
     alignItems: 'center',
     marginHorizontal: 30,
   },
   buttonText: {
     color: 'white',
-    fontSize: 16,
-    fontFamily: fonts.bold
+    fontSize: 18,
+    fontFamily: fonts.bold,
   },
   bottomView: {
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 20
+    marginTop: '8%',
   },
   codeView: {
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 20
+    marginTop: '2%',
   },
   codeText: {
-    fontSize: 16,
-    fontFamily: fonts.medium,
-    color: colors.light_grey
-  },
-  contactText: {
-    marginTop: 20,
-    fontSize: 16,
+    fontSize: 18,
     fontFamily: fonts.medium,
     color: colors.light_grey,
-    alignSelf: 'center'
+  },
+  contactText: {
+    marginTop: '5%',
+    fontSize: 14, 
+    fontFamily: fonts.medium,
+    color: colors.light_grey,
+    alignSelf: 'center',
+    textAlign: 'center',
   },
   root: {
     flex: 1,
-    padding: 20
+    padding: 20,
   },
   codeFieldRoot: {
-    marginTop: 20
+    marginTop: '5%',
   },
   cell: {
     width: 40,
@@ -405,19 +402,22 @@ const styles = StyleSheet.create({
   },
   focusCell: {
     borderColor: colors.white,
-    alignSelf: 'center'
+    alignSelf: 'center',
   },
   codeSection: {
-    marginLeft: 30,
-    marginRight: 30,
-    marginTop: 18
+    marginHorizontal: 30,
+    marginTop: '5%',
   },
   adminText: {
-    fontSize: 18,
+    fontSize: 16,
     color: colors.white,
     textDecorationLine: 'underline',
-    fontFamily: fonts.regular
-  }
+    fontFamily: fonts.regular,
+    marginTop: '8%',
+    textAlign: 'center',
+  },
 });
 
 export default MobileNumber;
+
+
