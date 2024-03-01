@@ -49,29 +49,28 @@ const NavigationStack = () => {
 
     return (
         <NavigationContainer>
-            <Stack.Navigator headerMode="none">
-
+            <Stack.Navigator>
                 {isLogged ? (
                     <>
-                        <Stack.Screen name="DashboardAdmin" component={routeNames.DashboardAdmin} />
-                        <Stack.Screen name="CreateUser" component={routeNames.CreateUser} />
-                        <Stack.Screen name="UsersList" component={routeNames.UserList} />
-                        <Stack.Screen name="UserProfile" component={routeNames.UserProfile} />
+                        <Stack.Screen options={{ headerShown: false }} name="DashboardAdmin" component={routeNames.DashboardAdmin} />
+                        <Stack.Screen options={{ headerShown: false }} name="CreateUser" component={routeNames.CreateUser} />
+                        <Stack.Screen options={{ headerShown: false }} name="UsersList" component={routeNames.UserList} />
+                        <Stack.Screen options={{ headerShown: false }} name="UserProfile" component={routeNames.UserProfile} />
                     </>
                 ) : isLoggedUser ? (
                     <>
-                     <Stack.Screen name="IdScreen" component={routeNames.IdScreen} />
-                    <Stack.Screen name="HomeUser" component={routeNames.HomeUser} />
+                     <Stack.Screen options={{ headerShown: false }} name="IdScreen" component={routeNames.IdScreen} />
+                    <Stack.Screen options={{ headerShown: false }} name="HomeUser" component={routeNames.HomeUser} />
                     </>
                 ) : (
                     <>
-                        <Stack.Screen name="MobileVerification" component={routeNames.MobileVerification} />
-                        <Stack.Screen name="LoginAdmin" component={routeNames.LoginAdmin} />
-                        <Stack.Screen name="Plan" component={routeNames.Plan} />
-                        <Stack.Screen name="Checkout" component={routeNames.Checkout} />
-                        <Stack.Screen name="PlanDetails" component={routeNames.PlanDetails} />
-                        <Stack.Screen name="SuccessScreen" component={routeNames.SuccessScreen} />
-                        <Stack.Screen name="ContactUs" component={routeNames.ContactUs} />
+                        <Stack.Screen options={{ headerShown: false }} name="MobileVerification" component={routeNames.MobileVerification} />
+                        <Stack.Screen options={{ headerShown: false }} name="LoginAdmin" component={routeNames.LoginAdmin} />
+                        <Stack.Screen options={{ headerShown: false }} name="Plan" component={routeNames.Plan} />
+                        <Stack.Screen options={{ headerShown: false }} name="Checkout" component={routeNames.Checkout} />
+                        <Stack.Screen options={{ headerShown: false }} name="PlanDetails" component={routeNames.PlanDetails} />
+                        <Stack.Screen options={{ headerShown: false }} name="SuccessScreen" component={routeNames.SuccessScreen} />
+                        <Stack.Screen options={{ headerShown: false }} name="ContactUs" component={routeNames.ContactUs} />
                     </>
                 )}
             </Stack.Navigator>

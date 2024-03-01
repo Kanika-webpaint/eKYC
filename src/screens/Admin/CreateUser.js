@@ -6,18 +6,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import {
-    SafeAreaView,
-    StyleSheet,
-    View,
-    Text,
-    ScrollView,
-    TextInput,
-    TouchableOpacity,
-    Image,
-    ToastAndroid,
-    Alert,
-} from 'react-native';
+import { SafeAreaView, StyleSheet, View, Text, ScrollView, TextInput, TouchableOpacity, Image, Dimensions } from 'react-native';
 import colors from '../../common/colors';
 import RedButton from '../../components/RedButton';
 import { useNavigation } from '@react-navigation/native';
@@ -34,25 +23,19 @@ import showAlert from '../../components/showAlert';
 
 
 function CreateUser() {
-    const [userData, setFormData] = useState({
-        username: '',
-        phoneNo: '',
-    });
-    const [errorMessages, setErrorMessages] = useState({
-        username: '',
-        phoneNo: '',
-    });
-    const navigation = useNavigation();
+    const [userData, setFormData] = useState({ username: '', phoneNo: '' });
+    const [errorMessages, setErrorMessages] = useState({ username: '',phoneNo: '' });
+    const [isPotrait, setIsPortrait] = useState(true)
     const [isLoading, setIsLoading] = useState(false);
     const [show, setShow] = useState(false)
     const [token, setAuthToken] = useState('')
-    const dispatch = useDispatch()
     const [countryCode, setCountryCode] = useState('')
+    const navigation = useNavigation();
+    const dispatch = useDispatch()
+
     const OrganizationHomeList = useSelector((state) => state?.login?.orgDetails)
     const getUsersList = useSelector(state => state?.login?.getUsersList);
     const adminDataList = useSelector(state => state?.login?.adminLogin?.data);
-
-
 
     const handleInputChange = (field, value) => {
         setFormData({ ...userData, [field]: value });
@@ -71,11 +54,30 @@ function CreateUser() {
             });
     }, [token]);
 
-  
+    useEffect(() => {
+        const updateOrientation = () => {
+            const { height, width } = Dimensions.get('window');
+            setIsPortrait(height > width);
+        };
+        Dimensions.addEventListener('change', updateOrientation);
+        // Return a cleanup function
+        // return () => {
+        //     Dimensions?.removeEventListener('change', updateOrientation);
+        // };
+    }, []);
 
-    console.log(adminDataList?.amount,getUsersList?.length, "amountttt")
+    useEffect(() => {
+        const updateOrientation = () => {
+            const { height, width } = Dimensions.get('window');
+            setIsPortrait(height > width);
+        };
+        // Add event listener when the screen focuses
+        const unsubscribeFocus = navigation.addListener('focus', updateOrientation);
+        // Remove event listener when the screen unfocuses
+        return unsubscribeFocus;
+    }, [navigation]);
+
     const handleCreateUser = () => {
-        // Basic validation
         const newErrorMessages = {};
 
         if (!userData.username) {
@@ -98,8 +100,6 @@ function CreateUser() {
                 phoneNumber: countryCodeSelected + userData?.phoneNo,
                 organizationId: OrganizationHomeList?.organization?.id || ''
             }
-   
-
             if (adminDataList?.amount === '4999' && getUsersList?.length <= 49) {
                 dispatch(CreateUserAction(requestData, token, navigation, setIsLoading));
             } else if (adminDataList?.amount === '4499' && getUsersList?.length <= 199) {
@@ -112,11 +112,9 @@ function CreateUser() {
                     setIsLoading(false)
                     showAlert('Please purchase enterprise plan to add more users.');
                 }
-            }   
-            
+            }
         }
     };
-
 
     const onChangeCountryCode = () => {
         setShow(true)
@@ -162,7 +160,7 @@ function CreateUser() {
                         </View>
                         <ErrorMessage errorMessageText={errorMessages.phoneNo} style={{ marginLeft: 5 }} />
                     </View>
-                    <RedButton buttonContainerStyle={styles.buttonContainer} ButtonContent={isLoading ? <Loader /> : 'CREATE USER'} contentStyle={styles.buttonText} onPress={() => handleCreateUser()} />
+                    <RedButton buttonContainerStyle={[styles.buttonContainer, { marginTop: isPotrait ? '15%' : '5%', }]} ButtonContent={isLoading ? <Loader /> : 'CREATE USER'} contentStyle={styles.buttonText} onPress={() => handleCreateUser()} />
                     <CountryPick show={show} onBackdropPress={() => setShow(false)} pickerButtonOnPress={(item) => {
                         setCountryCode(item.dial_code);
                         setShow(false);
@@ -211,7 +209,6 @@ const styles = StyleSheet.create({
         paddingLeft: 15
     },
     buttonContainer: {
-        marginTop: '15%',
         backgroundColor: colors.app_red,
         paddingVertical: 10,
         paddingHorizontal: 20,
@@ -219,8 +216,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         width: '100%',
         height: 50,
-        justifyContent:'center',
-        alignItems:'center'
+        justifyContent: 'center',
+        alignItems: 'center'
     },
     buttonText: {
         color: colors.white,

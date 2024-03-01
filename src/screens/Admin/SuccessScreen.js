@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, StyleSheet, ScrollView, Animated, Easing, Platform, Alert, ToastAndroid } from 'react-native';
+import { View, Text, Image, StyleSheet, ScrollView, Animated, Easing, Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { success } from '../../common/images';
@@ -7,16 +7,21 @@ import { fonts } from '../../common/fonts';
 import colors from '../../common/colors';
 import RedButton from '../../components/RedButton';
 import Loader from '../../components/ActivityIndicator';
-import RNFS from 'react-native-fs';
-import showAlert from '../../components/showAlert';
+
 
 const SuccessScreen = ({ route }) => {
     const navigation = useNavigation();
     const [isLoading, setIsLoading] = useState(false);
+    const [isPotrait, setIsPortrait] = useState(true)
     const [spinValue] = useState(new Animated.Value(0));
-    const [invoiceShow, showInvoiceDetail] = useState(false);
+ 
+
     const onPressContinue = () => {
-        navigation.navigate('LoginAdmin', { isOrgReg: true })
+        setIsLoading(true)
+        setTimeout(() => {
+            navigation.navigate('LoginAdmin', { isOrgReg: true })
+            setIsLoading(false)
+        }, 500);
     }
 
     useEffect(() => {
@@ -29,46 +34,45 @@ const SuccessScreen = ({ route }) => {
                 useNativeDriver: true
             }
         );
-
         animateSpin.start();
-
         return () => {
             // Clean up animation on unmount if necessary
             animateSpin.stop();
         };
     }, [spinValue]);
 
+    useEffect(() => {
+        const updateOrientation = () => {
+            const { height, width } = Dimensions.get('window');
+            setIsPortrait(height > width);
+        };
+        Dimensions.addEventListener('change', updateOrientation);
+        // Return a cleanup function
+        // return () => {
+        //     Dimensions?.removeEventListener('change', updateOrientation);
+        // };
+    }, []);
+
+    useEffect(() => {
+        const updateOrientation = () => {
+            const { height, width } = Dimensions.get('window');
+            setIsPortrait(height > width);
+        };
+        // Add event listener when the screen focuses
+        const unsubscribeFocus = navigation.addListener('focus', updateOrientation);
+        // Remove event listener when the screen unfocuses
+        return unsubscribeFocus;
+    }, [navigation]);
+
     const spin = spinValue.interpolate({
         inputRange: [0, 1],
         outputRange: ['0deg', '360deg']
     });
 
-    const downloadInvoice = async () => {
-        setIsLoading(true);
-        const invoiceContent = {
-            planPrice: route?.params?.invoiceDetail?.planPrice,
-            cardNumber: route?.params?.invoiceDetail?.cardNumber || '',
-            email: route?.params?.invoiceDetail?.email,
-            name: route?.params?.invoiceDetail?.name,
-            address: route?.params?.invoiceDetail?.address,
-            city: route?.params?.invoiceDetail?.city,
-            state: route?.params?.invoiceDetail?.state
-        };
-
-        const csvContent = Object.keys(invoiceContent).map(key => `${key},${invoiceContent[key]}`).join('\n');
-        const path = RNFS.DownloadDirectoryPath + '/invoiceee.txt';
-        await RNFS.writeFile(path, csvContent, 'utf8');
-        showAlert('Invoice Downloaded successfully!!');
-        setTimeout(() => {
-            setIsLoading(false);
-            showInvoiceDetail(false);
-        }, 1000)
-    };
-
     return (
         <SafeAreaView style={styles.safeArea}>
             <ScrollView keyboardShouldPersistTaps='handled'>
-                <View style={styles.mainView}>
+                <View style={[styles.mainView, { marginTop: isPotrait ? '30%' : '5%' }]}>
                     <Animated.View
                         style={{
                             transform: [{ rotate: spin }]
@@ -82,7 +86,7 @@ const SuccessScreen = ({ route }) => {
                     <Text style={styles.pay}>Payment Successful!</Text>
                     <Text style={styles.confirmText}>Thank you for your payment of N{route?.params?.purchasedPlanAmount}. Your transaction has been successfully processed.</Text>
                     <Text style={styles.confirmText}>Please proceed to sign in to access your account.</Text>
-                    <RedButton buttonContainerStyle={styles.buttonContainer} ButtonContent={isLoading ? <Loader /> : 'CONTINUE'} contentStyle={styles.buttonText} onPress={() => onPressContinue()} />
+                    <RedButton buttonContainerStyle={[styles.buttonContainer, { marginBottom: isPotrait ? 0 : 20 }]} ButtonContent={isLoading ? <Loader /> : 'CONTINUE'} contentStyle={styles.buttonText} onPress={() => onPressContinue()} />
                 </View>
             </ScrollView>
         </SafeAreaView>
@@ -98,7 +102,6 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        marginTop: '30%',
         paddingHorizontal: 20,
     },
     successImg: {

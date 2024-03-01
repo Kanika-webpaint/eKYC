@@ -6,20 +6,9 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import {
-    SafeAreaView,
-    StyleSheet,
-    View,
-    Image,
-    Text,
-    ScrollView,
-    TouchableOpacity,
-    ToastAndroid,
-    ActivityIndicator,
-    TextInput,
-} from 'react-native';
+import { SafeAreaView, StyleSheet, View, Image, Text, ScrollView, TouchableOpacity, TextInput } from 'react-native';
 import colors from '../../common/colors';
-import { back, checked, contact, plan_select, unchecked } from '../../common/images';
+import { back, contact } from '../../common/images';
 import { useNavigation } from '@react-navigation/native';
 import { items } from '../../common/PlansList';
 import { fonts } from '../../common/fonts';
@@ -32,24 +21,13 @@ import RedButton from '../../components/RedButton';
 import ErrorMessage from '../../components/ErrorMsg';
 
 function ContactUs() {
-    const [selectedItem, setSelectedItem] = useState(items[0]);
-    const navigation = useNavigation();
-    const [selectedEnterprise, setSelectEnterprise] = useState(false)
-    const [token, setAuthToken] = useState('')
     const [isLoading, setIsLoading] = useState(false);
+    const [token, setAuthToken] = useState('')
+    const [userData, setFormData] = useState({ subject: '', email: '', phNo: '', description: '' });
+    const [errorMessages, setErrorMessages] = useState({ subject: '', email: '', phNo: '', description: '' });
+    const navigation = useNavigation();
     const dispatch = useDispatch()
-    const [userData, setFormData] = useState({
-        subject: '',
-        email: '',
-        phNo: '',
-        description: ''
-    });
-    const [errorMessages, setErrorMessages] = useState({
-        subject: '',
-        email: '',
-        phNo: '',
-        description: ''
-    });
+    
     useEffect(() => {
         AsyncStorage.getItem("token").then((value) => {
             if (value) {
@@ -99,7 +77,6 @@ function ContactUs() {
             dispatch(ContactUsAction(requestData, token, navigation, setIsLoading))
         }
     }
-
 
     return (
         <SafeAreaView style={styles.safeArea}>
@@ -198,7 +175,7 @@ const styles = StyleSheet.create({
         fontSize: 17,
         textAlign: 'center',
         marginBottom: 10,
-        marginTop:10,
+        marginTop: 10,
         fontFamily: fonts.regular,
     },
     mainView: {

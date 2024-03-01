@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState ,useEffect} from 'react';
 import {
     SafeAreaView,
     StyleSheet,
@@ -9,6 +9,7 @@ import {
     ScrollView,
     TouchableOpacity,
     FlatList,
+    Dimensions,
 } from 'react-native';
 import colors from '../../common/colors';
 import { back, check, phone, plan_select } from '../../common/images';
@@ -22,6 +23,7 @@ import Status from '../../components/Status';
 function PlanDetails({ route }) {
     const navigation = useNavigation();
     const [isLoading, setIsLoading] = useState(false);
+    const [isPotrait, setIsPortrait] = useState(true)
 
     const renderPlanItem = (item) => {
         return (
@@ -40,6 +42,34 @@ function PlanDetails({ route }) {
         }, 1000)
 
     }
+
+
+    useEffect(() => {
+        const updateOrientation = () => {
+            const { height, width } = Dimensions.get('window');
+            setIsPortrait(height > width);
+        };
+
+        Dimensions.addEventListener('change', updateOrientation);
+
+        // Return a cleanup function
+        // return () => {
+        //     Dimensions?.removeEventListener('change', updateOrientation);
+        // };
+    }, []);
+
+    useEffect(() => {
+        const updateOrientation = () => {
+            const { height, width } = Dimensions.get('window');
+            setIsPortrait(height > width);
+        };
+
+        // Add event listener when the screen focuses
+        const unsubscribeFocus = navigation.addListener('focus', updateOrientation);
+
+        // Remove event listener when the screen unfocuses
+        return unsubscribeFocus;
+    }, [navigation]);
 
     return (
         <SafeAreaView style={styles.safeArea}>
@@ -67,7 +97,7 @@ function PlanDetails({ route }) {
                             PreminumPlanData : EnterprisePlanData}
                         renderItem={(item) => renderPlanItem(item)}
                     />
-                    <RedButton buttonContainerStyle={styles.buttonContainer} ButtonContent={isLoading ? <Loader /> : 'CHECKOUT'} contentStyle={styles.buttonText} onPress={() => NavigateToCheckout()} />
+                    <RedButton buttonContainerStyle={[styles.buttonContainer, { marginBottom: isPotrait ? '3%' : '5%' }]} ButtonContent={isLoading ? <Loader /> : 'CHECKOUT'} contentStyle={styles.buttonText} onPress={() => NavigateToCheckout()} />
                 </View>
             </ScrollView>
         </SafeAreaView>
@@ -101,7 +131,7 @@ const styles = StyleSheet.create({
         height: 25,
         width: 25,
         marginRight: 10,
-        marginLeft:10
+        marginLeft: 10
     },
     title: {
         flex: 1,
@@ -118,13 +148,13 @@ const styles = StyleSheet.create({
     },
     buttonContainer: {
         marginTop: '15%',
-        marginBottom: '3%',
+
         backgroundColor: colors.app_red,
         paddingVertical: 10,
         borderRadius: 8,
         alignItems: 'center',
         marginHorizontal: 30,
-        width:'85%'
+        width: '85%'
     },
     buttonText: {
         color: colors.white,

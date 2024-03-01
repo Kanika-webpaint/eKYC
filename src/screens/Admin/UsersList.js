@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, TextInput, FlatList, Text, Image, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { back, close, down, profile, rightArrow } from '../../common/images';
+import { back, close, profile, rightArrow } from '../../common/images';
 import { useNavigation } from '@react-navigation/native';
 import { getUsersListAction } from '../../redux/actions/user';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -12,11 +12,10 @@ import { fonts } from '../../common/fonts';
 const UserList = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredUsers, setFilteredUsers] = useState([]);
-  const navigation = useNavigation();
   const [isLoading, setIsLoading] = useState(false);
+  const navigation = useNavigation();
   const dispatch = useDispatch()
   const usersListing = useSelector((state) => state?.login?.getUsersList)
-
 
   useEffect(() => {
     AsyncStorage.getItem("token").then((value) => {
@@ -150,7 +149,6 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     padding: 10,
-
   },
   containerHeader: {
     flex: 1,

@@ -14,10 +14,10 @@ import {
 import { fonts } from '../common/fonts';
 
 
-function SignInUp({ onPress, signupContent, signUpText }) {
+function SignInUp({ onPress, signupContent, signUpText ,viewBottomSignup}) {
     return (
         <>
-            <TouchableOpacity style={styles.bottomSignUpView} onPress={onPress}>
+            <TouchableOpacity style={[styles.bottomSignUpView, viewBottomSignup]} onPress={onPress}>
                 <Text style={styles.bottomText}>{signupContent}</Text>
                 <Text style={styles.signUpText}>{signUpText}</Text>
             </TouchableOpacity>

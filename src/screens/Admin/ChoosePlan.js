@@ -1,38 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import {
-    SafeAreaView,
-    StyleSheet,
-    View,
-    Image,
-    Text,
-    ScrollView,
-    TouchableOpacity,
-    Platform,
-} from 'react-native';
+import React, { useState } from 'react';
+import { SafeAreaView, StyleSheet, View, Image, Text, ScrollView, TouchableOpacity, Platform, } from 'react-native';
 import colors from '../../common/colors';
 import { back, checked, plan_select, unchecked } from '../../common/images';
 import { useNavigation } from '@react-navigation/native';
 import { items } from '../../common/PlansList';
 import { fonts } from '../../common/fonts';
 import Status from '../../components/Status';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useDispatch } from 'react-redux';
+
 
 function ChoosePlan() {
     const [selectedItem, setSelectedItem] = useState();
-    const navigation = useNavigation();
     const [selectedEnterprise, setSelectEnterprise] = useState(false)
-    const [token, setAuthToken] = useState('')
-    const [isLoading, setIsLoading] = useState(false);
-    const dispatch = useDispatch()
-    
-    useEffect(() => {
-        AsyncStorage.getItem("token").then((value) => {
-            if (value) {
-                setAuthToken(value)
-            }
-        })
-    }, []);
+    const navigation = useNavigation();
 
     const handleSelection = (item) => {
         setSelectEnterprise(false)
@@ -66,7 +45,7 @@ function ChoosePlan() {
                     <Text style={styles.midTitle}>Choose a subscription plan to unlock full access to the application's features.</Text>
                     <Image source={plan_select} style={styles.imagePlanSelect} />
                     <View style={styles.itemsContainer}>
-                        {items?.map((item) => ( 
+                        {items?.map((item) => (
                             <TouchableOpacity
                                 key={item?.id}
                                 style={[styles.radioButton, selectedItem?.id === item?.id && styles.selectedItem]}
@@ -128,7 +107,7 @@ const styles = StyleSheet.create({
     mainView: {
         flex: 1,
         padding: 10,
-        marginVertical:30,
+        marginVertical: 30,
         alignItems: 'center',
         backgroundColor: colors.light_purple,
         borderTopLeftRadius: 20,
@@ -147,7 +126,7 @@ const styles = StyleSheet.create({
         width: 150,
         alignSelf: 'center',
         resizeMode: 'contain',
-        marginBottom:25,
+        marginBottom: 25,
     },
     itemsContainer: {
         width: '100%',
@@ -156,7 +135,7 @@ const styles = StyleSheet.create({
     radioButton: {
         flexDirection: 'row',
         padding: 15,
-        width: '90%',
+        width: '95%',
         backgroundColor: colors.white,
         borderRadius: 5,
         marginBottom: 20,

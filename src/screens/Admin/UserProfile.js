@@ -6,27 +6,12 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import {
-    SafeAreaView,
-    StyleSheet,
-    View,
-    TextInput,
-    Image,
-    Text,
-    ImageBackground,
-    ScrollView,
-    TouchableOpacity,
-} from 'react-native';
+import { SafeAreaView, StyleSheet,  View,  TextInput,Image, Text, ScrollView, TouchableOpacity} from 'react-native';
 import colors from '../../common/colors';
-import RedButton from '../../components/RedButton';
-import { back, background_image, finger_print, profile, validifyX } from '../../common/images';
+import { back,  profile } from '../../common/images';
 import { useNavigation } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux'
-import { LoginAction, LoginAdminAction, getUserByIdAction } from '../../redux/actions/user';
-import Loader from '../../components/ActivityIndicator';
-import Logo from '../../components/Logo';
-import ErrorMessage from '../../components/ErrorMsg';
-import SignInUp from '../../components/SignInUp';
+import {  getUserByIdAction } from '../../redux/actions/user';
 import { fonts } from '../../common/fonts';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Status from '../../components/Status';
@@ -131,8 +116,6 @@ const styles = StyleSheet.create({
         width: 25,
         marginRight: 10, // Add some space between back arrow and text
     },
-
-
 });
 
 export default UserProfile;

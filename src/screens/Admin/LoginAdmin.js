@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView, StyleSheet, View, TextInput, Image, Text, ScrollView, TouchableOpacity, Keyboard } from 'react-native';
+import { SafeAreaView, StyleSheet, View, TextInput, Image, Text, ScrollView, TouchableOpacity, Keyboard, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useDispatch } from 'react-redux';
 import { LoginAdminAction } from '../../redux/actions/user';
@@ -14,20 +14,43 @@ import Status from '../../components/Status';
 import RedButton from '../../components/RedButton';
 
 const LoginAdmin = ({ route }) => {
-    const navigation = useNavigation();
-    const dispatch = useDispatch();
     const [userData, setUserData] = useState({ email: '', password: '' });
-        // const [userData, setUserData] = useState({ email: '', password:, role: 'organization' '', role: 'organization' });   // uncomment it when role field added from bacakend.
-
+    // const [userData, setUserData] = useState({ email: '', password:, role: 'organization' '', role: 'organization' });   // uncomment it when role field added from bacakend.
     const [errorMessages, setErrorMessages] = useState({ email: '', password: '' });
     const [isLoading, setIsLoading] = useState(false);
+    const [isPotrait, setIsPortrait] = useState(true)
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+    const navigation = useNavigation();
+    const dispatch = useDispatch();
 
     useEffect(() => {
         if (route?.params?.isOrgReg === true) {
             setUserData({ email: '', password: '' });
         }
     }, [route?.params?.isOrgReg]);
+
+    useEffect(() => {
+        const updateOrientation = () => {
+            const { height, width } = Dimensions.get('window');
+            setIsPortrait(height > width);
+        };
+        Dimensions.addEventListener('change', updateOrientation);
+        // Return a cleanup function
+        // return () => {
+        //     Dimensions?.removeEventListener('change', updateOrientation);
+        // };
+    }, []);
+
+    useEffect(() => {
+        const updateOrientation = () => {
+            const { height, width } = Dimensions.get('window');
+            setIsPortrait(height > width);
+        };
+        // Add event listener when the screen focuses
+        const unsubscribeFocus = navigation.addListener('focus', updateOrientation);
+        // Remove event listener when the screen unfocuses
+        return unsubscribeFocus;
+    }, [navigation]);
 
     const handleInputChange = (field, value) => {
         setUserData({ ...userData, [field]: value });
@@ -68,7 +91,7 @@ const LoginAdmin = ({ route }) => {
                 </TouchableOpacity>
                 <ScrollView keyboardShouldPersistTaps='handled'>
                     <View style={styles.content}>
-                        <Logo />
+                        <Logo styleContainer={{ marginTop: isPotrait ? '30%' : '5%' }} fingerPrintStyle={[styles.fingerPrintStyle, { left: isPotrait ? 60 : 310}]}/>
                         <Text style={styles.title}>Login with your Admin (Portal) Details</Text>
                         <View style={styles.inputContainer}>
                             <Image source={mail} style={styles.icon} />
@@ -101,10 +124,7 @@ const LoginAdmin = ({ route }) => {
                         <ErrorMessage errorMessageText={errorMessages.password} />
                     </View>
                     <RedButton buttonContainerStyle={styles.buttonContainer} ButtonContent={isLoading ? <Loader /> : 'SIGN IN'} contentStyle={styles.buttonText} onPress={() => handleLogin()} />
-
-                    {route?.params?.isOrgReg === true ? null : <SignInUp signupContent={'Do not have an account?'} signUpText={' ' + 'Sign Up'} onPress={() => navigation.navigate('Plan')} />}
-
-
+                    {route?.params?.isOrgReg === true ? null : <SignInUp viewBottomSignup={[styles.bottomSignUpView, { marginTop: isPotrait ? '8%' : '1%', marginBottom: isPotrait ? 0 : 20 }]} signupContent={'Do not have an account?'} signUpText={' ' + 'Sign Up'} onPress={() => navigation.navigate('Plan')} />}
                 </ScrollView>
             </View>
         </SafeAreaView>
@@ -125,6 +145,12 @@ const styles = StyleSheet.create({
         width: 20,
         margin: 20,
         resizeMode: 'contain',
+    },
+    bottomSignUpView: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+
     },
     content: {
         flex: 1,

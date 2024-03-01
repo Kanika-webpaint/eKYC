@@ -1,4 +1,4 @@
-import { Platform, SafeAreaView, StyleSheet, View, Image, Text, ScrollView, TouchableOpacity, FlatList, ToastAndroid, Alert } from 'react-native';
+import { SafeAreaView, StyleSheet, View, Image, Text, ScrollView, TouchableOpacity, FlatList} from 'react-native';
 import React, { useState, useEffect, useCallback } from 'react';
 import colors from '../../common/colors';
 import { logout, plan_select, plus, team } from '../../common/images';
@@ -9,7 +9,6 @@ import Loader from '../../components/ActivityIndicator';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { fonts } from '../../common/fonts';
 import Status from '../../components/Status';
-import { CommonActions } from "@react-navigation/native";
 import { loginAdminslice } from '../../redux/slices/user';
 import showAlert from '../../components/showAlert';
 
@@ -18,6 +17,7 @@ function DashboardAdmin() {
     const navigation = useNavigation();
     const dispatch = useDispatch();
     const OrganizationHomeList = useSelector((state) => state?.login?.orgDetails);
+    
     const DashboardItemsData = [
         {
             id: 0,

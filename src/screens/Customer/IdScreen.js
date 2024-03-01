@@ -5,17 +5,8 @@
  * @format
  */
 
-import React, { useState } from 'react';
-import {
-  SafeAreaView,
-  StyleSheet,
-  View,
-  Text,
-  ScrollView,
-  Dimensions,
-  Alert,
-  Platform,
-} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { SafeAreaView, StyleSheet, View, Text, ScrollView, Dimensions } from 'react-native';
 import colors from '../../common/colors';
 import RedButton from '../../components/RedButton';
 import { useNavigation } from '@react-navigation/native';
@@ -32,18 +23,41 @@ function IdScreen({ route }) {
   const [isLoading, setIsLoading] = useState(false);
   const [verificationCardData, setVerificationCardData] = useState();
   const { height: screenHeight } = Dimensions.get('window');
+  const [isPotrait, setIsPortrait] = useState(true)
 
   const onPressStarted = () => {
     setIsLoading(true);
     setTimeout(() => onPressGo(), 1000);
   };
 
+  useEffect(() => {
+    const updateOrientation = () => {
+      const { height, width } = Dimensions.get('window');
+      setIsPortrait(height > width);
+    };
+    Dimensions.addEventListener('change', updateOrientation);
+    // Return a cleanup function
+    // return () => {
+    //     Dimensions?.removeEventListener('change', updateOrientation);
+    // };
+  }, []);
+
+  useEffect(() => {
+    const updateOrientation = () => {
+      const { height, width } = Dimensions.get('window');
+      setIsPortrait(height > width);
+    };
+    // Add event listener when the screen focuses
+    const unsubscribeFocus = navigation.addListener('focus', updateOrientation);
+    // Remove event listener when the screen unfocuses
+    return unsubscribeFocus;
+  }, [navigation]);
+
   const onPressGo = () => {
     setIsLoading(false);
     Inquiry.fromTemplate(TEMPLATE_ID)
       .environment(Environment.SANDBOX)
       .onComplete((inquiryId, status, fields) => {
-        console.log(status, fields, "check on done call or not")
         try {
           if (status === 'completed') {
             setVerificationCardData(fields);
@@ -69,11 +83,7 @@ function IdScreen({ route }) {
     <SafeAreaView style={styles.safeArea}>
       <Status lightContent />
       <ScrollView keyboardShouldPersistTaps="handled">
-        <Logo
-
-          fingerPrintStyle={styles.fingerPrint}
-          logoStyle={styles.logo}
-        />
+        <Logo styleContainer={{ marginTop: isPotrait ? '30%' : '5%' }} fingerPrintStyle={[styles.fingerPrintStyle, { left: isPotrait ? 60 : 310 }]} />
         <View style={[styles.mainView, { height: screenHeight * 0.5 }]}>
           <Text style={styles.textVerify}>
             Simplify Identity Verification
@@ -83,7 +93,7 @@ function IdScreen({ route }) {
           </Text>
         </View>
         <RedButton
-          buttonContainerStyle={styles.buttonContainer}
+          buttonContainerStyle={[styles.buttonContainer, { marginBottom: isPotrait ? 0 : 20 }]}
           ButtonContent={isLoading ? <Loader /> : "Let's get started ->"}
           contentStyle={styles.buttonText}
           onPress={() => onPressStarted()}
@@ -133,7 +143,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     alignSelf: 'center',
     fontFamily: fonts.medium,
-    marginRight: 5, 
+    marginRight: 5,
   },
   logo: {
     width: '60%',

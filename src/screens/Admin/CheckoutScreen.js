@@ -6,7 +6,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView, StyleSheet, View, Text, TouchableOpacity, Image, ScrollView, TextInput, FlatList, ToastAndroid, Alert } from 'react-native';
+import { SafeAreaView, StyleSheet, View, Text, TouchableOpacity, Image, ScrollView, TextInput, FlatList, Dimensions } from 'react-native';
 import colors from '../../common/colors';
 import RedButton from '../../components/RedButton';
 import { back, down } from '../../common/images';
@@ -16,7 +16,7 @@ import { fonts } from '../../common/fonts';
 import { Country, State, City } from 'country-state-city';
 import ErrorMessageCheckout from '../../components/ErrorMsgCheckout';
 import Status from '../../components/Status';
-import { CardField, CardForm, createToken } from '@stripe/stripe-react-native';
+import { CardField, createToken } from '@stripe/stripe-react-native';
 import { PUBLISH_KEY, API_URL } from '@env'
 import { StripeProvider, confirmPayment } from '@stripe/stripe-react-native';
 import axios from 'axios';
@@ -24,36 +24,25 @@ import showAlert from '../../components/showAlert';
 
 
 function CheckoutScreen({ route }) {
-    const [userData, setFormData] = useState({
-        email: '',
-        cardNo: '',
-        expDate: '',
-        cvv: '',
-        name: '',
-        address: ''
-    });
-    const [errorMessages, setErrorMessages] = useState({
-        email: '',
-        name: '',
-        address: '',
-        country: ''
-    });
-    const navigation = useNavigation();
+    const [userData, setFormData] = useState({ email: '', cardNo: '', expDate: '', cvv: '', name: '', address: '' });
+    const [errorMessages, setErrorMessages] = useState({ email: '', name: '', address: '', country: '' });
+    const [countryData, setCountryData] = useState([]);
+    const [selectedOption, setSelectedOption] = useState(null);
+    const [selectedState, setSelectedState] = useState(null);
+    const [selectedCity, setSelectedCity] = useState(null);
+    const [statesData, setStatesData] = useState();
+    const [cardDetails, setCardDetails] = useState()
+    const [cityData, setCitiesData] = useState();
+    const [showCity, setShowCity] = useState();
     const [isLoading, setIsLoading] = useState(false);
     const [showOptions, setShowOptions] = useState(false);
     const [showState, setShowState] = useState(false);
-    const [selectedOption, setSelectedOption] = useState(null);
-    const [selectedState, setSelectedState] = useState(null);
-    const [countryData, setCountryData] = useState([]);
     const [countryErrMsg, setCountryErrorMsg] = useState(false)
     const [stateErrMsg, setStateErrorMsg] = useState(false)
-    const [statesData, setStatesData] = useState();
     const [cityErrMsg, setCityErrorMsg] = useState(false)
-    const [cityData, setCitiesData] = useState();
-    const [showCity, setShowCity] = useState();
-    const [selectedCity, setSelectedCity] = useState(null);
-    const [cardDetails, setCardDetails] = useState()
     const [cardDetailsErrMsg, setCardDetailsErrMsg] = useState(false)
+    const [isPotrait, setIsPortrait] = useState(true)
+    const navigation = useNavigation();
 
 
     useEffect(() => {
@@ -70,10 +59,29 @@ function CheckoutScreen({ route }) {
         }
     }, []);
 
-  
 
+    useEffect(() => {
+        const updateOrientation = () => {
+            const { height, width } = Dimensions.get('window');
+            setIsPortrait(height > width);
+        };
+        Dimensions.addEventListener('change', updateOrientation);
+        // Return a cleanup function
+        // return () => {
+        //     Dimensions?.removeEventListener('change', updateOrientation);
+        // };
+    }, []);
 
-  
+    useEffect(() => {
+        const updateOrientation = () => {
+            const { height, width } = Dimensions.get('window');
+            setIsPortrait(height > width);
+        };
+        // Add event listener when the screen focuses
+        const unsubscribeFocus = navigation.addListener('focus', updateOrientation);
+        // Remove event listener when the screen unfocuses
+        return unsubscribeFocus;
+    }, [navigation]);
 
     const handleInputChange = (field, value) => {
         setFormData({ ...userData, [field]: value });
@@ -83,7 +91,6 @@ function CheckoutScreen({ route }) {
     const handleOptionPress = (option) => {
         setSelectedOption(option?.name);
         setShowOptions(false);
-
     };
 
     const handleStatePress = (option) => {
@@ -103,7 +110,6 @@ function CheckoutScreen({ route }) {
             setCitiesData(nigeriaStatesCitiesData);
         }
     }
-
 
     const onPressCountryItem = (item) => {
         return (
@@ -131,19 +137,7 @@ function CheckoutScreen({ route }) {
         })
     }
 
-    // const creatPaymentIntent = (data) => {
-    //     return new Promise((resolve, reject) => {
-    //         axios.post('http://192.168.1.10:5000/api/stripecheckout', data).then(function (res) {
-    //             resolve(res)
-    //         }).catch(function (error) {
-    //             reject(error)
-    //         })
-    //     })
-    // }
-
-
     const handleLogin = async () => {
-
         const newErrorMessages = {};
 
         if (!userData.name) {
@@ -228,7 +222,6 @@ function CheckoutScreen({ route }) {
                         showAlert('Something went wrong. Please try again later.');
 
                     }
-
                 } catch (error) {
                     setIsLoading(false)
                     console.error('Error generating token:', error);
@@ -237,7 +230,6 @@ function CheckoutScreen({ route }) {
             }
         }
     }
-
 
     const onPressStateItem = (item) => {
         return (
@@ -379,7 +371,6 @@ function CheckoutScreen({ route }) {
                                     )}
                                 </View>
                             )}
-
                             {selectedOption && selectedState && (
                                 <View>
                                     <Text style={styles.titleText}>City</Text>
@@ -454,17 +445,13 @@ function CheckoutScreen({ route }) {
                                     console.log('focusField', focusedField);
                                 }}
                             />
-
-                            {/* <CardForm
-                                style={{height:170,width:'90%'}}
-                            /> */}
                             {cardDetailsErrMsg && <Text style={styles.errorText}>
                                 Card details are required
                             </Text>}
                         </View>
                         <RedButton
-                            buttonContainerStyle={styles.buttonContainer}
-                            ButtonContent={isLoading ? <Loader /> : route?.params?.amount === 'N4999' ? 'N4999 PAY NOW' : 'N4499 PAY NOW'}
+                            buttonContainerStyle={[styles.buttonContainer, { marginTop: isPotrait ? '20%' : '8%' }]}
+                            ButtonContent={isLoading ? <Loader /> : route?.params?.amount === 'N4999' ? ' PAY N4999' : 'PAY N4499'}
                             contentStyle={styles.buttonText}
                             onPress={() => handleLogin()}
                         />
@@ -481,7 +468,6 @@ const styles = StyleSheet.create({
         backgroundColor: colors.light_purple,
     },
     buttonContainer: {
-        marginTop: '20%', // Adjusted for spacing
         backgroundColor: colors.app_red,
         paddingVertical: 10, // Adjusted for spacing
         borderRadius: 8,
