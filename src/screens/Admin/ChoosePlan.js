@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { SafeAreaView, StyleSheet, View, Image, Text, ScrollView, TouchableOpacity, Platform, } from 'react-native';
+import { SafeAreaView, StyleSheet, View, Image, Text, ScrollView, TouchableOpacity, Platform, Linking, } from 'react-native';
 import colors from '../../common/colors';
 import { back, checked, plan_select, unchecked } from '../../common/images';
 import { useNavigation } from '@react-navigation/native';
@@ -24,9 +24,10 @@ function ChoosePlan() {
     };
 
     const selectEnterprise = () => {
-        setSelectEnterprise(true)
-        setSelectedItem('')
-        navigation.navigate('ContactUs')
+     Linking.openURL(`tel:999990000`) 
+        // setSelectEnterprise(true)
+        // setSelectedItem('')
+        // navigation.navigate('ContactUs')
     }
 
     return (
