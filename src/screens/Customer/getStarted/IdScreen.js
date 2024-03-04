@@ -88,7 +88,7 @@ function IdScreen({ route }) {
             Simplify Identity Verification
           </Text>
           <Text style={styles.middleText}>
-            Validyfy provides seamless digital verification solutions, empowering businesses to securely and conveniently interact with their customers.
+          Validifyx provides seamless digital verification solutions, empowering businesses to securely and conveniently interact with their customers.
           </Text>
         </View>
         <RedButton
