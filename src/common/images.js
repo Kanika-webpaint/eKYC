@@ -27,5 +27,6 @@ export const hide = require('./assets/hide.png');
 export const contact = require('./assets/contact.png');
 export const download = require('./assets/download.png');
 export const logout = require('./assets/logout.png');
+export const coupan = require('./assets/coupan.png');
 
 

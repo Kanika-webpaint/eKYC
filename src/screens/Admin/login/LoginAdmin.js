@@ -2,16 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { SafeAreaView, StyleSheet, View, TextInput, Image, Text, ScrollView, TouchableOpacity, Keyboard, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useDispatch } from 'react-redux';
-import { LoginAdminAction } from '../../redux/actions/user';
-import Loader from '../../components/ActivityIndicator';
-import ErrorMessage from '../../components/ErrorMsg';
-import { mail, padlock, view, hide, back_arow } from '../../common/images';
-import colors from '../../common/colors';
-import Logo from '../../components/Logo';
-import SignInUp from '../../components/SignInUp';
-import { fonts } from '../../common/fonts';
-import Status from '../../components/Status';
-import RedButton from '../../components/RedButton';
+import { LoginAdminAction } from '../../../redux/actions/user';
+import Loader from '../../../components/ActivityIndicator';
+import ErrorMessage from '../../../components/ErrorMsg';
+import { mail, padlock, view, hide, back_arow } from '../../../common/images';
+import colors from '../../../common/colors';
+import Logo from '../../../components/Logo';
+import SignInUp from '../../../components/SignInUp';
+import { fonts } from '../../../common/fonts';
+import Status from '../../../components/Status';
+import RedButton from '../../../components/RedButton';
+import { styles } from './styles';
 
 const LoginAdmin = ({ route }) => {
     const [userData, setUserData] = useState({ email: '', password: '' });
@@ -131,74 +132,5 @@ const LoginAdmin = ({ route }) => {
     );
 };
 
-const styles = StyleSheet.create({
-    safeArea: {
-        flex: 1,
-        backgroundColor: colors.app_blue,
-    },
-    container: {
-        flex: 1,
-        backgroundColor: colors.app_blue,
-    },
-    backArrow: {
-        height: 20,
-        width: 20,
-        margin: 20,
-        resizeMode: 'contain',
-    },
-    bottomSignUpView: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
-
-    },
-    content: {
-        flex: 1,
-        justifyContent: 'center',
-        // alignItems: 'center',
-    },
-    title: {
-        fontSize: 17,
-        color: colors.white,
-        fontFamily: fonts.regular,
-        marginTop: 20,
-        marginBottom: 50,
-        textAlign: 'center',
-    },
-    inputContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        borderBottomWidth: 1,
-        borderBottomColor: colors.white,
-        marginHorizontal: 30,
-    },
-    input: {
-        flex: 1,
-        fontSize: 16,
-        color: colors.white,
-        fontFamily: fonts.regular,
-        width: '100%',
-        marginLeft: 10,
-    },
-    icon: {
-        height: 20,
-        width: 20,
-        tintColor: colors.white,
-    },
-    buttonContainer: {
-        marginTop: '10%',
-        marginBottom: '3%',
-        backgroundColor: colors.app_red,
-        paddingVertical: 12,
-        borderRadius: 8,
-        alignItems: 'center',
-        marginHorizontal: 30,
-    },
-    buttonText: {
-        color: colors.white,
-        fontSize: 16,
-        fontFamily: fonts.bold,
-    },
-});
 
 export default LoginAdmin;

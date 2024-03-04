@@ -5,22 +5,22 @@
  * @format
  */
 
-import React, { useState, useEffect } from 'react';
-import { SafeAreaView, StyleSheet, View, Text, TouchableOpacity, Image, ScrollView, TextInput, FlatList, Dimensions } from 'react-native';
-import colors from '../../common/colors';
-import RedButton from '../../components/RedButton';
-import { back, down } from '../../common/images';
+import React, { useState, useEffect, useCallback } from 'react';
+import { SafeAreaView, View, Text, TouchableOpacity, Image, ScrollView, TextInput, FlatList, Dimensions, ActivityIndicator } from 'react-native';
+import colors from '../../../common/colors';
+import RedButton from '../../../components/RedButton';
+import { back, close, coupan, down } from '../../../common/images';
 import { useNavigation } from '@react-navigation/native';
-import Loader from '../../components/ActivityIndicator';
-import { fonts } from '../../common/fonts';
+import Loader from '../../../components/ActivityIndicator';
 import { Country, State, City } from 'country-state-city';
-import ErrorMessageCheckout from '../../components/ErrorMsgCheckout';
-import Status from '../../components/Status';
+import ErrorMessageCheckout from '../../../components/ErrorMsgCheckout';
+import Status from '../../../components/Status';
 import { CardField, createToken } from '@stripe/stripe-react-native';
 import { PUBLISH_KEY, API_URL } from '@env'
 import { StripeProvider, confirmPayment } from '@stripe/stripe-react-native';
 import axios from 'axios';
-import showAlert from '../../components/showAlert';
+import showAlert from '../../../components/showAlert';
+import { styles } from './styles';
 
 
 function CheckoutScreen({ route }) {
@@ -34,6 +34,9 @@ function CheckoutScreen({ route }) {
     const [cardDetails, setCardDetails] = useState()
     const [cityData, setCitiesData] = useState();
     const [showCity, setShowCity] = useState();
+    const [coupanCode, setCoupanCode] = useState()
+    const [grandTotalAmount, setTotalAmount] = useState()
+    const [resetAmount, setResetAmount] = useState(false)
     const [isLoading, setIsLoading] = useState(false);
     const [showOptions, setShowOptions] = useState(false);
     const [showState, setShowState] = useState(false);
@@ -42,6 +45,9 @@ function CheckoutScreen({ route }) {
     const [cityErrMsg, setCityErrorMsg] = useState(false)
     const [cardDetailsErrMsg, setCardDetailsErrMsg] = useState(false)
     const [isPotrait, setIsPortrait] = useState(true)
+    const [showSummary, setShowSummary] = useState(false)
+    const [load, setLoad] = useState(false)
+    const [discountedAmount, setDiscountedVal] = useState(0)
     const navigation = useNavigation();
 
 
@@ -111,14 +117,6 @@ function CheckoutScreen({ route }) {
         }
     }
 
-    const onPressCountryItem = (item) => {
-        return (
-            <TouchableOpacity onPress={() => handleOptionPress(item)}>
-                <Text style={{ fontSize: 18, paddingVertical: 10 }}>{item?.name}</Text>
-            </TouchableOpacity>
-        )
-    }
-
     const fetchCardDetails = (cardDetails) => {
         if (cardDetails?.complete) {
             setCardDetails(cardDetails)
@@ -136,6 +134,8 @@ function CheckoutScreen({ route }) {
             })
         })
     }
+
+
 
     const handleLogin = async () => {
         const newErrorMessages = {};
@@ -183,13 +183,21 @@ function CheckoutScreen({ route }) {
                 try {
                     setIsLoading(true)
                     const resToken = await createToken({ ...cardDetails, type: 'Card' })
-                    if (resToken) {
+                    let amount;
+                    if (grandTotalAmount) {
+                        amount = grandTotalAmount;
+                    } else if (route?.params?.amount === 'N4999') {
+                        amount = 4999;
+                    } else {
+                        amount = 4499;
+                    }
+                    if (resToken && amount) {
                         const requestData =
                         {
                             name: userData?.name,
                             email: userData?.email,
                             currency: 'NGN', // Set currency to NGN for Nigerian Naira
-                            amount: route?.params?.amount === 'N4999' ? '4999' : '4499',
+                            amount: amount,
                             address: userData?.address,
                             country: selectedOption,
                             state: selectedState,
@@ -198,13 +206,11 @@ function CheckoutScreen({ route }) {
                             zip: '123', // make it dynamic later
                             token: resToken?.token?.id   // stripe token
                         }
+                        console.log(requestData, "dataaaaa")
                         try {
                             const res = await creatPaymentIntent(requestData)
-                            console.log("payment intent create succesfully...!!!", res)
-
                             if (res?.data?.clientSecret) {
                                 let confirmPaymentIntent = await confirmPayment(res?.data?.clientSecret, { paymentMethodType: 'Card' })
-                                console.log("confirmPaymentIntent res++++", confirmPaymentIntent)
                                 if (confirmPaymentIntent) {
                                     //set payment method id here and send it to backend to store the transaction for future.
                                     setIsLoading(false)
@@ -220,7 +226,6 @@ function CheckoutScreen({ route }) {
                         }
                     } else {
                         showAlert('Something went wrong. Please try again later.');
-
                     }
                 } catch (error) {
                     setIsLoading(false)
@@ -247,6 +252,69 @@ function CheckoutScreen({ route }) {
         )
     }
 
+    const removeCoupanCode = useCallback(() => {
+        const resetedAmount = route?.params?.amount === 'N4999' ? 4999 : 4499
+        setCoupanCode('');
+        setShowSummary(false)
+        setResetAmount(true)
+        setTotalAmount(resetedAmount)
+    }, [coupanCode, resetAmount, grandTotalAmount])
+
+    const handleCoupan = useCallback((text) => {
+        if (text) {
+            console.log(text)
+            setCoupanCode(text);
+        } else {
+            const resetedAmount = route?.params?.amount === 'N4999' ? 4999 : 4499
+            setCoupanCode('');
+            setShowSummary(false)
+            setResetAmount(true)
+            setTotalAmount(resetedAmount)
+        }
+    }, [coupanCode, resetAmount, grandTotalAmount]);
+
+    const buttonContent = useCallback(() => {
+        if (isLoading) {
+            return <Loader />;
+        } else if (grandTotalAmount) {
+            return `PAY N${grandTotalAmount}`;
+        } else if (!showSummary && resetAmount && route?.params?.amount) {
+            return route?.params?.amount === 'N4999' ? ' PAY N4999' : 'PAY N4499';
+        } else {
+            return route?.params?.amount === 'N4999' ? ' PAY N4999' : 'PAY N4499';
+        }
+    }, [resetAmount, grandTotalAmount, isLoading, route?.params?.amount]);
+
+    const handleCoupanCode = useCallback(() => {
+        setLoad(true); // Show loader
+
+        setTimeout(() => {
+            const previousAmount = route?.params?.amount === 'N4999' ? 4999 : 4499; // Parse to number
+
+            if (!coupanCode.trim()) {
+                showAlert('Please enter a valid coupon code.');
+                setLoad(false); // Hide loader
+                return;
+            }
+
+            setShowSummary(true);
+
+            const discountPercentage = 10; // static 10% discount for now, change it later
+            const discountedAmount = previousAmount * (1 - discountPercentage / 100);
+            const discountAmount = previousAmount * (discountPercentage / 100);
+
+            if (discountedAmount > 0) {
+                setLoad(false); // Hide loader
+                setDiscountedVal(discountAmount.toFixed(0));
+                setTotalAmount(discountedAmount.toFixed(0));
+                showAlert('Coupon Code Applied successfully!');
+            } else {
+                setLoad(false); // Hide loader
+                showAlert('Coupon amount exceeds total amount.');
+            }
+        }, 1000); // Delay execution of the main code by 1000 milliseconds
+    }, [route?.params?.amount, coupanCode]);
+
     return (
         <SafeAreaView style={styles.safeArea}>
             <StripeProvider
@@ -264,9 +332,7 @@ function CheckoutScreen({ route }) {
                             </View>
                         </View>
                         <View style={{ marginTop: 30 }}>
-                            <Text style={styles.titleText}>
-                                Name
-                            </Text>
+                            <Text style={styles.titleText}>Name</Text>
                             <TextInput
                                 value={userData?.name}
                                 style={styles.input}
@@ -276,9 +342,7 @@ function CheckoutScreen({ route }) {
                                 keyboardType="email-address"
                             />
                             <ErrorMessageCheckout errorMessageText={errorMessages.name} />
-                            <Text style={styles.titleText}>
-                                Email
-                            </Text>
+                            <Text style={styles.titleText}>Email</Text>
                             <TextInput
                                 value={userData?.email}
                                 style={styles.input}
@@ -318,12 +382,13 @@ function CheckoutScreen({ route }) {
                                         shadowRadius: 2,
                                         elevation: 5
                                     }}>
-                                        <FlatList
-                                            style={{ color: 'red', padding: 10 }}
-                                            data={countryData && countryData}
-                                            renderItem={({ item }) => onPressCountryItem(item)}
-                                            keyExtractor={(item) => item.code}
-                                        />
+                                        {countryData?.map(item => {
+                                            return (
+                                                <TouchableOpacity onPress={() => handleOptionPress(item)}>
+                                                    <Text style={{ fontSize: 18, padding: 15 }}>{item?.name}</Text>
+                                                </TouchableOpacity>
+                                            )
+                                        })}
                                     </View>
                                 )}
                             </View>
@@ -415,9 +480,7 @@ function CheckoutScreen({ route }) {
                                     )}
                                 </View>
                             )}
-                            <Text style={styles.titleText}>
-                                Address
-                            </Text>
+                            <Text style={styles.titleText}>Address</Text>
                             <TextInput
                                 value={userData?.address}
                                 style={styles.input}
@@ -426,9 +489,7 @@ function CheckoutScreen({ route }) {
                                 onChangeText={(text) => handleInputChange('address', text)}
                             />
                             <ErrorMessageCheckout errorMessageText={errorMessages.address} />
-                            <Text style={styles.titleText}>
-                                Card details
-                            </Text>
+                            <Text style={styles.titleText}>Card details</Text>
                             <CardField
                                 postalCodeEnabled={false}
                                 placeholders={{
@@ -448,10 +509,62 @@ function CheckoutScreen({ route }) {
                             {cardDetailsErrMsg && <Text style={styles.errorText}>
                                 Card details are required
                             </Text>}
+                            <Text style={[styles.titleText, { marginTop: 30, marginBottom: 3 }]}>Have a coupan code?</Text>
+                            <View style={{ flexDirection: 'row' }}>
+                                <View style={styles.coupanCodeView}>
+                                    <Image source={coupan} style={{ resizeMode: 'contain', height: 20, width: 20, alignSelf: 'center', marginLeft: 10 }} />
+                                    <TextInput
+                                        value={coupanCode}
+                                        style={[styles.input, { borderRadius: 0, width: '70%' }]}
+                                        placeholder="Enter coupan code"
+                                        placeholderTextColor={colors.light_grey}
+                                        onChangeText={(text) => handleCoupan(text)}
+                                    />
+                                    {coupanCode?.length > 0 && (
+                                        <TouchableOpacity style={{ justifyContent: 'center', width: 30 }} onPress={() => removeCoupanCode()}>
+                                            <Image source={close} style={{ resizeMode: 'contain', height: 13, width: 13, alignSelf: 'center', }} />
+                                        </TouchableOpacity>
+                                    )}
+                                </View>
+                                <TouchableOpacity onPress={() => {
+                                    if (!coupanCode) {
+                                        showAlert('Please enter a valid coupon code.');
+                                    } else {
+                                        handleCoupanCode();
+                                    }
+                                }} style={[styles.input, { shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.8, shadowRadius: 2, elevation: 5, width: '28%', marginLeft: 10, borderWidth: 1, justifyContent: 'center', alignSelf: 'center' }]}>
+                                    <Text style={styles.applyText}>{'APPLY'}</Text>
+                                </TouchableOpacity>
+                            </View>
+                            {load ?
+                                <ActivityIndicator size="small" color={colors.app_red} style={{marginTop:20}}/> :
+                                showSummary ?
+                                    <View style={styles.summaryView}>
+                                        <Text style={styles.ordersummaryText}>Order summary</Text>
+                                        <View style={styles.viewAll}>
+                                            <Text style={styles.subTotal}>Subtotal</Text>
+                                            <Text style={styles.subTotal}>{route?.params?.amount === 'N4999' ? 'N4999' : 'N4499'}</Text>
+                                        </View>
+                                        <View style={styles.viewAll}>
+                                            <View style={styles.coupanView}>
+                                                <Image source={coupan} style={styles.imgCoupan} />
+                                                <Text style={styles.subTotal}>{coupanCode}</Text>
+                                            </View>
+                                            <Text style={styles.subTotal}>{'-' + 'N' + discountedAmount}</Text>
+                                        </View>
+                                        <View style={styles.viewAll}>
+                                            <Text style={styles.subTotal}>Grand total</Text>
+                                            <Text style={styles.subTotal}>{'N' + grandTotalAmount}</Text>
+                                        </View>
+                                    </View>
+                                    :
+                                    null
+                            }
+
                         </View>
                         <RedButton
                             buttonContainerStyle={[styles.buttonContainer, { marginTop: isPotrait ? '20%' : '8%' }]}
-                            ButtonContent={isLoading ? <Loader /> : route?.params?.amount === 'N4999' ? ' PAY N4999' : 'PAY N4499'}
+                            ButtonContent={buttonContent()}
                             contentStyle={styles.buttonText}
                             onPress={() => handleLogin()}
                         />
@@ -461,117 +574,6 @@ function CheckoutScreen({ route }) {
         </SafeAreaView>
     );
 }
-
-const styles = StyleSheet.create({
-    safeArea: {
-        flex: 1,
-        backgroundColor: colors.light_purple,
-    },
-    buttonContainer: {
-        backgroundColor: colors.app_red,
-        paddingVertical: 10, // Adjusted for spacing
-        borderRadius: 8,
-        alignSelf: 'center',
-        alignItems: 'center',
-        width: '100%', // Adjusted for better responsiveness
-        marginBottom: 20, // Adjusted for spacing
-    },
-    buttonText: {
-        color: colors.white,
-        fontSize: 16,
-        fontFamily: fonts.bold,
-    },
-    containerHeader: {
-        alignItems: 'center', // Centering horizontally
-    },
-    header: {
-        flexDirection: 'row',
-        backgroundColor: colors.light_purple,
-        paddingVertical: 10, // Adjusted for better spacing
-        alignItems: 'center',
-        width: '100%',
-    },
-    backArrow: {
-        height: 25,
-        width: 25,
-        marginRight: 10,
-    },
-    title: {
-        flex: 1,
-        textAlign: 'center',
-        fontSize: 20,
-        fontFamily: fonts.bold,
-        color: colors.black,
-    },
-    container: {
-        flex: 1,
-        padding: 16,
-    },
-    input: {
-        height: 50,
-        borderWidth: 1,
-        paddingLeft: 8,
-        borderRadius: 5,
-        color: colors.black,
-        borderColor: colors.white,
-        backgroundColor: colors.white,
-        fontFamily: fonts.regular,
-        marginBottom: 10,
-        fontSize: 16,
-        width: '100%', // Adjusted for full width
-    },
-    inputCount: {
-        flex: 1, // Adjusted to fill available space
-        color: colors.black,
-        fontSize: 16,
-        fontFamily: fonts.regular,
-    },
-    titleText: {
-        marginVertical: 2, // Adjusted for spacing
-        color: colors.grey,
-        fontFamily: fonts.regular,
-    },
-    addressField: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        width: '100%', // Adjusted for full width
-        height: 50,
-        borderWidth: 1,
-        paddingLeft: 8,
-        borderRadius: 5,
-        color: colors.black,
-        borderColor: colors.white,
-        backgroundColor: colors.white,
-        fontFamily: fonts.regular,
-        marginBottom: 10,
-        fontSize: 16,
-    },
-    errorMessageStyle: {
-        color: colors.app_red,
-        fontFamily: fonts.regular,
-        marginLeft: 5
-    },
-    errorText: {
-        marginTop: 5,
-        marginLeft: 5,
-        color: colors.app_red,
-        fontFamily: fonts.regular,
-    },
-    cardStyling: {
-        backgroundColor: '#FFFFFF',
-        textColor: '#000000',
-        borderRadius: 5,
-        fontFamily: fonts.regular,
-        fontSize: 16
-    },
-    cardStripe: {
-        marginTop: 2,
-        height: 50,
-        width: '100%', // Adjusted for full width
-    },
-});
-
 
 export default CheckoutScreen;
 

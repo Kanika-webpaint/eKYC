@@ -3,8 +3,6 @@ import axios from 'axios'
 import { API_URL } from "@env"
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { contactUsSlice, createUserSlice, getOrgDetailsslice, getUserListSlice, getUserSlice, loginAdminslice, phoneNumberslice, registerAdminslice, verifyCodeslice } from '../slices/user';
-import { Alert, Platform, ToastAndroid } from 'react-native';
-import DashboardAdmin from '../../screens/Admin/DashboardAdmin';
 import showAlert from '../../components/showAlert';
 
 

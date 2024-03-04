@@ -16,16 +16,16 @@ import {
     ImageBackground,
     ScrollView,
 } from 'react-native';
-import colors from '../../common/colors';
-import RedButton from '../../components/RedButton';
-import { background_image } from '../../common/images';
+import colors from '../common/colors';
+import RedButton from '../components/RedButton';
+import { background_image } from '../common/images';
 import { useNavigation } from '@react-navigation/native';
-import { RegisterAction } from '../../redux/actions/user';
+import { RegisterAction } from '../redux/actions/user';
 import { useDispatch, useSelector } from 'react-redux';
-import Loader from '../../components/ActivityIndicator';
-import Logo from '../../components/Logo';
-import ErrorMessage from '../../components/ErrorMsg';
-import SignInUp from '../../components/SignInUp';
+import Loader from '../components/ActivityIndicator';
+import Logo from '../components/Logo';
+import ErrorMessage from '../components/ErrorMsg';
+import SignInUp from '../components/SignInUp';
 
 
 function RegisterAdmin() {

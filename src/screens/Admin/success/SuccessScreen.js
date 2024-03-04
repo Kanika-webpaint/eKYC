@@ -2,11 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, ScrollView, Animated, Easing, Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
-import { success } from '../../common/images';
-import { fonts } from '../../common/fonts';
-import colors from '../../common/colors';
-import RedButton from '../../components/RedButton';
-import Loader from '../../components/ActivityIndicator';
+import { success } from '../../../common/images';
+
+import RedButton from '../../../components/RedButton';
+import Loader from '../../../components/ActivityIndicator';
+import { styles } from './styles';
 
 
 const SuccessScreen = ({ route }) => {
@@ -93,49 +93,5 @@ const SuccessScreen = ({ route }) => {
     );
 };
 
-const styles = StyleSheet.create({
-    safeArea: {
-        flex: 1,
-        backgroundColor: colors.light_purple,
-    },
-    mainView: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingHorizontal: 20,
-    },
-    successImg: {
-        height: 150,
-        width: 150,
-        resizeMode: 'contain',
-    },
-    pay: {
-        fontSize: 25,
-        fontFamily: fonts.bold,
-        color: colors.black,
-        marginTop: 30,
-        textAlign: 'center',
-    },
-    confirmText: {
-        fontSize: 16,
-        fontFamily: fonts.medium,
-        color: colors.grey,
-        marginTop: 20,
-        textAlign: 'center',
-    },
-    buttonContainer: {
-        marginTop: 50,
-        backgroundColor: colors.app_red,
-        paddingVertical: 10,
-        borderRadius: 8,
-        alignItems: 'center',
-        width: '70%',
-    },
-    buttonText: {
-        color: colors.white,
-        fontSize: 16,
-        fontFamily: fonts.bold,
-    },
-});
 
 export default SuccessScreen;

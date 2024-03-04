@@ -7,14 +7,16 @@
 
 import React, { useEffect, useState } from 'react';
 import { SafeAreaView, StyleSheet,  View,  TextInput,Image, Text, ScrollView, TouchableOpacity} from 'react-native';
-import colors from '../../common/colors';
-import { back,  profile } from '../../common/images';
+import colors from '../../../common/colors';
+import { back,  profile } from '../../../common/images';
 import { useNavigation } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux'
-import {  getUserByIdAction } from '../../redux/actions/user';
-import { fonts } from '../../common/fonts';
+import {  getUserByIdAction } from '../../../redux/actions/user';
+import { fonts } from '../../../common/fonts';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Status from '../../components/Status';
+import Status from '../../../components/Status';
+import { styles } from './styles';
+
 
 function UserProfile({ route }) {
     const navigation = useNavigation();
@@ -72,51 +74,7 @@ function UserProfile({ route }) {
     );
 }
 
-const styles = StyleSheet.create({
-    safeArea: {
-        flex: 1,
-        backgroundColor: colors.light_purple
-    },
-    title: {
-        flex: 1, // Allow text to take remaining space
-        textAlign: 'center', // Center the text horizontally
-        fontSize: 20,
-        marginLeft: -30,
-        fontFamily: fonts.bold,
-        color: 'black', // Assuming text color
-    },
-    input: {
-        height: 50,
-        borderWidth: 1,
-        paddingLeft: 8,
-        borderRadius: 5,
-        color: colors.black,
-        borderWidth: 1,
-        width: '100%',
-        fontSize: 16,
-        borderColor: colors.white,
-        backgroundColor: colors.white,
-        fontFamily: fonts.regular,
-        marginBottom: 20
-    },
-    containerHeader: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    header: {
-        flexDirection: 'row',
-        backgroundColor: colors.light_purple,
-        padding: 5,
-        alignItems: 'center', // Vertical alignment
-        width: '100%', // Take full width of the screen
-    },
-    backArrow: {
-        height: 25,
-        width: 25,
-        marginRight: 10, // Add some space between back arrow and text
-    },
-});
+
 
 export default UserProfile;
 
