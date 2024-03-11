@@ -1,4 +1,4 @@
-import React, { useState ,useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     SafeAreaView,
     View,
@@ -89,7 +89,7 @@ function PlanDetails({ route }) {
                 </View>
                 <View style={styles.mainView}>
                     <Image source={plan_select} style={styles.imagePlanSelect} />
-                    <Text style={styles.amount}>{'Pay ' + route?.params?.amount || ''}</Text>
+                    <Text style={styles.amount}>{'Pay ' + route?.params?.amount === 'N14999' ? 'N14,999' : 'N13,499'}</Text>
                     <FlatList scrollEnabled={false} data={route?.params?.plan === 'Basic' ?
                         BasicPlanData : route?.params?.plan === 'Premium' ?
                             PreminumPlanData : EnterprisePlanData}

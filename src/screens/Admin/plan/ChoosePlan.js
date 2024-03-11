@@ -18,9 +18,9 @@ function ChoosePlan() {
         setSelectEnterprise(false)
         setSelectedItem(prevItem => prevItem?.id === item?.id ? null : item);
         if (item?.id === 1) {
-            navigation.navigate('PlanDetails', { plan: 'Basic', amount: 'N4999' })
+            navigation.navigate('PlanDetails', { plan: 'Basic', amount: 'N14999' })
         } else {
-            navigation.navigate('PlanDetails', { plan: 'Premium', amount: 'N4499' })
+            navigation.navigate('PlanDetails', { plan: 'Premium', amount: 'N13499' })
         }
     };
 

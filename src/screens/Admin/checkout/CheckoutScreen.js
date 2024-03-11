@@ -6,7 +6,7 @@
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { SafeAreaView, View, Text, TouchableOpacity, Image, ScrollView, TextInput, FlatList, Dimensions, ActivityIndicator } from 'react-native';
+import { SafeAreaView, View, Text, TouchableOpacity, Image, ScrollView, TextInput, FlatList, Dimensions, ActivityIndicator, Linking } from 'react-native';
 import colors from '../../../common/colors';
 import RedButton from '../../../components/RedButton';
 import { back, close, coupan, down } from '../../../common/images';
@@ -15,7 +15,7 @@ import Loader from '../../../components/ActivityIndicator';
 import { Country, State, City } from 'country-state-city';
 import ErrorMessageCheckout from '../../../components/ErrorMsgCheckout';
 import Status from '../../../components/Status';
-import { CardField, createToken } from '@stripe/stripe-react-native';
+import { CardField, createToken, createPaymentMethod, initPaymentSheet } from '@stripe/stripe-react-native';
 import { PUBLISH_KEY, API_URL } from '@env'
 import { StripeProvider, confirmPayment } from '@stripe/stripe-react-native';
 import axios from 'axios';
@@ -126,7 +126,14 @@ function CheckoutScreen({ route }) {
     }
 
     const creatPaymentIntent = (data) => {
+        console.log(data, "dataaaaaa")
         return new Promise((resolve, reject) => {
+            // axios.post('http://192.168.1.24:8080/api/stripecheckout', data).then(function (res) {
+            //     resolve(res)
+            // }).catch(function (error) {
+            //     reject(error)
+            // })
+
             axios.post(`${API_URL}/stripecheckout`, data).then(function (res) {
                 resolve(res)
             }).catch(function (error) {
@@ -135,6 +142,199 @@ function CheckoutScreen({ route }) {
         })
     }
 
+
+    const createCustomer = (data) => {
+        return new Promise((resolve, reject) => {
+            const config = {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    Authorization: 'Bearer sk_test_51OmCVYSEL02qr6meHFYch0kudum5OKF73YC3YcR14IMDKFa22xFJolqFlLn4DzlNEnznGgtFkj78NlTbE3yvxB6e00Izgz8l7l', // Add 'Bearer' prefix before token
+                },
+            };
+            axios.post('https://api.stripe.com/v1/customers', JSON.stringify(data), config)
+                .then(function (res) {
+                    resolve(res);
+                })
+                .catch(function (error) {
+                    reject(error);
+                });
+        });
+    };
+
+    const createPrice = (data) => {
+        return new Promise((resolve, reject) => {
+            const config = {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    Authorization: 'Bearer sk_test_51OmCVYSEL02qr6meHFYch0kudum5OKF73YC3YcR14IMDKFa22xFJolqFlLn4DzlNEnznGgtFkj78NlTbE3yvxB6e00Izgz8l7l', // Add 'Bearer' prefix before token
+                },
+            };
+            axios.post('https://api.stripe.com/v1/prices', data, config)
+                .then(function (res) {
+                    resolve(res);
+                })
+                .catch(function (error) {
+                    reject(error);
+                });
+        });
+    };
+
+    // const createSubscription = (customerId, priceId) => {
+    //     console.log(customerId, priceId, "idssss in function")
+    //     return new Promise((resolve, reject) => {
+    //         const config = {
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //             },
+    //         };
+    //         axios.post('http://192.168.1.24:8080/api/stripesubscription', { customerId, priceId }, config)
+    //             .then(function (res) {
+    //                 resolve(res);
+    //             })
+    //             .catch(function (error) {
+    //                 reject(error);
+    //             });
+    //     });
+    // };
+
+
+    const customAppearance = {
+        // font: {
+        //   family:
+        //     Platform.OS === 'android' ? 'avenirnextregular' : 'AvenirNext-Regular',
+        // },
+        shapes: {
+            borderRadius: 12,
+            borderWidth: 0.5,
+        },
+        primaryButton: {
+            shapes: {
+                borderRadius: 20,
+            },
+        },
+        colors: {
+            primary: '#fcfdff',
+            background: '#ffffff',
+            componentBackground: '#f3f8fa',
+            componentBorder: '#f3f8fa',
+            componentDivider: '#000000',
+            primaryText: '#000000',
+            secondaryText: '#000000',
+            componentText: '#000000',
+            placeholderText: '#73757b',
+        },
+    };
+
+    async function openPaymentSheet() {
+        try {
+            const billingDetails = {
+                name: 'Jane Doe',
+                email: 'foo@bar.com',
+                phone: '555-555-555',
+                address: 'test',
+            };
+            const dataaaa = await initPaymentSheet({
+                customerId: 'cus_PhNF4ZYQKqNPFz',
+                customFlow: true,
+                appearance: customAppearance,
+                merchantDisplayName: 'Merchant Name',
+                paymentIntentClientSecret: 'pi_3OrygsSEL02qr6me0gYKhQ79_secret_XvAecIR65Y3u0R19mzEDtn9hg',
+                style: 'automatic',
+                googlePay: { merchantCountryCode: 'US', testEnv: true },
+                returnURL: 'stripe-example://stripe-redirect',
+                defaultBillingDetails: billingDetails,
+            });
+
+            // If no errors occur during initialization, you can proceed with opening the payment sheet
+            console.log('Payment sheet initialized successfully:', dataaaa);
+        } catch (error) {
+            // Handle any errors that occur during initialization
+            console.error('Error initializing payment sheet:', error);
+        }
+    }
+
+
+    const createSubscription = async (customerId, priceId) => {
+        console.log(customerId, "customer iddd")
+        console.log(priceId, "price iddd")
+        const config = {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                Authorization: 'Bearer sk_test_51OmCVYSEL02qr6meHFYch0kudum5OKF73YC3YcR14IMDKFa22xFJolqFlLn4DzlNEnznGgtFkj78NlTbE3yvxB6e00Izgz8l7l', // Add 'Bearer' prefix before token
+            },
+        };
+        try {
+            const response = await axios.post('https://api.stripe.com/v1/subscriptions', {
+                customer: customerId,
+                items: [
+                    {
+                        price: 'price_1OrfqJSEL02qr6meyZ2HrQtE',
+                    },
+                ],
+                payment_behavior: "default_incomplete",
+                payment_settings: { save_default_payment_method: "on_subscription" },
+                expand: ["latest_invoice.payment_intent"],
+                collection_method: "charge_automatically"
+            }, config);
+
+            console.log('Subscription created:', response);
+            if (response) {
+                openPaymentSheet()
+            }
+
+        } catch (error) {
+            console.error('Error:', error.response ? error.response.data : error.message);
+        }
+    };
+
+    const payInvoiceFinal = (idInvoice, data) => {
+        console.log(idInvoice, data, "dataaa invoiceee")
+        return new Promise((resolve, reject) => {
+            const config = {
+                headers: {
+                    // 'Accept': 'multipart/form-data',
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Authorization': 'Bearer sk_test_51OmCVYSEL02qr6meHFYch0kudum5OKF73YC3YcR14IMDKFa22xFJolqFlLn4DzlNEnznGgtFkj78NlTbE3yvxB6e00Izgz8l7l', // Add 'Bearer' prefix before token
+                },
+            };
+
+            axios.post(`https://api.stripe.com/v1/invoices/${idInvoice}/pay`, data, config)
+                .then(function (res) {
+                    console.log(res, "invoiceee")
+                    resolve(res);
+                })
+                .catch(function (error) {
+                    console.log(error?.response, "invoicee in erroror")
+                    reject(error);
+                });
+        });
+    }
+
+
+
+    const attachDefaultPaymentMethod = (customerId, paymentMethodId) => {
+        console.log(customerId, paymentMethodId, "doneeeee")
+        return new Promise((resolve, reject) => {
+            const config = {
+                headers: {
+                    // 'Accept': 'multipart/form-data',
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Authorization': 'Bearer sk_test_51OmCVYSEL02qr6meHFYch0kudum5OKF73YC3YcR14IMDKFa22xFJolqFlLn4DzlNEnznGgtFkj78NlTbE3yvxB6e00Izgz8l7l', // Add 'Bearer' prefix before token
+                },
+            };
+
+            const data = new FormData();
+            data.append('customer', customerId);
+            axios.post(`https://api.stripe.com/v1/payment_methods/${paymentMethodId}/attach`, data, config)
+                .then(function (res) {
+                    resolve(res);
+                })
+                .catch(function (error) {
+                    console.log(error, "eroorrr here")
+                    reject(error);
+                });
+        });
+    };
 
 
     const handleLogin = async () => {
@@ -183,20 +383,21 @@ function CheckoutScreen({ route }) {
                 try {
                     setIsLoading(true)
                     const resToken = await createToken({ ...cardDetails, type: 'Card' })
+                    console.log(resToken, "tokennn")
                     let amount;
                     if (grandTotalAmount) {
                         amount = grandTotalAmount;
                     } else if (route?.params?.amount === 'N4999') {
-                        amount = 4999;
+                        amount = 20000;
                     } else {
-                        amount = 4499;
+                        amount = 20000;
                     }
                     if (resToken && amount) {
                         const requestData =
                         {
                             name: userData?.name,
                             email: userData?.email,
-                            currency: 'NGN', // Set currency to NGN for Nigerian Naira
+                            currency: 'INR', // Set currency to NGN for Nigerian Naira
                             amount: amount,
                             address: userData?.address,
                             country: selectedOption,
@@ -206,19 +407,141 @@ function CheckoutScreen({ route }) {
                             zip: '123', // make it dynamic later
                             token: resToken?.token?.id   // stripe token
                         }
-                        console.log(requestData, "dataaaaa")
                         try {
                             const res = await creatPaymentIntent(requestData)
+                            console.log(res, "resss here from backedn on basis of token")
                             if (res?.data?.clientSecret) {
                                 let confirmPaymentIntent = await confirmPayment(res?.data?.clientSecret, { paymentMethodType: 'Card' })
+                                console.log(confirmPaymentIntent, "confirmPaymentIntent")
+                                setIsLoading(false)
+                                const config = {
+                                    headers: {
+                                        'Content-Type': 'application/x-www-form-urlencoded',
+                                        Authorization: 'Bearer sk_test_51OmCVYSEL02qr6meHFYch0kudum5OKF73YC3YcR14IMDKFa22xFJolqFlLn4DzlNEnznGgtFkj78NlTbE3yvxB6e00Izgz8l7l', // Add 'Bearer' prefix before token
+                                    },
+                                };
                                 if (confirmPaymentIntent) {
-                                    //set payment method id here and send it to backend to store the transaction for future.
-                                    setIsLoading(false)
-                                    navigation.navigate('SuccessScreen', { purchasedPlanAmount: confirmPaymentIntent?.paymentIntent?.amount })
-                                } else {
-                                    setIsLoading(false)
-                                    showAlert('Payment failed, please try again!!')
+                                    const responsePaymentLink = await axios.post('https://api.stripe.com/v1/payment_links', {
+                                        line_items: [
+                                            {
+                                                price: 'price_1Orfn8SEL02qr6mepdDLMpTx',
+                                                quantity: 1,
+                                            },
+                                        ],
+                                    }, config);                                 
+                                    const paymentURL = responsePaymentLink?.data?.url // Your Stripe payment URL
+
+                                    // const paymentURL = responsePaymentLink?.data?.url + "?prefilled_email=" + email + "?prefilled_last4=" + numberCard + "?prefilled_expirymonth=" + expiryMonth + "?prefilled_expiryyear=" + expiryYear; // Your Stripe payment URL
+                                    if (await Linking.canOpenURL(paymentURL)) {
+                                        await Linking.openURL(paymentURL);
+                                    } else {
+                                        console.error('Cannot open URL:', paymentURL);
+                                        // Handle error
+                                    }
                                 }
+                                // if (confirmPaymentIntent) {
+                                //     const requestDataCustomer =
+                                //     {
+                                //         name: userData?.name,
+                                //         email: userData?.email,
+                                //         currency: 'NGN', // Set currency to NGN for Nigerian Naira
+                                //         amount: amount,
+                                //         address: userData?.address,
+                                //         country: selectedOption,
+                                //         state: selectedState,
+                                //         city: selectedCity,
+                                //         // userId: '', //will update it later
+                                //         zip: '123', // make it dynamic later
+                                //         payment_method: res?.data?.clientSecret?.payment_method,
+                                //     }
+                                //     const resCustomer = await createCustomer(requestDataCustomer)
+                                //     console.log(resCustomer, "response create customer to get customer id")  // cus_12334 customer id here
+
+                                //     if (resCustomer?.data?.id) {
+                                //         const requestDataa = {
+                                //             customer: resCustomer?.data?.id,
+                                //             items: [
+                                //                 {
+                                //                     price: 'price_1OrfqJSEL02qr6meyZ2HrQtE',
+                                //                 },
+                                //             ],
+                                //             payment_behavior: "default_incomplete",
+                                //             // payment_settings: { payment_method: paymentMethod.id },
+                                //             payment_settings: { payment_method: confirmPaymentIntent?.paymentIntent?.paymentMethod?.id },
+                                //             expand: ["latest_invoice.payment_intent"],
+                                //             collection_method: "charge_automatically"
+                                //         }
+                                //         console.log(requestDataa?.customer, requestDataa?.items[0]?.price, 'idsssssss')
+                                //         const config = {
+                                //             headers: {
+                                //                 'Content-Type': 'application/x-www-form-urlencoded',
+                                //                 Authorization: 'Bearer sk_test_51OmCVYSEL02qr6meHFYch0kudum5OKF73YC3YcR14IMDKFa22xFJolqFlLn4DzlNEnznGgtFkj78NlTbE3yvxB6e00Izgz8l7l', // Add 'Bearer' prefix before token
+                                //             },
+                                //         };
+                                //         try {
+                                //             const response = await axios.post('https://api.stripe.com/v1/subscriptions', {
+                                //                 customer: resCustomer?.data?.id,
+                                //                 items: [
+                                //                     {
+                                //                         price: 'price_1OrfqJSEL02qr6meyZ2HrQtE',
+                                //                     },
+                                //                 ],
+                                //                 payment_behavior: "default_incomplete",
+                                //                 payment_settings: { save_default_payment_method: "on_subscription" },
+                                //                 expand: ["latest_invoice.payment_intent"],
+                                //                 collection_method: "charge_automatically"
+                                //             }, config);
+
+                                //             console.log('Subscription created:', response);
+                                //             if (response) {
+                                //                 const responsePaymentLink = await axios.post('https://api.stripe.com/v1/payment_links', {
+                                //                     line_items: [
+                                //                         {
+                                //                             price: 'price_1OrfqJSEL02qr6meyZ2HrQtE',
+                                //                             quantity: 1,
+                                //                         },
+                                //                     ],
+                                //                 }, config);
+
+                                //                 console.log(responsePaymentLink?.data?.url, "payment linkkk")
+
+                                //                 const paymentURL = responsePaymentLink?.data?.url; // Your Stripe payment URL
+                                //                 if (await Linking.canOpenURL(paymentURL)) {
+                                //                     await Linking.openURL(paymentURL);
+                                //                 } else {
+                                //                     console.error('Cannot open URL:', paymentURL);
+                                //                     // Handle error
+                                //                 }
+                                //             }
+
+                                //         } catch (error) {
+                                //             console.error('Error:', error.response ? error.response.data : error.message);
+                                //         }
+                                //         // if (subscription?.data?.data?.id) {
+                                //         //     console.log(subscription?.data?.data?.id, "callingggg")
+                                //         //     setIsLoading(false)
+
+                                //         //     const dataaaa = await initPaymentSheet({
+
+                                //         //         appearance: customAppearance,
+                                //         //     });
+
+                                //         //     // if (subscription?.data?.status === "incomplete") {
+                                //         //     //     setIsLoading(false)
+                                //         //     //     showAlert("Subscription setup incomplete. Additional action may be required.");
+                                //         //     // } else if (subscription?.data?.status === "active") {
+                                //         //     //     setIsLoading(false)
+                                //         //     //     navigation.navigate('SuccessScreen', { purchasedPlanAmount: confirmPaymentIntent?.paymentIntent?.amount });
+                                //         //     // }
+
+                                //         // }
+
+                                //     }
+
+                                // } else {
+                                //     setIsLoading(false)
+                                //     showAlert('Payment failed, please try again!!')
+                                // }
                             }
                         } catch (error) {
                             setIsLoading(false)
@@ -537,7 +860,7 @@ function CheckoutScreen({ route }) {
                                 </TouchableOpacity>
                             </View>
                             {load ?
-                                <ActivityIndicator size="small" color={colors.app_red} style={{marginTop:20}}/> :
+                                <ActivityIndicator size="small" color={colors.app_red} style={{ marginTop: 20 }} /> :
                                 showSummary ?
                                     <View style={styles.summaryView}>
                                         <Text style={styles.ordersummaryText}>Order summary</Text>
