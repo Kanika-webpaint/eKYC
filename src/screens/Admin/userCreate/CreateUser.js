@@ -37,7 +37,6 @@ function CreateUser() {
     const OrganizationHomeList = useSelector((state) => state?.login?.orgDetails)
     const getUsersList = useSelector(state => state?.login?.getUsersList);
     const adminDataList = useSelector(state => state?.login?.adminLogin?.data);
-
     const handleInputChange = (field, value) => {
         setFormData({ ...userData, [field]: value });
         setErrorMessages({ ...errorMessages, [field]: '' });
@@ -101,19 +100,20 @@ function CreateUser() {
                 phoneNumber: countryCodeSelected + userData?.phoneNo,
                 organizationId: OrganizationHomeList?.organization?.id || ''
             }
-            if (adminDataList?.amount === '4999' && getUsersList?.length <= 49) {
-                dispatch(CreateUserAction(requestData, token, navigation, setIsLoading));
-            } else if (adminDataList?.amount === '4499' && getUsersList?.length <= 199) {
-                dispatch(CreateUserAction(requestData, token, navigation, setIsLoading));
-            } else {
-                if (adminDataList?.amount === '4999') {
-                    setIsLoading(false)
-                    showAlert('Please purchase premium plan to add more users.');
-                } else if (adminDataList?.amount === '4499') {
-                    setIsLoading(false)
-                    showAlert('Please purchase enterprise plan to add more users.');
-                }
-            }
+            dispatch(CreateUserAction(requestData, token, navigation, setIsLoading));
+            // if (adminDataList?.amount === '4999' && getUsersList?.length <= 49) {
+            //     dispatch(CreateUserAction(requestData, token, navigation, setIsLoading));
+            // } else if (adminDataList?.amount === '4499' && getUsersList?.length <= 199) {
+            //     dispatch(CreateUserAction(requestData, token, navigation, setIsLoading));
+            // } else {
+            //     if (adminDataList?.amount === '4999') {
+            //         setIsLoading(false)
+            //         showAlert('Please purchase premium plan to add more users.');
+            //     } else if (adminDataList?.amount === '4499') {
+            //         setIsLoading(false)
+            //         showAlert('Please purchase enterprise plan to add more users.');
+            //     }
+            // }
         }
     };
 
@@ -150,7 +150,7 @@ function CreateUser() {
                         </Text>
                         <View style={styles.input}>
                             <TouchableOpacity style={{ height: 30, width: 50, marginRight: 10, marginTop: 10, justifyContent: 'center', alignItems: 'center' }} onPress={() => onChangeCountryCode()}>
-                                <Text style={{ color: colors.black, alignSelf: 'center' }}>{countryCode ? countryCode : '+91'}</Text>
+                                <Text style={{ color: colors.black, alignSelf: 'center' }}>{countryCode ? countryCode : '+234'}</Text>
                             </TouchableOpacity>
                             <TextInput
                                 style={{ width: '80%' }}

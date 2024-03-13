@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, TextInput, FlatList, Text, Image, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { back, close, profile, rightArrow } from '../../../common/images';
+import { back, close, plus, profile, rightArrow } from '../../../common/images';
 import { useNavigation } from '@react-navigation/native';
 import { getUsersListAction } from '../../../redux/actions/user';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -80,11 +80,14 @@ const UserList = () => {
           </View>
           {isLoading ? <Loader /> :
             <View style={{ marginTop: 20 }}>
+              <View style={{flexDirection:'row'}}>
               <View style={{
                 flex: 1, flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10,
                 borderWidth: 1,
                 borderColor: '#ccc',
                 borderRadius: 5,
+                 width:'80%'
+                 
               }}>
                 <TextInput
                   placeholder="Search user..."
@@ -97,7 +100,11 @@ const UserList = () => {
                     <Image source={close} style={{ height: 15, width: 20, alignSelf: 'center', marginRight: 10 }} />
                   </TouchableOpacity>
                 )}
-
+                
+              </View>
+                 <TouchableOpacity onPress={() => navigation.navigate('CreateUser')} style={styles.addView}>
+                            <Image source={plus} style={styles.plusIcon} />
+                        </TouchableOpacity>
               </View>
               {usersListing && usersListing?.length > 0 ?
                 <FlatList

@@ -2,7 +2,7 @@
 import axios from 'axios'
 import { API_URL } from "@env"
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { contactUsSlice, createUserSlice, getOrgDetailsslice, getUserListSlice, getUserSlice, loginAdminslice, phoneNumberslice, registerAdminslice, verifyCodeslice } from '../slices/user';
+import { contactUsSlice, createUserSlice, getOrgDetailsslice, getUserListSlice, getUserSlice, loginAdminslice, phoneNumberslice, registerAdminslice, verifiedDataSlice, verifyCodeslice } from '../slices/user';
 import showAlert from '../../components/showAlert';
 
 
@@ -20,20 +20,19 @@ export const LoginAdminAction = (data, setIsLoading, setLoggedIn) => async (disp
         // console.log(res)
         if (res?.status == 200) {
             setIsLoading(false);
-            await dispatch(loginAdminslice( res, setLoggedIn ));
+            // await dispatch(loginAdminslice(res, setLoggedIn));
             await AsyncStorage.setItem('token', res?.data?.token);
             await AsyncStorage.setItem('role', "organization");
-
             const storedToken = await AsyncStorage.getItem('token');
             const storedRole = await AsyncStorage.getItem('role');
 
             if (storedRole && storedToken) {
                 // Redirect to the dashboard screen after successful login
                 // setLoggedIn(true);
-                await dispatch(loginAdminslice( res, setLoggedIn ));
+                await dispatch(loginAdminslice(res, setLoggedIn));
 
             }
-            
+
         }
     } catch (e) {
         if (e?.response?.status === 404) {
@@ -156,7 +155,8 @@ export const CreateUserAction =
                 if (res.status === 201) {
                     setIsLoading(false)
                     showAlert(res?.data?.message)
-                    navigation.navigate('DashboardAdmin')
+                  dispatch(getUsersListAction(token, setIsLoading))  
+                    navigation.goBack()
                 } else {
                     showAlert(res?.data?.message)
                 }
@@ -345,3 +345,34 @@ export const ContactUsAction =
                 showAlert(e?.response?.data?.message)
             }
         }
+
+
+const logoutAccount = async () => {
+    await AsyncStorage.clear();
+    dispatch(verifyCodeslice(false));
+    showAlert("Verification complete. Logout successful.Thank you for your cooperation.");
+};
+
+
+export const verifedCustomerDataAction =
+    (data,
+        navigation,
+        setIsLoading
+    ) => async (dispatch) => {
+        try {
+            console.log(API_URL, "createorganization")
+            const api_url = `${API_URL}/createorganization`
+            const res = await axios.post(api_url, data)
+            console.log(res, "responsee")
+            if (res.status === 200) {
+                setIsLoading(false)
+                logoutAccount()
+            } else {
+                showAlert(res?.data?.message)
+            }
+            await dispatch(verifiedDataSlice(res))
+        } catch (e) {
+            setIsLoading(false)
+            showAlert(e?.response?.data?.message)
+        }
+    }

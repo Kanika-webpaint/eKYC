@@ -60,7 +60,7 @@ const NavigationStack = () => {
                 ) : isLoggedUser ? (
                     <>
                      <Stack.Screen options={{ headerShown: false }} name="IdScreen" component={routeNames.IdScreen} />
-                    <Stack.Screen options={{ headerShown: false }} name="HomeUser" component={routeNames.HomeUser} />
+                    {/* <Stack.Screen options={{ headerShown: false }} name="HomeUser" component={routeNames.HomeUser} /> */}
                     </>
                 ) : (
                     <>

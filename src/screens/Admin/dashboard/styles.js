@@ -13,7 +13,7 @@ export const styles = StyleSheet.create({
         padding: 20
     },
     detailText: {
-        fontSize: 16,
+        fontSize: 20,
         color: colors.grey,
         fontFamily: fonts.medium
     },
@@ -57,13 +57,13 @@ export const styles = StyleSheet.create({
         borderRadius: 5
     },
     imgItem: {
-        height: 80,
-        width: 80,
+        height: 60,
+        width: 60,
         alignSelf: 'center'
     },
     titleItem: {
         fontFamily: fonts.bold,
-        fontSize: 18,
+        fontSize: 16,
         color: colors.black
     }
 });

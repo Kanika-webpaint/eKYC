@@ -13,7 +13,8 @@ const authSlice = createSlice({
         getUser: [],
         contact: [],
         isLogged:false,
-        isLoggedUser:false
+        isLoggedUser:false,
+        verifiedDataList:[]
     },
 
     reducers: {
@@ -22,7 +23,7 @@ const authSlice = createSlice({
         },
         verifyCodeslice: (state, action) => {
             state.verifyCode = action?.payload?.data
-            state.isLoggedUser = true
+            state.isLoggedUser = action.payload
         },
         loginAdminslice: (state, action) => {
             state.adminLogin = action?.payload?.data;
@@ -46,6 +47,9 @@ const authSlice = createSlice({
         contactUsSlice: (state, action) => {
             state.contact = action?.payload?.data
         },
+        verifiedDataSlice: (state, action) => {
+            state.verifiedDataList = action?.payload?.data
+        },
         //add more slices here
     }
 })
@@ -63,6 +67,7 @@ export const {
     createUserSlice,
     getUserListSlice,
     getUserSlice,
-    contactUsSlice
+    contactUsSlice,
+    verifiedDataSlice
     // add more slices here
 } = authSlice.actions

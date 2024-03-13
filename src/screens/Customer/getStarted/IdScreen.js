@@ -5,8 +5,8 @@
  * @format
  */
 
-import React, { useEffect, useState } from 'react';
-import { SafeAreaView,  View, Text, ScrollView, Dimensions } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { SafeAreaView, View, Text, ScrollView, Dimensions } from 'react-native';
 import RedButton from '../../../components/RedButton';
 import { useNavigation } from '@react-navigation/native';
 import Logo from '../../../components/Logo';
@@ -16,6 +16,10 @@ import Loader from '../../../components/ActivityIndicator';
 import { TEMPLATE_ID } from '@env';
 import showAlert from '../../../components/showAlert';
 import { styles } from './styles';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { verifyCodeslice } from '../../../redux/slices/user';
+import { useDispatch } from 'react-redux';
+import { verifedCustomerDataAction } from '../../../redux/actions/user';
 
 function IdScreen({ route }) {
   const navigation = useNavigation();
@@ -23,6 +27,7 @@ function IdScreen({ route }) {
   const [verificationCardData, setVerificationCardData] = useState();
   const { height: screenHeight } = Dimensions.get('window');
   const [isPotrait, setIsPortrait] = useState(true)
+  const dispatch = useDispatch();
 
   const onPressStarted = () => {
     setIsLoading(true);
@@ -52,16 +57,36 @@ function IdScreen({ route }) {
     return unsubscribeFocus;
   }, [navigation]);
 
+  const logoutAccount = useCallback(async () => {
+    await AsyncStorage.clear();
+    dispatch(verifyCodeslice(false));
+    showAlert("Verification complete. Logout successful.Thank you for your cooperation.");
+  }, [dispatch]);
+
   const onPressGo = () => {
     setIsLoading(false);
     Inquiry.fromTemplate(TEMPLATE_ID)
       .environment(Environment.SANDBOX)
       .onComplete((inquiryId, status, fields) => {
         try {
+          console.log(inquiryId, status, fields, "dataaa customerr")
           if (status === 'completed') {
             setVerificationCardData(fields);
+            setIsLoading(true)
+            logoutAccount()
+            const requestData =
+            {
+              inquiry_Id: inquiryId,
+              status_verification: status,
+              data: fields
+            }
+            // dispatch(verifedCustomerDataAction(requestData, navigation, setIsLoading));
+
+            // call post API to save verified data and logout after data save
+          
             setTimeout(() => {
-              navigation.navigate('HomeUser');
+              logoutAccount()
+              setIsLoading(false)
             }, 500);
           }
         } catch (e) {
@@ -70,7 +95,7 @@ function IdScreen({ route }) {
       })
       .onCanceled(
         (inquiryId, sessionToken) =>
-          showAlert('You have canceled verification'),
+          showAlert('You have canceled verification, please verify'),
         navigation.navigate('IdScreen'),
       )
       .onError(error => showAlert(error?.message))
@@ -78,6 +103,8 @@ function IdScreen({ route }) {
       .start();
   };
 
+
+  console.log(verificationCardData, "dataaa verification")
   return (
     <SafeAreaView style={styles.safeArea}>
       <Status lightContent />
@@ -88,7 +115,7 @@ function IdScreen({ route }) {
             Simplify Identity Verification
           </Text>
           <Text style={styles.middleText}>
-          Validifyx provides seamless digital verification solutions, empowering businesses to securely and conveniently interact with their customers.
+            Validifyx provides seamless digital verification solutions, empowering businesses to securely and conveniently interact with their customers.
           </Text>
         </View>
         <RedButton

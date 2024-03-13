@@ -23,6 +23,8 @@ import { fonts } from '../../../common/fonts';
 import Status from '../../../components/Status';
 import showAlert from '../../../components/showAlert';
 import { styles } from './styles';
+import { verifyCodeslice } from '../../../redux/slices/user';
+
 
 function MobileNumber() {
   const [value, setValue] = useState('');
@@ -35,6 +37,7 @@ function MobileNumber() {
   const [isLoading, setIsLoading] = useState(false);
   const [isPotrait, setIsPortrait] = useState(true)
   const dispatch = useDispatch()
+  const [confirmResult, setConfirmResult] = useState('')
   const ref = useBlurOnFulfill({ value, cellCount: CELL_COUNT });
   const [props, getCellOnLayoutHandler] = useClearByFocusCell({ value, setValue });
   const CELL_COUNT = 6;
@@ -77,44 +80,133 @@ function MobileNumber() {
     );
   };
 
-  const handleSendCode = () => {
+  // const handleSendCode = () => {
+  //   if (mobileNumber === '') {
+  //     setIsLoading(true)
+  //     setShowError(true)
+  //     setIsLoading(false)
+  //   } else {
+  //     setIsLoading(true)
+  //     let mobileNumberCode = countryCode ? countryCode : '+91'
+  //     console.log(mobileNumberCode + mobileNumber, "mobileee")
+  //     setNumberWithCode(mobileNumberCode + mobileNumber)
+  //     const requestData = {
+  //       phoneNumber: mobileNumberCode + mobileNumber
+  //     };
+  //     dispatch(PhoneNumberAction(requestData, navigation, setShowOTP, setIsLoading))
+  //   };
+  // }
+
+
+  const handleSendCode = async () => {
     if (mobileNumber === '') {
       setIsLoading(true)
       setShowError(true)
       setIsLoading(false)
     } else {
       setIsLoading(true)
+      // Request to send OTP
+      setShowError(false)
       let mobileNumberCode = countryCode ? countryCode : '+91'
-      console.log(mobileNumberCode + mobileNumber, "mobileee")
-      setNumberWithCode(mobileNumberCode + mobileNumber)
-      const requestData = {
-        phoneNumber: mobileNumberCode + mobileNumber
-      };
-      dispatch(PhoneNumberAction(requestData, navigation, setShowOTP, setIsLoading))
-    };
+      if (mobileNumberCode !== '' && mobileNumber !== '') {
+        await auth().signInWithPhoneNumber(mobileNumberCode + mobileNumber, true) //true added for resend code
+          .then(confirmResult => {
+            console.log(confirmResult,"resulttt")
+            setIsLoading(false)
+            setConfirmResult(confirmResult)
+            if (confirmResult._verificationId) {
+              setIsLoading(false)
+              setShowOTP(true)
+            } else {
+              setIsLoading(false)
+              showAlert('Please try again later!')
+            }
+          })
+          .catch(error => {
+            console.log(error, ">>>")
+            setIsLoading(false)
+            switch (error.code) {
+              case 'auth/too-many-requests' || 'auth/app-not-authorized':
+                showAlert('Please try again later!')
+                break;
+              case 'auth/invalid-phone-number':
+                showAlert('Please enter valid phone number')
+                break;
+              case 'auth/credential-already-in-use':
+                showAlert('This phone number is already in use.')
+                break;
+              case 'auth/missing-phone-number':
+                showAlert('Phone number is missing.')
+                break;
+
+              default:
+                break;
+            }
+          })
+      }
+      else {
+        setIsLoading(false)
+        showAlert('Please enter valid phone number')
+      }
+    }
   }
 
 
-  const handleVerifyCode = useCallback(async (setLoggedIn) => {
+  const handleVerifyCode = () => {
     // Request for OTP verification
     setIsLoading(true)
     if (value.length == 6) {
-      // const requestData = {
-      //   phoneNumber: numberWithCode,
-      //   receivedotp: value ? value : '1234'  //value should be '1234' for now, will check with static data
-      //   role:'user'
-      // };
-      const requestData = {
-        phoneNumber: numberWithCode,
-        receivedotp: value ? value : 123456 //value should be '1234' for now, will check with static data
-      };
-      dispatch(VerifyCodeAction(requestData, setIsLoading, setLoggedIn))
-      // dispatch(VerifyCodeAction(requestData, setIsLoading, setLoggedIn))
+      confirmResult
+        .confirm(value)
+        .then(user => {
+          console.log(user,"userrr hereee")
+          setIsLoading(false)
+          if (user) {
+            console.log("callll")
+            dispatch(verifyCodeslice(true));
+          }
+        })
+        .catch(error => {
+          setIsLoading(false)
+          switch (error.code) {
+            case 'auth/invalid-verification-code':
+              console.log(error.code, 'case 1')
+              showAlert('Invalid verification code. Please enter a valid code.')
+              break;
+            case 'auth/missing-verification-code':
+              console.log(error.code, 'case 2')
+              showAlert('Verification code is missing.')
+              break;
+            default:
+              break;
+          }
+        })
     } else {
       setIsLoading(false)
-      showAlert('Please enter a 6 digit OTP code.')
+      Alert.alert('Please enter a 6 digit OTP code.')
     }
-  }, [numberWithCode, value])
+  }
+
+  // const handleVerifyCode = useCallback(async (setLoggedIn) => {
+  //   // Request for OTP verification
+  //   setIsLoading(true)
+  //   if (value.length == 6) {
+  //     // const requestData = {
+  //     //   phoneNumber: numberWithCode,
+  //     //   receivedotp: value ? value : '1234'  //value should be '1234' for now, will check with static data
+  //     //   role:'user'
+  //     // };
+  //     const requestData = {
+  //       phoneNumber: numberWithCode,
+  //       receivedotp: value ? value : 123456 //value should be '1234' for now, will check with static data
+  //     };
+  //     dispatch(VerifyCodeAction(requestData, setIsLoading, setLoggedIn))
+  //     // dispatch(VerifyCodeAction(requestData, setIsLoading, setLoggedIn))
+  //   } else {
+  //     setIsLoading(false)
+  //     showAlert('Please enter a 6 digit OTP code.')
+  //   }
+  // }, [numberWithCode, value])
 
 
   const submitMobileNumber = () => {
@@ -199,7 +291,9 @@ function MobileNumber() {
             <>
               <View style={styles.container}>
                 <TouchableOpacity style={{ height: 30, width: 50, marginLeft: 10, marginRight: 10, borderRadius: 5, justifyContent: 'center', alignItems: 'center' }} onPress={() => onChangeCountryCode()}>
-                  <Text style={{ color: colors.white }}>{countryCode ? countryCode : '+91'}</Text>
+                  {/* <Text style={{ color: colors.white }}>{countryCode ? countryCode : '+91'}</Text> */}
+                  <Text style={{ color: colors.white }}>{countryCode ? countryCode : '+234'}</Text>
+                  {/* uncomment me to set country code Nigeria */}
                 </TouchableOpacity>
                 <TextInput
                   value={mobileNumber}
