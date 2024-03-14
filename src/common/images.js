@@ -28,5 +28,14 @@ export const contact = require('./assets/contact.png');
 export const download = require('./assets/download.png');
 export const logout = require('./assets/logout.png');
 export const coupan = require('./assets/coupan.png');
-
-
+export const logoValidyfy = require('./assets/logoValidyfy.png');
+export const planIcon = require('./assets/planIcon.png');
+export const usersIcon = require('./assets/usersIcon.png');
+export const profileGrey = require('./assets/profileGrey.png');
+export const iconPlanGrey = require('./assets/iconPlanGrey.png');
+export const iconPlanWhite = require('./assets/iconPlanWhite.png');
+export const iconUsersWhite = require('./assets/iconUsersWhite.png');
+export const iconUsersGrey = require('./assets/iconUsersGrey.png');
+export const filter = require('./assets/filter.png');
+export const userCreate = require('./assets/userCreate.png');
+export const userRed = require('./assets/userRed.png');

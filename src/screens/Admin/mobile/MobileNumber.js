@@ -6,9 +6,9 @@
  */
 
 import React, { useCallback, useEffect, useState } from 'react';
-import { SafeAreaView, StyleSheet, View, Text, TextInput, ScrollView, TouchableOpacity, Keyboard, Dimensions } from 'react-native';
+import { SafeAreaView, StyleSheet, View, Text, TextInput, ScrollView, TouchableOpacity, Keyboard, Dimensions, Image } from 'react-native';
 import colors from '../../../common/colors';
-import { verification } from '../../../common/images';
+import { logoValidyfy, verification } from '../../../common/images';
 import MobileNumberCodeVerification from '../../../components/MobileNumberCodeVerification';
 import { CodeField, Cursor, useBlurOnFulfill, useClearByFocusCell, } from 'react-native-confirmation-code-field';
 import { useNavigation } from '@react-navigation/native';
@@ -111,7 +111,6 @@ function MobileNumber() {
       if (mobileNumberCode !== '' && mobileNumber !== '') {
         await auth().signInWithPhoneNumber(mobileNumberCode + mobileNumber, true) //true added for resend code
           .then(confirmResult => {
-            console.log(confirmResult,"resulttt")
             setIsLoading(false)
             setConfirmResult(confirmResult)
             if (confirmResult._verificationId) {
@@ -159,7 +158,6 @@ function MobileNumber() {
       confirmResult
         .confirm(value)
         .then(user => {
-          console.log(user,"userrr hereee")
           setIsLoading(false)
           if (user) {
             console.log("callll")
@@ -263,7 +261,7 @@ function MobileNumber() {
       <Status lightContent />
       <View style={{ flex: 1, backgroundColor: colors.app_blue }}>
         <ScrollView style={{ marginBottom: 10 }} keyboardShouldPersistTaps='handled'>
-          <Logo styleContainer={{ marginTop: isPotrait ? '30%' : '5%' }} fingerPrintStyle={[styles.fingerPrintStyle, { left: isPotrait ? 60 : 310 }]} />
+          <Image source={logoValidyfy} style={{ marginTop: isPotrait ? '30%' : '5%', alignSelf: 'center', resizeMode: 'contain', width: '60%' }} />
           <MobileNumberCodeVerification verificationImageSource={verification} textFirst={'To begin, Please enter your'} textMiddle={showOTP ? 'Unique Registration code' : 'Mobile Number'} textLast={showOTP ? '(Received by SMS)' : '(Receive an OTP by SMS)'} />
           {showOTP ?
             <View style={styles.codeSection}>

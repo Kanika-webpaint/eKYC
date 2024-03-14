@@ -5,6 +5,8 @@ import colors from "../../../common/colors";
 export const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
+        backgroundColor:colors.white
+        
     },
     amount: {
         color: colors.app_red,
@@ -19,7 +21,7 @@ export const styles = StyleSheet.create({
     },
     header: {
         flexDirection: 'row',
-        backgroundColor: colors.light_purple,
+        backgroundColor: colors.white,
         paddingVertical: 20, // Adjusted padding
         paddingHorizontal: 10, // Adjusted padding
         alignItems: 'center',
@@ -76,6 +78,20 @@ export const styles = StyleSheet.create({
         marginTop: 20,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: colors.light_purple,
-    }
+        backgroundColor: colors.white,
+    },
+    input: {
+        height: 50,
+        borderWidth: 1,
+        paddingLeft: 8,
+        borderRadius: 5,
+        color: colors.black,
+        borderColor: colors.white,
+        backgroundColor: colors.white,
+        fontFamily: fonts.regular,
+        marginBottom: 10,
+        marginTop:30,
+        fontSize: 16,
+        width:'80%'
+    },
 });

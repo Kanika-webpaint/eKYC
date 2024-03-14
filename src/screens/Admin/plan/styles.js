@@ -5,7 +5,7 @@ import { fonts } from "../../../common/fonts";
 export const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
-        backgroundColor: colors.light_purple
+        backgroundColor: colors.white
     },
     scrollViewContent: {
         flexGrow: 1,
@@ -15,7 +15,7 @@ export const styles = StyleSheet.create({
     },
     header: {
         flexDirection: 'row',
-        backgroundColor: colors.light_purple,
+     
         padding: 20,
         alignItems: 'center',
     },
@@ -36,7 +36,7 @@ export const styles = StyleSheet.create({
         padding: 10,
         marginVertical: 30,
         alignItems: 'center',
-        backgroundColor: colors.light_purple,
+       
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20
     },
@@ -63,13 +63,14 @@ export const styles = StyleSheet.create({
         flexDirection: 'row',
         padding: 15,
         width: '95%',
-        backgroundColor: colors.white,
+        backgroundColor: colors.purple_dim,
         borderRadius: 5,
         marginBottom: 20,
         alignItems: 'center',
     },
     selectedItem: {
-        backgroundColor: colors.white, // Changed background color for selected item
+       
+        backgroundColor: colors.purple_dim, // Changed background color for selected item
         opacity: 0.8, // Added opacity
         ...Platform.select({
             ios: {

@@ -5,7 +5,7 @@ import { fonts } from "../../../common/fonts";
 export const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: colors.light_purple
+    backgroundColor: colors.white
   },
   itemContainer: {
     flexDirection: 'row',
@@ -27,15 +27,15 @@ export const styles = StyleSheet.create({
   userName: {
     fontSize: 16,
     fontWeight: 'bold',
+    color: colors.grey_text
   },
   phoneNumber: {
     fontSize: 14,
-    color: '#555',
+    color: colors.grey_text
   },
   searchInput: {
     padding: 10,
-    width:'100%',
-    marginLeft:10
+    width: '100%',
   },
   containerHeader: {
     flex: 1,
@@ -44,7 +44,7 @@ export const styles = StyleSheet.create({
   },
   header: {
     flexDirection: 'row',
-    backgroundColor: colors.light_purple,
+    backgroundColor: colors.white,
     padding: 5,
     alignItems: 'center', // Vertical alignment
     width: '100%', // Take full width of the screen
@@ -58,7 +58,7 @@ export const styles = StyleSheet.create({
     flex: 1, // Allow text to take remaining space
     textAlign: 'center', // Center the text horizontally
     fontSize: 20,
-    fontWeight: fonts.bold,
+    fontFamily: fonts.bold,
     color: 'black', // Assuming text color
   },
   plusIcon: {
@@ -68,15 +68,19 @@ export const styles = StyleSheet.create({
     alignSelf: 'center'
   },
   addView: {
-    height: 42,
-    width: 42,
-    justifyContent: 'center',
-    alignItems: 'center',
+    height: 40,
+    alignSelf: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.8,
     shadowRadius: 2,
-    elevation: 3,
+    elevation: 5,
     marginLeft: 8
   },
+  filterIcon: {
+    height: 20,
+    width: 20,
+    alignSelf: 'center', marginLeft: 10
+  },
+  close: { height: 15, width: 20, alignSelf: 'center', marginRight: 10 }
 });

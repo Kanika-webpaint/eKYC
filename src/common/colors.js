@@ -7,5 +7,7 @@ export default colors = {
     white:'#ffffff',
     grey:'#575C69',
     placeholder_grey:"#999",
-    purple:"#6E1CF5"
+    purple:"#6E1CF5",
+    purple_dim:'#FAF9FF',
+    grey_text:'#575C69'
 }

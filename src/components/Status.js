@@ -16,7 +16,7 @@ import colors from '../common/colors';
 function Status({ isLight, lightContent }) {
     return (
         <>
-            <StatusBar backgroundColor={isLight ? colors.light_purple : colors.app_blue} barStyle={lightContent ? "light-content" : "dark-content"} />
+            <StatusBar backgroundColor={isLight ? colors.white : colors.app_blue} barStyle={lightContent ? "light-content" : "dark-content"} />
 
         </>
     );

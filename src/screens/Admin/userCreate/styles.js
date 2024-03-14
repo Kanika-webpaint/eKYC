@@ -5,7 +5,7 @@ import { fonts } from "../../../common/fonts";
 export const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
-        backgroundColor: colors.light_purple
+        backgroundColor: colors.white
     },
     container: {
         flex: 1,
@@ -22,10 +22,12 @@ export const styles = StyleSheet.create({
         width: '100%',
         fontSize: 16,
         borderColor: colors.white,
-        backgroundColor: colors.white,
+        backgroundColor: colors.purple_dim,
+        elevation: 2,
         fontFamily: fonts.regular
     },
     usernameinput: {
+        elevation: 2,
         height: 50,
         borderWidth: 1,
         flexDirection: 'row',
@@ -33,11 +35,12 @@ export const styles = StyleSheet.create({
         color: colors.black,
         borderWidth: 1,
         width: '100%',
-        fontSize: 16,
+      
         borderColor: colors.white,
-        backgroundColor: colors.white,
-        fontFamily: fonts.regular,
-        paddingLeft: 15
+        backgroundColor: colors.purple_dim,
+      
+        paddingLeft: 15,
+
     },
     buttonContainer: {
         backgroundColor: colors.app_red,
@@ -48,7 +51,8 @@ export const styles = StyleSheet.create({
         width: '100%',
         height: 50,
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
+        elevation:2
     },
     buttonText: {
         color: colors.white,
@@ -63,7 +67,6 @@ export const styles = StyleSheet.create({
     },
     header: {
         flexDirection: 'row',
-        backgroundColor: colors.light_purple,
         padding: 5,
         alignItems: 'center', // Vertical alignment
         width: '100%', // Take full width of the screen
@@ -82,7 +85,7 @@ export const styles = StyleSheet.create({
     },
     userNameText: {
         margin: 5,
-        color: colors.grey,
+        color: colors.grey_text,
         fontFamily: fonts.medium
     }
 });

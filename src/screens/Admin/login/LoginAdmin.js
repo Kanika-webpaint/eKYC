@@ -5,7 +5,7 @@ import { useDispatch } from 'react-redux';
 import { LoginAdminAction } from '../../../redux/actions/user';
 import Loader from '../../../components/ActivityIndicator';
 import ErrorMessage from '../../../components/ErrorMsg';
-import { mail, padlock, view, hide, back_arow } from '../../../common/images';
+import { mail, padlock, view, hide, back_arow, logoValidyfy } from '../../../common/images';
 import colors from '../../../common/colors';
 import Logo from '../../../components/Logo';
 import SignInUp from '../../../components/SignInUp';
@@ -92,7 +92,7 @@ const LoginAdmin = ({ route }) => {
                 </TouchableOpacity>
                 <ScrollView keyboardShouldPersistTaps='handled'>
                     <View style={styles.content}>
-                        <Logo styleContainer={{ marginTop: isPotrait ? '30%' : '5%' }} fingerPrintStyle={[styles.fingerPrintStyle, { left: isPotrait ? 60 : 310}]}/>
+                        <Image source={logoValidyfy} style={{ marginTop: isPotrait ? '20%' : '5%' ,alignSelf:'center',resizeMode:'contain', width:'60%'}}/>
                         <Text style={styles.title}>Login with your Admin (Portal) Details</Text>
                         <View style={styles.inputContainer}>
                             <Image source={mail} style={styles.icon} />
