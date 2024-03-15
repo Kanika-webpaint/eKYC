@@ -39,3 +39,4 @@ export const iconUsersGrey = require('./assets/iconUsersGrey.png');
 export const filter = require('./assets/filter.png');
 export const userCreate = require('./assets/userCreate.png');
 export const userRed = require('./assets/userRed.png');
+export const splashLogo = require('./assets/splashLogo.png');

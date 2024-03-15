@@ -31,12 +31,14 @@ export const styles = StyleSheet.create({
     },
     containerHeader: {
         flex: 1,
+        margin:20,
         justifyContent: 'center',
         alignItems: 'center',
     },
     header: {
         flexDirection: 'row',
         padding: 5,
+        margin:20,
         alignItems: 'center', // Vertical alignment
         width: '100%', // Take full width of the screen
     },

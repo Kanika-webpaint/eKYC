@@ -1,0 +1,74 @@
+/**
+ * Sample React Native App
+ * https://github.com/facebook/react-native
+ *
+ * @format
+ */
+
+import React, { useState, useEffect } from 'react';
+import { SafeAreaView, View, Text, ScrollView, TouchableOpacity, Image, Dimensions } from 'react-native';
+import colors from '../../../common/colors';
+import { useNavigation } from '@react-navigation/native';
+import { useDispatch } from 'react-redux';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Loader from '../../../components/ActivityIndicator';
+import { back } from '../../../common/images';
+import { fonts } from '../../../common/fonts';
+import Status from '../../../components/Status';
+import { styles } from './styles';
+import PlanItem from '../../../components/PlanItem';
+
+
+function CurrentPlan() {
+    const [isPotrait, setIsPortrait] = useState(true)
+    const [isLoading, setIsLoading] = useState(false);
+    const [token, setAuthToken] = useState('')
+    const navigation = useNavigation();
+    const dispatch = useDispatch()
+
+
+    useEffect(() => {
+        AsyncStorage.getItem("token").then((value) => {
+            if (value) {
+                setAuthToken(value)
+            }
+        })
+            .then(res => {
+                //do something else
+            });
+    }, [token]);
+
+
+    return (
+        <SafeAreaView style={styles.safeArea}>
+            <Status isLight />
+            <ScrollView style={styles.safeArea} keyboardShouldPersistTaps='handled'>
+                <View style={styles.header}>
+                    <TouchableOpacity onPress={() => navigation.goBack()} hitSlop={{ top: 50, bottom: 50, right: 50, left: 50 }} style={{ height: 50, width: 50, alignItems: 'center', justifyContent: 'center' }}>
+                        <Image source={back} style={styles.backArrow} />
+                    </TouchableOpacity>
+                    <Text style={styles.title}>My Plan</Text>
+                </View>
+                <View style={{ borderWidth: 0.3, borderColor: colors.light_grey }}></View>
+                <View style={{ backgroundColor: colors.purple_dim, margin: 20 }}>
+                    <Text style={{ fontSize: 20, fontFamily: fonts.bold, color: colors.black, padding: 10 }}>Details</Text>
+                    <PlanItem title={'Current Plan'} value={'Basic'} />
+                    <PlanItem title={'Billing Email'} value={'kanika.webpaint@gmail.com'} />
+                    <PlanItem title={'Status'} value={'Active'} styleText={{ backgroundColor: 'green', borderRadius: 10, padding: 3, color: colors.white }} />
+                    <PlanItem title={'Price'} value={'N14,999'} />
+                    <PlanItem title={'Billing period'} value={'Yearly'} />
+                    <PlanItem title={'Subscription renewal date'} value={'14-03-2025'} />
+                </View>
+                <View style={{ backgroundColor: colors.purple_dim, margin: 20 }}>
+                    <Text style={{ fontSize: 20, fontFamily: fonts.bold, color: colors.black, padding: 10 }}>Features</Text>
+                    <PlanItem title={'Users'} value={'1-50'} />
+                </View>
+            </ScrollView>
+        </SafeAreaView>
+    );
+}
+
+
+export default CurrentPlan
+
+

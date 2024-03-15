@@ -1,5 +1,5 @@
 export default colors = {
-    app_blue: '#001229',
+    app_blue: '#00081B',
     light_grey:'#CCD0D4',
     app_red:'#CE1010',
     black:'#000000',

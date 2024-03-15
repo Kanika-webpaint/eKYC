@@ -56,6 +56,7 @@ const NavigationStack = () => {
                         <Stack.Screen options={{ headerShown: false }} name="CreateUser" component={routeNames.CreateUser} />
                         <Stack.Screen options={{ headerShown: false }} name="UsersList" component={routeNames.UserList} />
                         <Stack.Screen options={{ headerShown: false }} name="UserProfile" component={routeNames.UserProfile} />
+                        <Stack.Screen options={{ headerShown: false }} name="CurrentPlan" component={routeNames.CurrentPlan} />
                     </>
                 ) : isLoggedUser ? (
                     <>

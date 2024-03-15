@@ -35,10 +35,8 @@ export const styles = StyleSheet.create({
         color: colors.black,
         borderWidth: 1,
         width: '100%',
-      
         borderColor: colors.white,
         backgroundColor: colors.purple_dim,
-      
         paddingLeft: 15,
 
     },
@@ -49,7 +47,7 @@ export const styles = StyleSheet.create({
         borderRadius: 8,
         alignItems: 'center',
         width: '100%',
-        height: 50,
+        height: 45,
         justifyContent: 'center',
         alignItems: 'center',
         elevation:2

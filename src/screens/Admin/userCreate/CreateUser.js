@@ -6,7 +6,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView,  View, Text, ScrollView, TextInput, TouchableOpacity, Image, Dimensions } from 'react-native';
+import { SafeAreaView, View, Text, ScrollView, TextInput, TouchableOpacity, Image, Dimensions } from 'react-native';
 import colors from '../../../common/colors';
 import RedButton from '../../../components/RedButton';
 import { useNavigation } from '@react-navigation/native';
@@ -128,7 +128,7 @@ function CreateUser() {
                 <View style={{ margin: 20 }}>
                     <View style={styles.containerHeader}>
                         <View style={styles.header}>
-                            <TouchableOpacity onPress={() => navigation.goBack()}>
+                            <TouchableOpacity onPress={() => navigation.goBack()} hitSlop={{ top: 50, bottom: 50, right: 50, left: 50 }} style={{ height: 50, width: 50, alignItems: 'center', justifyContent: 'center' }}>
                                 <Image source={back} style={styles.backArrow} />
                             </TouchableOpacity>
                             <Text style={styles.title}>Create user</Text>
@@ -137,7 +137,7 @@ function CreateUser() {
                     <View style={{ marginTop: 30 }}>
                         <Image source={userCreate} style={{ height: 150, width: 150, alignSelf: 'center', marginBottom: 20 }}></Image>
                         <Text style={styles.userNameText}>
-                            Username
+                            Name
                         </Text>
                         <View style={styles.usernameinput}>
                             <Image source={userRed} style={{ height: 20, width: 20, alignSelf: 'center', resizeMode: 'contain' }} />

@@ -126,7 +126,7 @@ function MobileNumber() {
             setIsLoading(false)
             switch (error.code) {
               case 'auth/too-many-requests' || 'auth/app-not-authorized':
-                showAlert('Please try again later!')
+                showAlert('Too many attempts with One-Time Passwords. Please try again later.')
                 break;
               case 'auth/invalid-phone-number':
                 showAlert('Please enter valid phone number')

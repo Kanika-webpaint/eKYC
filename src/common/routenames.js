@@ -16,6 +16,7 @@ import SuccessScreen from "../screens/Admin/success/SuccessScreen";
 import UserProfile from "../screens/Admin/profile/UserProfile";
 import ContactUs from "../screens/Admin/contact/ContactUs";
 import IdScreen from "../screens/Customer/getStarted/IdScreen";
+import CurrentPlan from "../screens/Admin/currentPlanDetail/CurrentPlan";
 
 export const routeNames = {
     MobileVerification: MobileNumber,
@@ -35,5 +36,6 @@ export const routeNames = {
     SuccessScreen:SuccessScreen,
     UserProfile:UserProfile,
     ContactUs:ContactUs,
-    IdScreen:IdScreen 
+    IdScreen:IdScreen ,
+    CurrentPlan: CurrentPlan
 }

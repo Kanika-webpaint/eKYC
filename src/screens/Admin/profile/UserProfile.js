@@ -6,12 +6,12 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { SafeAreaView, StyleSheet,  View,  TextInput,Image, Text, ScrollView, TouchableOpacity} from 'react-native';
+import { SafeAreaView, StyleSheet, View, TextInput, Image, Text, ScrollView, TouchableOpacity } from 'react-native';
 import colors from '../../../common/colors';
-import { back,  profile } from '../../../common/images';
+import { back, profile, userRed } from '../../../common/images';
 import { useNavigation } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux'
-import {  getUserByIdAction } from '../../../redux/actions/user';
+import { getUserByIdAction } from '../../../redux/actions/user';
 import { fonts } from '../../../common/fonts';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Status from '../../../components/Status';
@@ -48,7 +48,9 @@ function UserProfile({ route }) {
                             <Text style={styles.title}>Profile</Text>
                         </View>
                     </View>
-                    <Image source={profile} style={{ marginTop: 20, height: 100, width: 100, resizeMode: 'contain', alignSelf: 'center' }} />
+                    <View style={{ backgroundColor: colors.purple_dim, borderWidth: 1, justifyContent: 'center', alignItems: 'center', height: 70, width: 70, alignSelf: 'center', borderRadius: 40, borderColor: colors.app_red, elevation: 2, marginTop: 20 }}>
+                        <Image source={userRed} style={{ height: 30, width: 30, resizeMode: 'contain', alignSelf: 'center' }} />
+                    </View>
                 </View>
                 <View style={{ margin: 20 }}>
                     <TextInput

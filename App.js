@@ -10,7 +10,7 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 import colors from './src/common/colors';
-import { validifyX_logo, x_logo } from './src/common/images';
+import { splashLogo, x_logo } from './src/common/images';
 import NavigationStack from './src/navigation/NavigationStack';
 import NetworkLogger from 'react-native-network-logger';
 
@@ -39,7 +39,7 @@ function App() {
       return (
         <View style={styles.splashContainer}>
           <Image source={x_logo} style={styles.backgroundImage} />
-          <Image source={validifyX_logo} style={styles.logo} />
+          <Image source={splashLogo} style={styles.logo} />
         </View>
       );
     } else {
@@ -91,6 +91,9 @@ const styles = StyleSheet.create({
   logo: {
     alignSelf: 'center',
     justifyContent: 'center',
+    resizeMode: 'contain',
+    height: 80,
+    width: '80%'
   },
   backgroundImage: {
     position: 'absolute',
