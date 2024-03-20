@@ -23,7 +23,9 @@ import { fonts } from '../../../common/fonts';
 import Status from '../../../components/Status';
 import showAlert from '../../../components/showAlert';
 import { styles } from './styles';
-import { verifyCodeslice } from '../../../redux/slices/user';
+import { phoneNumberslice, verifyCodeslice } from '../../../redux/slices/user';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 function MobileNumber() {
@@ -80,74 +82,102 @@ function MobileNumber() {
     );
   };
 
-  // const handleSendCode = () => {
-  //   if (mobileNumber === '') {
-  //     setIsLoading(true)
-  //     setShowError(true)
-  //     setIsLoading(false)
-  //   } else {
-  //     setIsLoading(true)
-  //     let mobileNumberCode = countryCode ? countryCode : '+91'
-  //     console.log(mobileNumberCode + mobileNumber, "mobileee")
-  //     setNumberWithCode(mobileNumberCode + mobileNumber)
-  //     const requestData = {
-  //       phoneNumber: mobileNumberCode + mobileNumber
-  //     };
-  //     dispatch(PhoneNumberAction(requestData, navigation, setShowOTP, setIsLoading))
-  //   };
-  // }
+  const checkUserRegister = async () => {
 
-
-  const handleSendCode = async () => {
+    console.log("call function")
     if (mobileNumber === '') {
       setIsLoading(true)
       setShowError(true)
       setIsLoading(false)
     } else {
       setIsLoading(true)
-      // Request to send OTP
-      setShowError(false)
       let mobileNumberCode = countryCode ? countryCode : '+91'
-      if (mobileNumberCode !== '' && mobileNumber !== '') {
-        await auth().signInWithPhoneNumber(mobileNumberCode + mobileNumber, true) //true added for resend code
-          .then(confirmResult => {
-            setIsLoading(false)
-            setConfirmResult(confirmResult)
-            if (confirmResult._verificationId) {
-              setIsLoading(false)
-              setShowOTP(true)
-            } else {
-              setIsLoading(false)
-              showAlert('Please try again later!')
-            }
-          })
-          .catch(error => {
-            console.log(error, ">>>")
-            setIsLoading(false)
-            switch (error.code) {
-              case 'auth/too-many-requests' || 'auth/app-not-authorized':
-                showAlert('Too many attempts with One-Time Passwords. Please try again later.')
-                break;
-              case 'auth/invalid-phone-number':
-                showAlert('Please enter valid phone number')
-                break;
-              case 'auth/credential-already-in-use':
-                showAlert('This phone number is already in use.')
-                break;
-              case 'auth/missing-phone-number':
-                showAlert('Phone number is missing.')
-                break;
+      console.log(mobileNumberCode + mobileNumber, "mobileee")
+      setNumberWithCode(mobileNumberCode + mobileNumber)
+      const requestData = {
+        phoneNumber: mobileNumberCode + mobileNumber
+      };
 
-              default:
-                break;
-            }
-          })
+      console.log(requestData, "dataaa")
+      // const api_url = `${API_URL}/sendOTP`
+      const api_url = 'http://192.168.1.26:8080/api/sendOTP'
+      const res = await axios.post(api_url, requestData)
+      console.log(res, "response send OTP")
+      if (res?.status === 200) {
+        console.log(res, "response register userr")
+        await AsyncStorage.setItem('token', res?.data?.token);
+        await AsyncStorage.setItem('role', "user");
+        const storedToken = await AsyncStorage.getItem('token_user');
+        const storedRole = await AsyncStorage.getItem('role_user');
+        console.log(storedToken, storedRole, "token roleee")
+        if (storedRole && storedToken) {
+          // handleSendCode(numberWithCode)  // firebase call then 
+        }
+      } else {
+        showAlert(res?.data?.message)
       }
-      else {
-        setIsLoading(false)
-        showAlert('Please enter valid phone number')
-      }
+      await dispatch(phoneNumberslice(res))
+
+      // dispatch(PhoneNumberAction(requestData, navigation, setShowOTP, setIsLoading))
+    };
+  }
+
+
+
+
+  const handleSendCode = async (numberWithCode) => {
+    console.log(numberWithCode, "codeee with number")
+    // if (mobileNumber === '') {
+    //   setIsLoading(true)
+    //   setShowError(true)
+    //   setIsLoading(false)
+    // } 
+    // else {
+    //   setIsLoading(true)
+    //   // Request to send OTP
+    //   setShowError(false)
+    //   let mobileNumberCode = countryCode ? countryCode : '+91'
+    if (numberWithCode) {
+      await auth().signInWithPhoneNumber(numberWithCode, true) //true added for resend code
+        .then(confirmResult => {
+          console.log(confirmResult, "resulttt")
+          setIsLoading(false)
+          setConfirmResult(confirmResult)
+          if (confirmResult._verificationId) {
+            setIsLoading(false)
+            setShowOTP(true)
+          } else {
+            setIsLoading(false)
+            showAlert('Please try again later!')
+          }
+        })
+        .catch(error => {
+          console.log(error, ">>>")
+          setIsLoading(false)
+          switch (error.code) {
+            case 'auth/too-many-requests' || 'auth/app-not-authorized':
+              showAlert('Too many attempts with One-Time Passwords. Please try again later.')
+              break;
+            case 'auth/invalid-phone-number':
+              showAlert('Please enter valid phone number')
+              break;
+            case 'auth/credential-already-in-use':
+              showAlert('This phone number is already in use.')
+              break;
+            case 'auth/missing-phone-number':
+              showAlert('Phone number is missing.')
+              break;
+
+            default:
+              break;
+          }
+        })
     }
+    else {
+      setIsLoading(false)
+      showAlert('Please enter valid phone number')
+    }
+    // }
   }
 
 
@@ -209,7 +239,8 @@ function MobileNumber() {
 
   const submitMobileNumber = () => {
     Keyboard.dismiss();
-    handleSendCode()
+    // handleSendCode()
+    checkUserRegister()
   }
 
   const submitOTP = () => {

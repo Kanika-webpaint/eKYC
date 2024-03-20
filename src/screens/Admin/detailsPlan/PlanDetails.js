@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
     SafeAreaView,
     View,
@@ -8,6 +8,7 @@ import {
     TouchableOpacity,
     FlatList,
     Dimensions,
+    Linking,
 } from 'react-native';
 import colors from '../../../common/colors';
 import { back, check, phone, plan_select } from '../../../common/images';
@@ -17,11 +18,21 @@ import RedButton from '../../../components/RedButton';
 import Loader from '../../../components/ActivityIndicator';
 import Status from '../../../components/Status';
 import { styles } from './styles';
+import axios from 'axios';
+import SuccessScreen from '../success/SuccessScreen';
+import { useDispatch } from 'react-redux';
+import { useStripe } from '@stripe/stripe-react-native';
+import { Link } from 'react-router-native';
+import showAlert from '../../../components/showAlert';
+
 
 function PlanDetails({ route }) {
     const navigation = useNavigation();
     const [isLoading, setIsLoading] = useState(false);
     const [isPotrait, setIsPortrait] = useState(true)
+    const [urlVal, setUrlVal] = useState('');
+    const dispatch = useDispatch()
+    const webViewRef = useRef(null)
 
     const renderPlanItem = (item) => {
         return (
@@ -38,7 +49,6 @@ function PlanDetails({ route }) {
             navigation.navigate('Checkout', { amount: route?.params?.amount || '' })
             setIsLoading(false)
         }, 1000)
-
     }
 
 
@@ -72,7 +82,7 @@ function PlanDetails({ route }) {
     return (
         <SafeAreaView style={styles.safeArea}>
             <Status isLight />
-            <ScrollView style={{ backgroundColor: colors.light_purple }}>
+            <ScrollView >
                 <View style={styles.containerHeader}>
                     <View style={styles.header}>
                         <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -89,7 +99,7 @@ function PlanDetails({ route }) {
                 </View>
                 <View style={styles.mainView}>
                     <Image source={plan_select} style={styles.imagePlanSelect} />
-                    <Text style={styles.amount}>{'Pay ' + route?.params?.amount === 'N14999' ? 'N14,999' : 'N13,499'}</Text>
+                    <Text style={styles.amount}>{route?.params?.amount === 'N14999' ? 'N14,999' : 'N13,499'}</Text>
                     <FlatList scrollEnabled={false} data={route?.params?.plan === 'Basic' ?
                         BasicPlanData : route?.params?.plan === 'Premium' ?
                             PreminumPlanData : EnterprisePlanData}

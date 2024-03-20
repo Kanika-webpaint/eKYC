@@ -17,6 +17,7 @@ import { fonts } from '../../../common/fonts';
 import Status from '../../../components/Status';
 import { styles } from './styles';
 import PlanItem from '../../../components/PlanItem';
+import { getPlanDetailsAction } from '../../../redux/actions/user';
 
 
 function CurrentPlan() {
@@ -25,6 +26,18 @@ function CurrentPlan() {
     const [token, setAuthToken] = useState('')
     const navigation = useNavigation();
     const dispatch = useDispatch()
+    // const planDetailsList = useSelector((state) => state?.login?.planDetailList)
+    // console.log(planDetailsList, "list plan detailss")
+    // useEffect(() => {
+    //     AsyncStorage.getItem("token").then((value) => {
+    //         if (value) {
+    //             dispatch(getPlanDetailsAction(value, setIsLoading))
+    //         }
+    //     })
+    //         .then(res => {
+    //             //do something else
+    //         });
+    // }, [dispatch]);
 
 
     useEffect(() => {
@@ -58,6 +71,14 @@ function CurrentPlan() {
                     <PlanItem title={'Price'} value={'N14,999'} />
                     <PlanItem title={'Billing period'} value={'Yearly'} />
                     <PlanItem title={'Subscription renewal date'} value={'14-03-2025'} />
+
+                    {/* <PlanItem title={'Current Plan'} value={planDetailsList?.data?.planName} />
+                    <PlanItem title={'Billing Email'} value={planDetailsList?.data?.email} />
+                    <PlanItem title={'Status'} value={planDetailsList?.data?.status} styleText={{ backgroundColor: 'green', borderRadius: 10, padding: 3, color: colors.white }} />
+                    <PlanItem title={'Price'} value={planDetailsList?.data?.amount} />
+                    <PlanItem title={'Billing period'} value={planDetailsList?.data?.billingPeriod} />
+                    <PlanItem title={'Subscription renewal date'} value={planDetailsList?.data?.renewDate} /> */}
+
                 </View>
                 <View style={{ backgroundColor: colors.purple_dim, margin: 20 }}>
                     <Text style={{ fontSize: 20, fontFamily: fonts.bold, color: colors.black, padding: 10 }}>Features</Text>

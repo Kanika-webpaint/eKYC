@@ -18,7 +18,7 @@ import showAlert from '../../../components/showAlert';
 import { styles } from './styles';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { verifyCodeslice } from '../../../redux/slices/user';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { verifedCustomerDataAction } from '../../../redux/actions/user';
 
 function IdScreen({ route }) {
@@ -28,11 +28,29 @@ function IdScreen({ route }) {
   const { height: screenHeight } = Dimensions.get('window');
   const [isPotrait, setIsPortrait] = useState(true)
   const dispatch = useDispatch();
+  const [userToken, setTokenUser]=useState('')
+  const phoneNumberToken = useSelector((state) => state?.login?.phoneNumber)
+
+  console.log(phoneNumberToken,"tokennnn")
 
   const onPressStarted = () => {
     setIsLoading(true);
     setTimeout(() => onPressGo(), 1000);
   };
+
+ 
+  useEffect(() => {
+    AsyncStorage.getItem("token_user").then((value) => {
+        if (value) {
+            setTokenUser(value)
+        }
+    })
+        .then(res => {
+            //do something else
+        });
+}, [dispatch,userToken]);
+
+
 
   useEffect(() => {
     const updateOrientation = () => {
@@ -76,14 +94,32 @@ function IdScreen({ route }) {
             logoutAccount()
             const requestData =
             {
-              inquiry_Id: inquiryId,
-              status_verification: status,
-              data: fields
+              addressCity: fields?.addressCity?.value ? fields?.addressCity?.value : '',
+              addressCountryCode: fields?.addressCountryCode?.value ? fields?.addressCountryCode?.value : '',
+              addressPostalCode: fields?.addressPostalCode?.value ? fields?.addressPostalCode?.value : '',
+              addressStreet1: fields?.addressStreet1?.value ? fields?.addressStreet1?.value : '',
+              addressStreet2: fields?.addressStreet2?.value ? fields?.addressStreet2?.value : '',
+              addressSubdivision: fields?.addressSubdivision?.value ? fields?.addressSubdivision?.value : '',
+              birthdate: fields?.birthdate?.value ? fields?.birthdate?.value : '',
+              currentGovernmentId: fields?.currentGovernmentId?.value ? fields?.currentGovernmentId?.value : '',
+              currentSelfie: fields?.currentSelfie?.value ? fields?.currentSelfie?.value : '',
+              emailAddress: fields?.emailAddress?.value ? fields?.emailAddress?.value : '',
+              expirationDate: fields?.expirationDate?.value ? fields?.expirationDate?.value : '',
+              identificationClass: fields?.identificationClass?.value ? fields?.identificationClass?.value : '',
+              identificationNumber: fields?.identificationNumber?.value ? fields?.identificationNumber?.value : '',
+              nameFirst: fields?.nameFirst?.value ? fields?.nameFirst?.value : '',
+              nameLast: fields?.nameLast?.value ? fields?.nameLast?.value : '',
+              nameMiddle: fields?.nameMiddle?.value ? fields?.nameMiddle?.value : '',
+              phoneNumber: fields?.phoneNumber?.value ? fields?.phoneNumber?.value : '',
+              selectedCountryCode: fields?.selectedCountryCode?.value ? fields?.selectedCountryCode?.value : '',
+              selectedIdClass: fields?.selectedIdClass?.value ? fields?.selectedIdClass?.value : '',
+              inquiryId: inquiryId,
+              status: status
             }
-            // dispatch(verifedCustomerDataAction(requestData, navigation, setIsLoading));
+            dispatch(verifedCustomerDataAction(requestData, navigation, userToken, setIsLoading));
 
             // call post API to save verified data and logout after data save
-          
+
             setTimeout(() => {
               logoutAccount()
               setIsLoading(false)

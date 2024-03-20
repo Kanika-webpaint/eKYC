@@ -1,7 +1,7 @@
 export const BasicPlanData = [
     {
         id: 0,
-        listItem: '1-50 users'
+        listItem: 'Users (1-50)'
     },
     // {
     //     id: 1,
@@ -17,7 +17,7 @@ export const BasicPlanData = [
 export const PreminumPlanData = [
     {
         id: 0,
-        listItem: '51-200'
+        listItem: 'Users (51-200)'
     },
     // {
     //     id: 1,

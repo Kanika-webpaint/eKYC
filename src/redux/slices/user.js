@@ -14,7 +14,10 @@ const authSlice = createSlice({
         contact: [],
         isLogged:false,
         isLoggedUser:false,
-        verifiedDataList:[]
+        verifiedDataList:[],
+        verifiedDataListDashboard:[],
+        stripeSubs:[],
+        planDetailList:[]
     },
 
     reducers: {
@@ -50,6 +53,15 @@ const authSlice = createSlice({
         verifiedDataSlice: (state, action) => {
             state.verifiedDataList = action?.payload?.data
         },
+        getVerifiedUserListSlice:(state, action) => {
+            state.verifiedDataListDashboard = action?.payload?.data
+        },
+        stripeSubscriptionSlice:(state, action) => {
+            state.stripeSubs = action?.payload?.data
+        },
+        getPlanDetailSlice:(state, action) => {
+            state.planDetailList = action?.payload?.data
+        }
         //add more slices here
     }
 })
@@ -68,6 +80,9 @@ export const {
     getUserListSlice,
     getUserSlice,
     contactUsSlice,
-    verifiedDataSlice
+    verifiedDataSlice,
+    getVerifiedUserListSlice,
+    stripeSubscriptionSlice,
+    getPlanDetailSlice
     // add more slices here
 } = authSlice.actions

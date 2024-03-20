@@ -5,7 +5,7 @@ import { fonts } from "../../../common/fonts";
 export const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
-        backgroundColor: colors.light_purple,
+        backgroundColor: colors.white,
     },
     buttonContainer: {
         backgroundColor: colors.app_red,
@@ -26,7 +26,7 @@ export const styles = StyleSheet.create({
     },
     header: {
         flexDirection: 'row',
-        backgroundColor: colors.light_purple,
+        // backgroundColor: colors.light_purple,
         paddingVertical: 10, // Adjusted for better spacing
         alignItems: 'center',
         width: '100%',
@@ -54,7 +54,7 @@ export const styles = StyleSheet.create({
         borderRadius: 5,
         color: colors.black,
         borderColor: colors.white,
-        backgroundColor: colors.white,
+        backgroundColor: colors.purple_dim,
         fontFamily: fonts.regular,
         marginBottom: 10,
         fontSize: 16,
@@ -70,6 +70,7 @@ export const styles = StyleSheet.create({
         marginVertical: 2, // Adjusted for spacing
         color: colors.grey,
         fontFamily: fonts.regular,
+        // marginBottom:10
     },
     addressField: {
         flexDirection: 'row',
@@ -82,7 +83,7 @@ export const styles = StyleSheet.create({
         borderRadius: 5,
         color: colors.black,
         borderColor: colors.white,
-        backgroundColor: colors.white,
+        backgroundColor: colors.purple_dim,
         fontFamily: fonts.regular,
         marginBottom: 10,
         fontSize: 16,
@@ -99,7 +100,7 @@ export const styles = StyleSheet.create({
         fontFamily: fonts.regular,
     },
     cardStyling: {
-        backgroundColor: '#FFFFFF',
+        backgroundColor: colors.purple_dim,
         textColor: '#000000',
         borderRadius: 5,
         fontFamily: fonts.regular,
