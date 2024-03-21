@@ -6,17 +6,11 @@ import { contactUsSlice, createUserSlice, getOrgDetailsslice, getPlanDetailSlice
 import showAlert from '../../components/showAlert';
 import { useDispatch } from 'react-redux';
 
-
-
-
 console.log(API_URL, "APIII URLLLL")
 
 export const LoginAdminAction = (data, setIsLoading, setLoggedIn) => async (dispatch) => {
-
     try {
-        console.log(API_URL, "APIII URLLLL")
-        // const api_url = `${API_URL}/loginorganization`;
-        const api_url = 'http://192.168.1.26:8080/api/loginorganization'
+        const api_url = `${API_URL}/loginorganization`;
         const res = await axios.post(api_url, data);
         // console.log(res)
         if (res?.status == 200) {
@@ -26,14 +20,11 @@ export const LoginAdminAction = (data, setIsLoading, setLoggedIn) => async (disp
             await AsyncStorage.setItem('role', "organization");
             const storedToken = await AsyncStorage.getItem('token');
             const storedRole = await AsyncStorage.getItem('role');
-
             if (storedRole && storedToken) {
                 // Redirect to the dashboard screen after successful login
                 // setLoggedIn(true);
                 await dispatch(loginAdminslice(res, setLoggedIn));
-
             }
-
         }
     } catch (e) {
         if (e?.response?.status === 404) {
@@ -53,15 +44,12 @@ export const LoginAdminAction = (data, setIsLoading, setLoggedIn) => async (disp
 };
 
 
-
-
 export const RegisterAdminAction =
     (data,
         navigation,
         setIsLoading
     ) => async (dispatch) => {
         try {
-            console.log(API_URL, "createorganization")
             const api_url = `${API_URL}/createorganization`
             const res = await axios.post(api_url, data)
             if (res?.status === 201) {
@@ -87,7 +75,6 @@ export const getOrgDetailsAction = (token, setIsLoading) => async (dispatch) => 
                 Authorization: `${token}`,
             },
         }
-        console.log(API_URL, "getorganizationdetails")
         const api_url = `${API_URL}/getorganizationdetails`
         const res = await axios.get(api_url, config)
         console.log(res, "response org detailss")
@@ -95,7 +82,6 @@ export const getOrgDetailsAction = (token, setIsLoading) => async (dispatch) => 
         AsyncStorage.setItem('org_id', JSON.stringify(res?.data?.organization?.id))
         AsyncStorage.setItem('org_name', JSON.stringify(res?.data?.organization?.name))
         if (res?.status === 200) {
-            console.log(res, "res get details of orgggg")
             setIsLoading(false)
         } else {
             showAlert(res?.data?.message)
@@ -117,7 +103,6 @@ export const getUsersListAction = (token, setIsLoading) => async (dispatch) => {
         }
         console.log(API_URL, "users")
         const api_url = `${API_URL}/users`
-        // const api_url = 'http://192.168.1.26:5000/api/users'
         const res = await axios.get(api_url, config)
         console.log(res, "response get users")
         await dispatch(getUserListSlice(res))
@@ -143,7 +128,6 @@ export const CreateUserAction =
     ) =>
         async (dispatch) => {
             try {
-                console.log(API_URL, "createuser")
                 const config = {
                     headers: {
                         'Content-Type': 'application/json',
@@ -152,7 +136,6 @@ export const CreateUserAction =
                 }
                 const api_url = `${API_URL}/createuser`
                 const res = await axios.post(api_url, data, config)
-                console.log(res, "response create user by admin ")
                 if (res.status === 201) {
                     setIsLoading(false)
                     showAlert(res?.data?.message)
@@ -184,7 +167,6 @@ export const getUserByIdAction =
                     },
                 }
                 const api_url = `${API_URL}/users/${id}`
-                // const api_url = `http://192.168.1.18:5000/api/users/${id}`;
                 const res = await axios.get(api_url, config)
                 console.log(res, "get particular user detail:::")
                 if (res.status === 200) {
@@ -208,9 +190,7 @@ export const PhoneNumberAction =
             try {
                 const api_url = `${API_URL}/sendOTP`
                 const res = await axios.post(api_url, data)
-                console.log(res, "response send OTP")
                 if (res?.status === 200) {
-                    console.log(res, "response otp sendd")
                     setIsLoading(false)
                 } else {
                     showAlert(res?.data?.message)
@@ -222,25 +202,24 @@ export const PhoneNumberAction =
             }
         }
 
-export const VerifyCodeAction =
-    (
-        data,
-        setIsLoading,
-        setLoggedIn
-    ) =>
-        async (dispatch) => {
-            try {
-
-                if (data?.receivedotp == '123456') {
-                    setIsLoading(false)
-                    await dispatch(verifyCodeslice({ data: '', setLoggedIn }));
-                } else {
-                    showAlert('Please enter valid otp.')
-                }
-            } catch (e) {
-                showAlert('try again later!')
-            }
-        }
+// export const VerifyCodeAction =
+//     (
+//         data,
+//         setIsLoading,
+//         setLoggedIn
+//     ) =>
+//         async (dispatch) => {
+//             try {
+//                 if (data?.receivedotp == '123456') {
+//                     setIsLoading(false)
+//                     await dispatch(verifyCodeslice({ data: '', setLoggedIn }));
+//                 } else {
+//                     showAlert('Please enter valid otp.')
+//                 }
+//             } catch (e) {
+//                 showAlert('try again later!')
+//             }
+//         }
 
 
 
@@ -365,11 +344,8 @@ export const verifedCustomerDataAction =
                     Authorization: `${token}`,
                 },
             }
-            console.log(API_URL, "document")
-            // const api_url = `${API_URL}/document`
-            const api_url = 'http://192.168.1.26:8080/api/document'   // change it to live
+            const api_url = `${API_URL}/document`
             const res = await axios.post(api_url, data, config)
-            console.log(res, "responsee validate customer")
             if (res.status === 200) {
                 setIsLoading(false)
                 logoutAccount()
@@ -393,14 +369,10 @@ export const getVerifiedUserAction = (token, setIsLoading) => async (dispatch) =
                 Authorization: `${token}`,
             },
         }
-        console.log(API_URL, "verifedUsers")
-        // const api_url = `${API_URL}/getalldocumentUsers`
-        const api_url = 'http://192.168.1.26:8080/api/getalldocumentUsers'
+        const api_url = `${API_URL}/getalldocumentUsers`
         const res = await axios.get(api_url, config)
-        console.log(res, "response get verifedUsersusers")
         await dispatch(getVerifiedUserListSlice(res))
         if (res?.status === 200) {
-            console.log(res, "res get users....")
             setIsLoading(false)
         } else {
             showAlert(res?.data?.message)
@@ -421,11 +393,8 @@ export const stripeSubscriptionAction =
     ) =>
         async (dispatch) => {
             try {
-                console.log(API_URL, "stripeSubscription")
                 const api_url = `${API_URL}/stripeSubscription`
                 const res = await axios.post(api_url, data)
-                console.log(res, "response verify OTP")
-                console.log(amount, "amount in action")
                 if (res.status === 200) {
                     setIsLoading(false)
                     navigation.navigate('SuccessScreen')
@@ -449,8 +418,7 @@ export const getPlanDetailsAction = (token, setIsLoading) => async (dispatch) =>
             },
         }
         console.log(API_URL, "plan details")
-        // const api_url = `${API_URL}/getPlanDetail`
-        const api_url = 'http://192.168.1.26:8080/api/getPlanDetail'
+        const api_url = `${API_URL}/getPlanDetail`
         const res = await axios.get(api_url, config)
         console.log(res, "response get plan detailsss")
         await dispatch(getPlanDetailSlice(res))

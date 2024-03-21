@@ -56,7 +56,6 @@ export const styles = StyleSheet.create({
         borderColor: colors.white,
         backgroundColor: colors.purple_dim,
         fontFamily: fonts.regular,
-        marginBottom: 10,
         fontSize: 16,
         width: '100%', // Adjusted for full width
     },
@@ -85,7 +84,7 @@ export const styles = StyleSheet.create({
         borderColor: colors.white,
         backgroundColor: colors.purple_dim,
         fontFamily: fonts.regular,
-        marginBottom: 10,
+
         fontSize: 16,
     },
     errorMessageStyle: {

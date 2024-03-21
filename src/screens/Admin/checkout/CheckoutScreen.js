@@ -23,7 +23,8 @@ import showAlert from '../../../components/showAlert';
 import { styles } from './styles';
 import { useDispatch } from 'react-redux';
 import { stripeSubscriptionAction } from '../../../redux/actions/user';
-
+import CheckoutForm from '../../../components/CheckoutForm';
+import { API_URL } from "@env"
 
 
 function CheckoutScreen({ route }) {
@@ -118,23 +119,23 @@ function CheckoutScreen({ route }) {
         }
     }
 
-    const handleLogin = async () => {
+    const handleCheckout = async () => {
         const newErrorMessages = {};
 
-        if (!userData.name) {
+        if (!userData.name.trim()) {
             newErrorMessages.name = 'Name is required';
         }
-        if (!userData.email) {
+        if (!userData.email.trim()) {
             newErrorMessages.email = 'Email is required';
         }
-        if (!userData.line1) {
+        if (!userData.line1.trim()) {
             newErrorMessages.line1 = 'Line 1 is required';
         }
 
-        if (!userData.line2) {
+        if (!userData.line2.trim()) {
             newErrorMessages.line2 = 'Line 2 is required';
         }
-        if (!userData.postalCode) {
+        if (!userData.postalCode.trim()) {
             newErrorMessages.postalCode = 'Postal code is required';
         }
 
@@ -164,6 +165,7 @@ function CheckoutScreen({ route }) {
                 setCityErrorMsg(false)
             }
             return;
+
         } else {
             if (!cardDetails || !cardDetails.complete) {
                 showAlert('Please enter valid card details');
@@ -205,8 +207,8 @@ function CheckoutScreen({ route }) {
                                     price_id: route?.params?.amount == 'N14999' ? PRICE_BASIC_PLAN : PRICE_PREMIUM_PLAN,   // check issue here
                                     paymentMethod: resPaymentMethod?.data?.id
                                 }
-
-                                axios.post('http://192.168.1.25:5000/api/stripesubscription', JSON.stringify(subscriptionData), configSubscription)
+                                const api_url = `${API_URL}/stripesubscription`
+                                await axios.post(api_url, JSON.stringify(subscriptionData), configSubscription)
                                     .then(async function (resSubscription) {
                                         const clientSecret = resSubscription?.data?.clientSecret;   // send whole response or check if plan details exist , then send in another API
                                         if (clientSecret) {
@@ -340,59 +342,74 @@ function CheckoutScreen({ route }) {
                             </View>
                         </View>
                         <View style={{ marginTop: 30 }}>
-                            <Text style={styles.titleText}>Name</Text>
-                            <TextInput
-                                value={userData?.name}
-                                style={styles.input}
-                                placeholder="Enter name here"
-                                placeholderTextColor={colors.light_grey}
-                                onChangeText={(text) => handleInputChange('name', text)}
-                                keyboardType="email-address"
-                            />
+                            <CheckoutForm value={userData?.name} placeholder="Enter name here" onChangeText={(text) => handleInputChange('name', text)} title={'Name'} />
                             <ErrorMessageCheckout errorMessageText={errorMessages.name} />
-                            <Text style={styles.titleText}>Email</Text>
-                            <TextInput
-                                value={userData?.email}
-                                style={styles.input}
-                                placeholder="Enter email here"
-                                placeholderTextColor={colors.light_grey}
-                                onChangeText={(text) => handleInputChange('email', text)}
-                                keyboardType="email-address"
-                            />
+                            <CheckoutForm value={userData?.email} placeholder="Enter email here" onChangeText={(text) => handleInputChange('email', text)} keyboardType="email-address" title={'Email'} />
                             <ErrorMessageCheckout errorMessageText={errorMessages.email} />
-                            <View style={{ marginBottom: 10 }}>
-                                <Text style={styles.titleText}>Country</Text>
+                            <CheckoutForm value={'Nigeria'} title={'Country'} />
+                            <View style={{ marginTop: 20 }}>
+                                <Text style={styles.titleText}>State</Text>
                                 <View style={styles.addressField}>
                                     <TextInput
-                                        value={'Nigeria'}
+                                        value={selectedState}
                                         editable={false}
                                         style={styles.inputCount}
-                                        placeholder="Select country"
+                                        placeholder="Select State"
                                         placeholderTextColor={colors.light_grey}
                                     // onChangeText={(text) => handleInputChange('address', text)}
                                     />
-
+                                    <TouchableOpacity onPress={() => setShowState(!showState)} style={{ marginRight: 20 }}>
+                                        <Image
+                                            source={down} // Change the path to your dropdown icon
+                                            style={{ width: 20, height: 20 }}
+                                        />
+                                    </TouchableOpacity>
                                 </View>
-                                <View>
-                                    <Text style={styles.titleText}>State</Text>
+                                {stateErrMsg && <Text style={styles.errorMessageStyle}>{'State is required'}</Text>}
+                                {showState && (
+                                    <View style={{
+                                        backgroundColor: colors.white,
+                                        borderRadius: 5,
+                                        shadowColor: '#000',
+                                        shadowOffset: { width: 0, height: 1 },
+                                        shadowOpacity: 0.8,
+                                        shadowRadius: 2,
+                                        elevation: 5,
+                                        height: 200,
+                                        flex: 1 // Allow the container to expand
+                                    }}>
+                                        <FlatList
+                                            nestedScrollEnabled
+                                            contentContainerStyle={{ flexGrow: 1 }}
+                                            style={{ padding: 10 }}
+                                            data={statesData && statesData}
+                                            renderItem={({ item }) => onPressStateItem(item)}
+                                            keyExtractor={(item) => item.code}
+                                        />
+                                    </View>
+                                )}
+                            </View>
+                            {/* )} */}
+                            {selectedState && (
+                                <View style={{ marginTop: 18 }}>
+                                    <Text style={styles.titleText}>City</Text>
                                     <View style={styles.addressField}>
                                         <TextInput
-                                            value={selectedState}
+                                            value={selectedCity}
                                             editable={false}
                                             style={styles.inputCount}
-                                            placeholder="Select State"
+                                            placeholder="Select City"
                                             placeholderTextColor={colors.light_grey}
-                                        // onChangeText={(text) => handleInputChange('address', text)}
                                         />
-                                        <TouchableOpacity onPress={() => setShowState(!showState)} style={{ marginRight: 20 }}>
+                                        <TouchableOpacity onPress={() => setShowCity(!showCity)} style={{ marginRight: 20 }}>
                                             <Image
                                                 source={down} // Change the path to your dropdown icon
                                                 style={{ width: 20, height: 20 }}
                                             />
                                         </TouchableOpacity>
                                     </View>
-                                    {stateErrMsg && <Text style={styles.errorMessageStyle}>{'State is required'}</Text>}
-                                    {showState && (
+                                    {cityErrMsg && <Text style={styles.errorMessageStyle}>{'City is required'}</Text>}
+                                    {showCity && (
                                         <View style={{
                                             backgroundColor: colors.white,
                                             borderRadius: 5,
@@ -408,57 +425,15 @@ function CheckoutScreen({ route }) {
                                                 nestedScrollEnabled
                                                 contentContainerStyle={{ flexGrow: 1 }}
                                                 style={{ padding: 10 }}
-                                                data={statesData && statesData}
-                                                renderItem={({ item }) => onPressStateItem(item)}
+                                                data={cityData && cityData}
+                                                renderItem={({ item }) => onPressCityItem(item)}
                                                 keyExtractor={(item) => item.code}
                                             />
                                         </View>
                                     )}
                                 </View>
-                                {/* )} */}
-                                {selectedState && (
-                                    <View>
-                                        <Text style={styles.titleText}>City</Text>
-                                        <View style={styles.addressField}>
-                                            <TextInput
-                                                value={selectedCity}
-                                                editable={false}
-                                                style={styles.inputCount}
-                                                placeholder="Select City"
-                                                placeholderTextColor={colors.light_grey}
-                                            />
-                                            <TouchableOpacity onPress={() => setShowCity(!showCity)} style={{ marginRight: 20 }}>
-                                                <Image
-                                                    source={down} // Change the path to your dropdown icon
-                                                    style={{ width: 20, height: 20 }}
-                                                />
-                                            </TouchableOpacity>
-                                        </View>
-                                        {cityErrMsg && <Text style={styles.errorMessageStyle}>{'City is required'}</Text>}
-                                        {showCity && (
-                                            <View style={{
-                                                backgroundColor: colors.white,
-                                                borderRadius: 5,
-                                                shadowColor: '#000',
-                                                shadowOffset: { width: 0, height: 1 },
-                                                shadowOpacity: 0.8,
-                                                shadowRadius: 2,
-                                                elevation: 5,
-                                                height: 200,
-                                                flex: 1 // Allow the container to expand
-                                            }}>
-                                                <FlatList
-                                                    nestedScrollEnabled
-                                                    contentContainerStyle={{ flexGrow: 1 }}
-                                                    style={{ padding: 10 }}
-                                                    data={cityData && cityData}
-                                                    renderItem={({ item }) => onPressCityItem(item)}
-                                                    keyExtractor={(item) => item.code}
-                                                />
-                                            </View>
-                                        )}
-                                    </View>
-                                )}
+                            )}
+                            <View style={{ marginTop: 12 }}>
                                 <Text style={styles.titleText}>Line 1</Text>
                                 <TextInput
                                     value={userData?.line1}
@@ -467,46 +442,47 @@ function CheckoutScreen({ route }) {
                                     placeholderTextColor={colors.light_grey}
                                     onChangeText={(text) => handleInputChange('line1', text)}
                                 />
-                                <ErrorMessageCheckout errorMessageText={errorMessages.line1} />
-                                <Text style={styles.titleText}>Line 2</Text>
-                                <TextInput
-                                    value={userData?.line2}
-                                    style={styles.input}
-                                    placeholder="Enter line 2"
-                                    placeholderTextColor={colors.light_grey}
-                                    onChangeText={(text) => handleInputChange('line2', text)}
-                                />
-                                <ErrorMessageCheckout errorMessageText={errorMessages.line2} />
-                                <Text style={styles.titleText}>Postal Code</Text>
-                                <TextInput
-                                    value={userData?.postalCode}
-                                    style={styles.input}
-                                    placeholder="Enter postal code"
-                                    placeholderTextColor={colors.light_grey}
-                                    onChangeText={(text) => handleInputChange('postalCode', text)}
-                                />
-                                <ErrorMessageCheckout errorMessageText={errorMessages.postalCode} />
-                                <Text style={styles.titleText}>Card details</Text>
-                                <CardField
-                                    // postalCodeEnabled={false}
-                                    placeholders={{
-                                        number: 'Enter card number',
-                                    }}
-                                    placeholderTextColor={'#CCD0D4'}
-                                    cardStyle={styles.cardStyling}
-                                    style={styles.cardStripe}
-                                    onCardChange={(cardDetails) => {
-                                        fetchCardDetails(cardDetails)
-                                    }}
-                                    onFocus={(focusedField) => {
-                                        console.log('focusField', focusedField);
-                                    }}
-                                />
-                                {cardDetailsErrMsg && <Text style={styles.errorText}>
-                                    Card details are required
-                                </Text>}
-                                {/* <Text style={[styles.titleText, { marginTop: 30, marginBottom: 3 }]}>Have a coupan code?</Text> */}
-                                {/* <View style={{ flexDirection: 'row' }}>
+                            </View>
+                            <ErrorMessageCheckout errorMessageText={errorMessages.line1} />
+                            <Text style={styles.titleText}>Line 2</Text>
+                            <TextInput
+                                value={userData?.line2}
+                                style={styles.input}
+                                placeholder="Enter line 2"
+                                placeholderTextColor={colors.light_grey}
+                                onChangeText={(text) => handleInputChange('line2', text)}
+                            />
+                            <ErrorMessageCheckout errorMessageText={errorMessages.line2} />
+                            <Text style={styles.titleText}>Postal Code</Text>
+                            <TextInput
+                                value={userData?.postalCode}
+                                style={styles.input}
+                                placeholder="Enter postal code"
+                                placeholderTextColor={colors.light_grey}
+                                onChangeText={(text) => handleInputChange('postalCode', text)}
+                            />
+                            <ErrorMessageCheckout errorMessageText={errorMessages.postalCode} />
+                            <Text style={styles.titleText}>Card details</Text>
+                            <CardField
+                                // postalCodeEnabled={false}
+                                placeholders={{
+                                    number: 'Enter card number',
+                                }}
+                                placeholderTextColor={'#CCD0D4'}
+                                cardStyle={styles.cardStyling}
+                                style={styles.cardStripe}
+                                onCardChange={(cardDetails) => {
+                                    fetchCardDetails(cardDetails)
+                                }}
+                                onFocus={(focusedField) => {
+                                    console.log('focusField', focusedField);
+                                }}
+                            />
+                            {cardDetailsErrMsg && <Text style={styles.errorText}>
+                                Card details are required
+                            </Text>}
+                            {/* <Text style={[styles.titleText, { marginTop: 30, marginBottom: 3 }]}>Have a coupan code?</Text> */}
+                            {/* <View style={{ flexDirection: 'row' }}>
                                     <View style={styles.coupanCodeView}>
                                         <Image source={coupan} style={{ resizeMode: 'contain', height: 20, width: 20, alignSelf: 'center', marginLeft: 10 }} />
                                         <TextInput
@@ -532,7 +508,7 @@ function CheckoutScreen({ route }) {
                                         <Text style={styles.applyText}>{'APPLY'}</Text>
                                     </TouchableOpacity>
                                 </View> */}
-                                {/* {load ?
+                            {/* {load ?
                                     <ActivityIndicator size="small" color={colors.app_red} style={{ marginTop: 20 }} /> :
                                     showSummary ?
                                         <View style={styles.summaryView}>
@@ -557,12 +533,12 @@ function CheckoutScreen({ route }) {
                                         null
                                 } */}
 
-                            </View>
+
                             <RedButton
                                 buttonContainerStyle={[styles.buttonContainer, { marginTop: isPotrait ? '8%' : '8%' }]}
                                 ButtonContent={buttonContent()}
                                 contentStyle={styles.buttonText}
-                                onPress={() => handleLogin()}
+                                onPress={() => handleCheckout()}
                             />
                         </View>
                     </View>

@@ -57,7 +57,7 @@ export const styles = StyleSheet.create({
     },
     buttonText: {
         color: colors.white,
-        fontSize: 18, // Adjusted font size
+        fontSize: 16, // Adjusted font size
         alignSelf: 'center',
         fontFamily: fonts.bold
     },
@@ -68,11 +68,12 @@ export const styles = StyleSheet.create({
         fontFamily: fonts.regular
     },
     itemImage: {
-        height: 24, // Adjusted height
-        width: 24, // Adjusted width
+        height: 20, // Adjusted height
+        width: 20, // Adjusted width
         resizeMode: 'contain',
         alignSelf: 'center',
-        marginRight: 20
+        marginRight: 10,
+        resizeMode:'contain'
     },
     mainView: {
         marginTop: 20,

@@ -26,7 +26,7 @@ import { styles } from './styles';
 import { phoneNumberslice, verifyCodeslice } from '../../../redux/slices/user';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { API_URL } from "@env"
 
 function MobileNumber() {
   const [value, setValue] = useState('');
@@ -97,10 +97,7 @@ function MobileNumber() {
       const requestData = {
         phoneNumber: mobileNumberCode + mobileNumber
       };
-
-      console.log(requestData, "dataaa")
-      // const api_url = `${API_URL}/sendOTP`
-      const api_url = 'http://192.168.1.26:8080/api/sendOTP'
+      const api_url = `${API_URL}/sendOTP`
       const res = await axios.post(api_url, requestData)
       console.log(res, "response send OTP")
       if (res?.status === 200) {
