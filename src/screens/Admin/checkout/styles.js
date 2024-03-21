@@ -21,9 +21,6 @@ export const styles = StyleSheet.create({
         fontSize: 16,
         fontFamily: fonts.bold,
     },
-    containerHeader: {
-        alignItems: 'center', // Centering horizontally
-    },
     header: {
         flexDirection: 'row',
         // backgroundColor: colors.light_purple,
@@ -35,6 +32,7 @@ export const styles = StyleSheet.create({
         height: 25,
         width: 25,
         marginRight: 10,
+        resizeMode:'contain'
     },
     title: {
         flex: 1,
@@ -84,7 +82,6 @@ export const styles = StyleSheet.create({
         borderColor: colors.white,
         backgroundColor: colors.purple_dim,
         fontFamily: fonts.regular,
-
         fontSize: 16,
     },
     errorMessageStyle: {
@@ -117,5 +114,18 @@ export const styles = StyleSheet.create({
     viewAll: { flexDirection: 'row', justifyContent: 'space-between' },
     subTotal: { fontSize: 16, fontFamily: fonts.regular },
     imgCoupan: { height: 15, width: 15, marginRight: 10 },
-    coupanView: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }
+    coupanView: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center' },
+    flatlistStyle:{
+        backgroundColor: colors.white,
+        borderRadius: 5,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.8,
+        shadowRadius: 2,
+        elevation: 5,
+        height: 200,
+        flex: 1 // Allow the container to expand
+    },
+    dropdownStyle:{ width: 20, height: 20, resizeMode: 'contain' },
+    itemm:{ fontSize: 18, paddingVertical: 10 }
 });

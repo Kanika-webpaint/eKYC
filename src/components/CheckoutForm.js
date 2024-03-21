@@ -16,7 +16,7 @@ import colors from '../common/colors';
 import { fonts } from '../common/fonts';
 
 
-function CheckoutForm({value, placeholder, onChangeText,title,keyboardType}) {
+function CheckoutForm({value, placeholder, onChangeText,title,keyboardType,editable}) {
     return (
         <>
             <View>
@@ -28,6 +28,7 @@ function CheckoutForm({value, placeholder, onChangeText,title,keyboardType}) {
                     placeholderTextColor={colors.light_grey}
                     onChangeText={onChangeText}
                     keyboardType={keyboardType}
+                    editable={editable}
                 />
             </View>
         </>

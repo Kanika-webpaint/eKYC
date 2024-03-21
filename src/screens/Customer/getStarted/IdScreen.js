@@ -21,7 +21,7 @@ import { verifyCodeslice } from '../../../redux/slices/user';
 import { useDispatch, useSelector } from 'react-redux';
 import { verifedCustomerDataAction } from '../../../redux/actions/user';
 
-function IdScreen({ route }) {
+function IdScreen() {
   const navigation = useNavigation();
   const [isLoading, setIsLoading] = useState(false);
   const [verificationCardData, setVerificationCardData] = useState();
@@ -33,12 +33,6 @@ function IdScreen({ route }) {
 
   console.log(phoneNumberToken,"tokennnn")
 
-  const onPressStarted = () => {
-    setIsLoading(true);
-    setTimeout(() => onPressGo(), 1000);
-  };
-
- 
   useEffect(() => {
     AsyncStorage.getItem("token_user").then((value) => {
         if (value) {
@@ -49,8 +43,6 @@ function IdScreen({ route }) {
             //do something else
         });
 }, [dispatch,userToken]);
-
-
 
   useEffect(() => {
     const updateOrientation = () => {
@@ -74,6 +66,11 @@ function IdScreen({ route }) {
     // Remove event listener when the screen unfocuses
     return unsubscribeFocus;
   }, [navigation]);
+
+  const onPressStarted = () => {
+    setIsLoading(true);
+    setTimeout(() => onPressGo(), 1000);
+  };
 
   const logoutAccount = useCallback(async () => {
     await AsyncStorage.clear();
@@ -117,9 +114,7 @@ function IdScreen({ route }) {
               status: status
             }
             dispatch(verifedCustomerDataAction(requestData, navigation, userToken, setIsLoading));
-
             // call post API to save verified data and logout after data save
-
             setTimeout(() => {
               logoutAccount()
               setIsLoading(false)
@@ -138,7 +133,6 @@ function IdScreen({ route }) {
       .build()
       .start();
   };
-
 
   console.log(verificationCardData, "dataaa verification")
   return (
@@ -164,7 +158,5 @@ function IdScreen({ route }) {
     </SafeAreaView>
   );
 }
-
-
 
 export default IdScreen;

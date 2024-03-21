@@ -6,17 +6,17 @@
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { SafeAreaView, View, Text, TouchableOpacity, Image, ScrollView, TextInput, FlatList, Dimensions, ActivityIndicator, Linking } from 'react-native';
+import { SafeAreaView, View, Text, TouchableOpacity, Image, ScrollView, TextInput, FlatList, Dimensions } from 'react-native';
 import colors from '../../../common/colors';
 import RedButton from '../../../components/RedButton';
 import { back, close, coupan, down } from '../../../common/images';
-import { useNavigation } from '@react-navigation/native';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
 import Loader from '../../../components/ActivityIndicator';
-import { Country, State, City } from 'country-state-city';
+import { State, City } from 'country-state-city';
 import ErrorMessageCheckout from '../../../components/ErrorMsgCheckout';
 import Status from '../../../components/Status';
 import { CardField, createToken } from '@stripe/stripe-react-native';
-import { PUBLISH_KEY, STRIPE_CLIENT_SECRET_KEY } from '@env'
+import { PUBLISH_KEY, STRIPE_CLIENT_SECRET_KEY, API_URL, PRICE_BASIC_PLAN, PRICE_PREMIUM_PLAN } from '@env'
 import { StripeProvider, confirmPayment } from '@stripe/stripe-react-native';
 import axios from 'axios';
 import showAlert from '../../../components/showAlert';
@@ -24,14 +24,11 @@ import { styles } from './styles';
 import { useDispatch } from 'react-redux';
 import { stripeSubscriptionAction } from '../../../redux/actions/user';
 import CheckoutForm from '../../../components/CheckoutForm';
-import { API_URL } from "@env"
 
 
 function CheckoutScreen({ route }) {
     const [userData, setFormData] = useState({ email: '', cardNo: '', expDate: '', cvv: '', name: '', line1: '', line2: '', postalCode: '' });
     const [errorMessages, setErrorMessages] = useState({ email: '', name: '', address: '', country: '', line1: '', line2: '', postalCode: '' });
-    const [countryData, setCountryData] = useState([]);
-    const [selectedOption, setSelectedOption] = useState(null);
     const [selectedState, setSelectedState] = useState(null);
     const [selectedCity, setSelectedCity] = useState(null);
     const [statesData, setStatesData] = useState();
@@ -42,9 +39,7 @@ function CheckoutScreen({ route }) {
     const [grandTotalAmount, setTotalAmount] = useState()
     const [resetAmount, setResetAmount] = useState(false)
     const [isLoading, setIsLoading] = useState(false);
-    const [showOptions, setShowOptions] = useState(false);
     const [showState, setShowState] = useState(false);
-    const [countryErrMsg, setCountryErrorMsg] = useState(false)
     const [stateErrMsg, setStateErrorMsg] = useState(false)
     const [cityErrMsg, setCityErrorMsg] = useState(false)
     const [cardDetailsErrMsg, setCardDetailsErrMsg] = useState(false)
@@ -53,8 +48,6 @@ function CheckoutScreen({ route }) {
     const [load, setLoad] = useState(false)
     const [discountedAmount, setDiscountedVal] = useState(0)
     const navigation = useNavigation();
-    const PRICE_BASIC_PLAN = 'price_1Orfn8SEL02qr6mepdDLMpTx';
-    const PRICE_PREMIUM_PLAN = 'price_1OrfqJSEL02qr6meyZ2HrQtE';
     const dispatch = useDispatch()
 
     useEffect(() => {
@@ -64,23 +57,12 @@ function CheckoutScreen({ route }) {
         }
     }, []);
 
-    const getCities = async (option) => {
-        const nigeriaStatesCitiesData = await City && City?.getCitiesOfState('NG', option?.isoCode);
-        if (nigeriaStatesCitiesData && option?.isoCode) {
-            setCitiesData(nigeriaStatesCitiesData);
-        }
-    }
-
     useEffect(() => {
         const updateOrientation = () => {
             const { height, width } = Dimensions.get('window');
             setIsPortrait(height > width);
         };
         Dimensions.addEventListener('change', updateOrientation);
-        // Return a cleanup function
-        // return () => {
-        //     Dimensions?.removeEventListener('change', updateOrientation);
-        // };
     }, []);
 
     useEffect(() => {
@@ -88,9 +70,7 @@ function CheckoutScreen({ route }) {
             const { height, width } = Dimensions.get('window');
             setIsPortrait(height > width);
         };
-        // Add event listener when the screen focuses
         const unsubscribeFocus = navigation.addListener('focus', updateOrientation);
-        // Remove event listener when the screen unfocuses
         return unsubscribeFocus;
     }, [navigation]);
 
@@ -99,6 +79,12 @@ function CheckoutScreen({ route }) {
         setErrorMessages({ ...errorMessages, [field]: '' });
     };
 
+    const getCities = async (option) => {
+        const nigeriaStatesCitiesData = await City && City?.getCitiesOfState('NG', option?.isoCode);
+        if (nigeriaStatesCitiesData && option?.isoCode) {
+            setCitiesData(nigeriaStatesCitiesData);
+        }
+    }
 
     const handleStatePress = (option) => {
         setSelectedState(option?.name)
@@ -112,6 +98,7 @@ function CheckoutScreen({ route }) {
     }
 
     const fetchCardDetails = (cardDetails) => {
+        console.log(cardDetails, "card DETAILS")
         if (cardDetails?.complete) {
             setCardDetails(cardDetails)
         } else {
@@ -119,9 +106,10 @@ function CheckoutScreen({ route }) {
         }
     }
 
+    console.log(API_URL, PRICE_PREMIUM_PLAN, PRICE_BASIC_PLAN, STRIPE_CLIENT_SECRET_KEY, PUBLISH_KEY, "api url test")
+
     const handleCheckout = async () => {
         const newErrorMessages = {};
-
         if (!userData.name.trim()) {
             newErrorMessages.name = 'Name is required';
         }
@@ -131,20 +119,14 @@ function CheckoutScreen({ route }) {
         if (!userData.line1.trim()) {
             newErrorMessages.line1 = 'Line 1 is required';
         }
-
         if (!userData.line2.trim()) {
             newErrorMessages.line2 = 'Line 2 is required';
         }
         if (!userData.postalCode.trim()) {
             newErrorMessages.postalCode = 'Postal code is required';
         }
-
-
         if (!cardDetails) {
             setCardDetailsErrMsg(true)
-        }
-        if (selectedOption === null) {
-            setCountryErrorMsg(true)
         }
         if (selectedState === null) {
             setStateErrorMsg(true)
@@ -152,12 +134,8 @@ function CheckoutScreen({ route }) {
         if (selectedCity === null) {
             setCityErrorMsg(true)
         }
-
         if (Object.keys(newErrorMessages).length > 0) {
             setErrorMessages(newErrorMessages);
-            if (selectedOption !== null && selectedOption.length > 0) {
-                setCountryErrorMsg(false)
-            }
             if (selectedState !== null) {
                 setStateErrorMsg(false)
             }
@@ -165,7 +143,6 @@ function CheckoutScreen({ route }) {
                 setCityErrorMsg(false)
             }
             return;
-
         } else {
             if (!cardDetails || !cardDetails.complete) {
                 showAlert('Please enter valid card details');
@@ -180,64 +157,87 @@ function CheckoutScreen({ route }) {
                         },
                     };
                     const resToken = await createToken({ ...cardDetails, type: 'Card' })
-                    const data =
-                    {
-                        type: 'card',
-                        card: { token: resToken?.token?.id },
-                    }
-                    axios.post('https://api.stripe.com/v1/payment_methods', data, config)
-                        .then(async function (resPaymentMethod) {
-                            if (resPaymentMethod && resPaymentMethod?.data && resPaymentMethod?.data?.id) {
-                                const configSubscription = {
-                                    headers: {
-                                        'Content-Type': 'application/json',
-                                    },
-                                };
-                                const subscriptionData = {
-                                    name: userData?.name,
-                                    email: userData?.email,
-                                    address: {
-                                        city: selectedCity,
-                                        country: 'Nigeria',
-                                        line1: userData?.line1,
-                                        line2: userData?.line2,
-                                        postal_code: userData?.postalCode,
-                                        state: selectedState
-                                    },
-                                    price_id: route?.params?.amount == 'N14999' ? PRICE_BASIC_PLAN : PRICE_PREMIUM_PLAN,   // check issue here
-                                    paymentMethod: resPaymentMethod?.data?.id
-                                }
-                                const api_url = `${API_URL}/stripesubscription`
-                                await axios.post(api_url, JSON.stringify(subscriptionData), configSubscription)
-                                    .then(async function (resSubscription) {
-                                        const clientSecret = resSubscription?.data?.clientSecret;   // send whole response or check if plan details exist , then send in another API
-                                        if (clientSecret) {
-                                            let confirmPaymentIntent = await confirmPayment(resSubscription?.data?.clientSecret, {
-                                                paymentMethodType: 'Card', paymentMethodData: {
-                                                    paymentMethodId: resPaymentMethod?.data?.id
-                                                }
-                                            })
-                                            if (confirmPaymentIntent?.paymentIntent?.status === 'Succeeded') {
-                                                setIsLoading(false)
-                                                navigation.navigate('SuccessScreen')
-                                                // call the API to save data to DB
+                    console.log(resToken, "response tokenn")
+                    if (resToken && resToken?.token && resToken?.token?.id) {
+                        const data =
+                        {
+                            type: 'card',
+                            card: { token: resToken?.token?.id },
+                        }
+                        axios.post('https://api.stripe.com/v1/payment_methods', data, config)
+                            .then(async function (resPaymentMethod) {
+                                if (resPaymentMethod && resPaymentMethod?.data && resPaymentMethod?.data?.id) {
+                                    const configSubscription = {
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                        },
+                                    };
+                                    const subscriptionData = {
+                                        name: userData?.name,
+                                        email: userData?.email,
+                                        address: {
+                                            city: selectedCity,
+                                            country: 'Nigeria',
+                                            line1: userData?.line1,
+                                            line2: userData?.line2,
+                                            postal_code: userData?.postalCode,
+                                            state: selectedState
+                                        },
+                                        price_id: route?.params?.amount == 'N14999' ? PRICE_BASIC_PLAN : PRICE_PREMIUM_PLAN,   // check issue here
+                                        paymentMethod: resPaymentMethod?.data?.id
+                                    }
+                                    const api_url = `${API_URL}/stripesubscription`
+                                    await axios.post(api_url, JSON.stringify(subscriptionData), configSubscription)
+                                        .then(async function (resSubscription) {
+                                            console.log(clientSecret, "secret client")
+                                            const clientSecret = resSubscription?.data?.clientSecret;
+                                            if (clientSecret) {
+                                                setIsLoading(true)
+                                                setTimeout(async () => {
+                                                    setIsLoading(false)
+                                                    navigation.navigate('SuccessScreen')
 
-                                                // const confirmationSubsData = {
-                                                //     dataSubscription: confirmPaymentIntent?.paymentIntent
-                                                // }
-                                                // dispatch(stripeSubscriptionAction(confirmationSubsData, navigation, setIsLoading))
+                                                    // no need to do.........
+                                                    
+                                                    // save success response
+                                                    // let confirmPaymentIntent = await confirmPayment(resSubscription?.data?.clientSecret, {
+                                                    //     paymentMethodType: 'Card', paymentMethodData: {
+                                                    //         paymentMethodId: resPaymentMethod?.data?.id
+                                                    //     }
+                                                    // })
+
+                                                    // try {
+                                                    //     if (confirmPaymentIntent?.paymentIntent?.status == 'Succeeded') {
+                                                    //         setIsLoading(false)
+                                                    //         navigation.navigate('SuccessScreen')
+                                                    //         // call the API to save data to DB
+
+                                                    //         // const confirmationSubsData = {
+                                                    //         //     dataSubscription: confirmPaymentIntent?.paymentIntent
+                                                    //         // }
+                                                    //         // dispatch(stripeSubscriptionAction(confirmationSubsData, navigation, setIsLoading))
+
+                                                    //     } else {
+                                                    //         setIsLoading(false)
+                                                    //     }
+                                                    // } catch (error) {
+                                                    //     setIsLoading(false)
+                                                    //     console.log(error, "error")
+                                                    // };
+                                                }, 500);
 
                                             } else {
-                                                // handle paymmnet failure
-                                                showAlert('Payment has been failed, Try again later!!')
+                                                setIsLoading(false)
+                                                showAlert('Apologies for the inconvenience, please try again later.')
                                             }
-                                        }
-                                    })
-                                    .catch(function (error) {
-                                        console.log(error, "error")
-                                    });
-                            }
-                        })
+                                        })
+                                        .catch(function (error) {
+                                            console.log(error, "error")
+                                        });
+                                }
+                            })
+                    }
+
                 } catch (error) {
                     setIsLoading(false)
                     showAlert('Error', 'Something went wrong. Please try again later.');
@@ -246,11 +246,10 @@ function CheckoutScreen({ route }) {
         }
     }
 
-
     const onPressStateItem = (item) => {
         return (
             <TouchableOpacity onPress={() => handleStatePress(item)}>
-                <Text style={{ fontSize: 18, paddingVertical: 10 }}>{item?.name}</Text>
+                <Text style={styles.itemm}>{item?.name}</Text>
             </TouchableOpacity>
         )
     }
@@ -258,7 +257,7 @@ function CheckoutScreen({ route }) {
     const onPressCityItem = (item) => {
         return (
             <TouchableOpacity onPress={() => handleCityPress(item)}>
-                <Text style={{ fontSize: 18, paddingVertical: 10 }}>{item?.name}</Text>
+                <Text style={styles.itemm}>{item?.name}</Text>
             </TouchableOpacity>
         )
     }
@@ -327,140 +326,64 @@ function CheckoutScreen({ route }) {
 
     return (
         <SafeAreaView style={styles.safeArea}>
-            <StripeProvider
-                publishableKey={PUBLISH_KEY}
-            >
+            <StripeProvider publishableKey={PUBLISH_KEY}>
                 <Status isLight />
                 <ScrollView keyboardShouldPersistTaps='handled'>
                     <View style={{ margin: 20 }}>
-                        <View style={styles.containerHeader}>
-                            <View style={styles.header}>
-                                <TouchableOpacity onPress={() => navigation.goBack()}>
-                                    <Image source={back} style={styles.backArrow} />
-                                </TouchableOpacity>
-                                <Text style={styles.title}>Checkout</Text>
-                            </View>
+                        <View style={styles.header}>
+                            <TouchableOpacity onPress={() => navigation.goBack()}>
+                                <Image source={back} style={styles.backArrow} />
+                            </TouchableOpacity>
+                            <Text style={styles.title}>Checkout</Text>
                         </View>
                         <View style={{ marginTop: 30 }}>
                             <CheckoutForm value={userData?.name} placeholder="Enter name here" onChangeText={(text) => handleInputChange('name', text)} title={'Name'} />
                             <ErrorMessageCheckout errorMessageText={errorMessages.name} />
                             <CheckoutForm value={userData?.email} placeholder="Enter email here" onChangeText={(text) => handleInputChange('email', text)} keyboardType="email-address" title={'Email'} />
                             <ErrorMessageCheckout errorMessageText={errorMessages.email} />
-                            <CheckoutForm value={'Nigeria'} title={'Country'} />
+                            <CheckoutForm value={'Nigeria'} title={'Country'} editable={false} />
                             <View style={{ marginTop: 20 }}>
                                 <Text style={styles.titleText}>State</Text>
                                 <View style={styles.addressField}>
-                                    <TextInput
-                                        value={selectedState}
-                                        editable={false}
-                                        style={styles.inputCount}
-                                        placeholder="Select State"
-                                        placeholderTextColor={colors.light_grey}
-                                    // onChangeText={(text) => handleInputChange('address', text)}
-                                    />
+                                    <TextInput value={selectedState} editable={false} style={styles.inputCount} placeholder="Select State" placeholderTextColor={colors.light_grey} />
                                     <TouchableOpacity onPress={() => setShowState(!showState)} style={{ marginRight: 20 }}>
-                                        <Image
-                                            source={down} // Change the path to your dropdown icon
-                                            style={{ width: 20, height: 20 }}
-                                        />
+                                        <Image source={down} style={styles.dropdownStyle} />
                                     </TouchableOpacity>
                                 </View>
                                 {stateErrMsg && <Text style={styles.errorMessageStyle}>{'State is required'}</Text>}
                                 {showState && (
-                                    <View style={{
-                                        backgroundColor: colors.white,
-                                        borderRadius: 5,
-                                        shadowColor: '#000',
-                                        shadowOffset: { width: 0, height: 1 },
-                                        shadowOpacity: 0.8,
-                                        shadowRadius: 2,
-                                        elevation: 5,
-                                        height: 200,
-                                        flex: 1 // Allow the container to expand
-                                    }}>
-                                        <FlatList
-                                            nestedScrollEnabled
-                                            contentContainerStyle={{ flexGrow: 1 }}
-                                            style={{ padding: 10 }}
-                                            data={statesData && statesData}
-                                            renderItem={({ item }) => onPressStateItem(item)}
-                                            keyExtractor={(item) => item.code}
-                                        />
+                                    <View style={styles.flatlistStyle}>
+                                        <FlatList nestedScrollEnabled contentContainerStyle={{ flexGrow: 1 }} style={{ padding: 10 }} data={statesData && statesData} renderItem={({ item }) => onPressStateItem(item)} keyExtractor={(item) => item.code} />
                                     </View>
                                 )}
                             </View>
-                            {/* )} */}
                             {selectedState && (
                                 <View style={{ marginTop: 18 }}>
                                     <Text style={styles.titleText}>City</Text>
                                     <View style={styles.addressField}>
-                                        <TextInput
-                                            value={selectedCity}
-                                            editable={false}
-                                            style={styles.inputCount}
-                                            placeholder="Select City"
-                                            placeholderTextColor={colors.light_grey}
-                                        />
+                                        <TextInput value={selectedCity} editable={false} style={styles.inputCount} placeholder="Select City" placeholderTextColor={colors.light_grey} />
                                         <TouchableOpacity onPress={() => setShowCity(!showCity)} style={{ marginRight: 20 }}>
-                                            <Image
-                                                source={down} // Change the path to your dropdown icon
-                                                style={{ width: 20, height: 20 }}
-                                            />
+                                            <Image source={down} style={{ width: 20, height: 20 }} />
                                         </TouchableOpacity>
                                     </View>
                                     {cityErrMsg && <Text style={styles.errorMessageStyle}>{'City is required'}</Text>}
                                     {showCity && (
-                                        <View style={{
-                                            backgroundColor: colors.white,
-                                            borderRadius: 5,
-                                            shadowColor: '#000',
-                                            shadowOffset: { width: 0, height: 1 },
-                                            shadowOpacity: 0.8,
-                                            shadowRadius: 2,
-                                            elevation: 5,
-                                            height: 200,
-                                            flex: 1 // Allow the container to expand
-                                        }}>
-                                            <FlatList
-                                                nestedScrollEnabled
-                                                contentContainerStyle={{ flexGrow: 1 }}
-                                                style={{ padding: 10 }}
-                                                data={cityData && cityData}
-                                                renderItem={({ item }) => onPressCityItem(item)}
-                                                keyExtractor={(item) => item.code}
-                                            />
+                                        <View style={styles.flatlistStyle}>
+                                            <FlatList nestedScrollEnabled contentContainerStyle={{ flexGrow: 1 }} style={{ padding: 10 }} data={cityData && cityData} renderItem={({ item }) => onPressCityItem(item)} keyExtractor={(item) => item.code} />
                                         </View>
                                     )}
                                 </View>
                             )}
                             <View style={{ marginTop: 12 }}>
                                 <Text style={styles.titleText}>Line 1</Text>
-                                <TextInput
-                                    value={userData?.line1}
-                                    style={styles.input}
-                                    placeholder="Enter line 1"
-                                    placeholderTextColor={colors.light_grey}
-                                    onChangeText={(text) => handleInputChange('line1', text)}
-                                />
+                                <TextInput value={userData?.line1} style={styles.input} placeholder="Enter line 1" placeholderTextColor={colors.light_grey} onChangeText={(text) => handleInputChange('line1', text)} />
                             </View>
                             <ErrorMessageCheckout errorMessageText={errorMessages.line1} />
                             <Text style={styles.titleText}>Line 2</Text>
-                            <TextInput
-                                value={userData?.line2}
-                                style={styles.input}
-                                placeholder="Enter line 2"
-                                placeholderTextColor={colors.light_grey}
-                                onChangeText={(text) => handleInputChange('line2', text)}
-                            />
+                            <TextInput value={userData?.line2} style={styles.input} placeholder="Enter line 2" placeholderTextColor={colors.light_grey} onChangeText={(text) => handleInputChange('line2', text)} />
                             <ErrorMessageCheckout errorMessageText={errorMessages.line2} />
                             <Text style={styles.titleText}>Postal Code</Text>
-                            <TextInput
-                                value={userData?.postalCode}
-                                style={styles.input}
-                                placeholder="Enter postal code"
-                                placeholderTextColor={colors.light_grey}
-                                onChangeText={(text) => handleInputChange('postalCode', text)}
-                            />
+                            <TextInput value={userData?.postalCode} style={styles.input} placeholder="Enter postal code" placeholderTextColor={colors.light_grey} onChangeText={(text) => handleInputChange('postalCode', text)} />
                             <ErrorMessageCheckout errorMessageText={errorMessages.postalCode} />
                             <Text style={styles.titleText}>Card details</Text>
                             <CardField
@@ -532,8 +455,6 @@ function CheckoutScreen({ route }) {
                                         :
                                         null
                                 } */}
-
-
                             <RedButton
                                 buttonContainerStyle={[styles.buttonContainer, { marginTop: isPotrait ? '8%' : '8%' }]}
                                 ButtonContent={buttonContent()}

@@ -1,38 +1,40 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import {
-    SafeAreaView,
-    View,
-    Image,
-    Text,
-    ScrollView,
-    TouchableOpacity,
-    FlatList,
-    Dimensions,
-    Linking,
-} from 'react-native';
-import colors from '../../../common/colors';
-import { back, check, phone, plan_select } from '../../../common/images';
+import React, { useState, useEffect } from 'react';
+import { SafeAreaView, View, Image, Text, ScrollView, TouchableOpacity, FlatList, Dimensions } from 'react-native';
+import { back, check, plan_select } from '../../../common/images';
 import { useNavigation } from '@react-navigation/native';
 import { BasicPlanData, EnterprisePlanData, PreminumPlanData } from '../../../common/PlansList';
 import RedButton from '../../../components/RedButton';
 import Loader from '../../../components/ActivityIndicator';
 import Status from '../../../components/Status';
 import { styles } from './styles';
-import axios from 'axios';
-import SuccessScreen from '../success/SuccessScreen';
-import { useDispatch } from 'react-redux';
-import { useStripe } from '@stripe/stripe-react-native';
-import { Link } from 'react-router-native';
-import showAlert from '../../../components/showAlert';
-
 
 function PlanDetails({ route }) {
     const navigation = useNavigation();
     const [isLoading, setIsLoading] = useState(false);
     const [isPotrait, setIsPortrait] = useState(true)
-    const [urlVal, setUrlVal] = useState('');
-    const dispatch = useDispatch()
-    const webViewRef = useRef(null)
+
+    useEffect(() => {
+        const updateOrientation = () => {
+            const { height, width } = Dimensions.get('window');
+            setIsPortrait(height > width);
+        };
+        Dimensions.addEventListener('change', updateOrientation);
+        // Return a cleanup function
+        // return () => {
+        //     Dimensions?.removeEventListener('change', updateOrientation);
+        // };
+    }, []);
+
+    useEffect(() => {
+        const updateOrientation = () => {
+            const { height, width } = Dimensions.get('window');
+            setIsPortrait(height > width);
+        };
+        // Add event listener when the screen focuses
+        const unsubscribeFocus = navigation.addListener('focus', updateOrientation);
+        // Remove event listener when the screen unfocuses
+        return unsubscribeFocus;
+    }, [navigation]);
 
     const renderPlanItem = (item) => {
         return (
@@ -50,34 +52,6 @@ function PlanDetails({ route }) {
             setIsLoading(false)
         }, 1000)
     }
-
-
-    useEffect(() => {
-        const updateOrientation = () => {
-            const { height, width } = Dimensions.get('window');
-            setIsPortrait(height > width);
-        };
-
-        Dimensions.addEventListener('change', updateOrientation);
-
-        // Return a cleanup function
-        // return () => {
-        //     Dimensions?.removeEventListener('change', updateOrientation);
-        // };
-    }, []);
-
-    useEffect(() => {
-        const updateOrientation = () => {
-            const { height, width } = Dimensions.get('window');
-            setIsPortrait(height > width);
-        };
-
-        // Add event listener when the screen focuses
-        const unsubscribeFocus = navigation.addListener('focus', updateOrientation);
-
-        // Remove event listener when the screen unfocuses
-        return unsubscribeFocus;
-    }, [navigation]);
 
     return (
         <SafeAreaView style={styles.safeArea}>
@@ -111,7 +85,5 @@ function PlanDetails({ route }) {
         </SafeAreaView>
     );
 }
-
-
 
 export default PlanDetails;

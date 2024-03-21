@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
-import { SafeAreaView, StyleSheet, View, Image, Text, ScrollView, TouchableOpacity, Platform, Linking, } from 'react-native';
-import colors from '../../../common/colors';
+import { SafeAreaView,  View, Image, Text, ScrollView, TouchableOpacity, Linking } from 'react-native';
 import { back, checked, plan_select, unchecked } from '../../../common/images';
 import { useNavigation } from '@react-navigation/native';
 import { items } from '../../../common/PlansList';
-import { fonts } from '../../../common/fonts';
 import Status from '../../../components/Status';
 import { styles } from './styles';
 
@@ -25,7 +23,8 @@ function ChoosePlan() {
     };
 
     const selectEnterprise = () => {
-     Linking.openURL(`tel:999990000`) 
+     Linking.openURL(`tel:+2348178888842`) // changed number with client number
+    //  Linking.openURL(`tel:+234999990000`)
         // setSelectEnterprise(true)
         // setSelectedItem('')
         // navigation.navigate('ContactUs')

@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, ScrollView, Animated, Easing, Dimensions } from 'react-native';
+import { View, Text, Image, ScrollView, Animated, Easing, Dimensions, BackHandler } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { success } from '../../../common/images';
 import RedButton from '../../../components/RedButton';
 import Loader from '../../../components/ActivityIndicator';
 import { styles } from './styles';
+import showAlert from '../../../components/showAlert';
 
 
 const SuccessScreen = ({ route }) => {
@@ -14,6 +15,12 @@ const SuccessScreen = ({ route }) => {
     const [isPotrait, setIsPortrait] = useState(true)
     const [spinValue] = useState(new Animated.Value(0));
 
+    useEffect(() => {
+        const backHandler = BackHandler.addEventListener('hardwareBackPress', () => true)
+        return () => {
+            backHandler.remove()
+        }
+    }, [])
 
     const onPressContinue = () => {
         setIsLoading(true)
