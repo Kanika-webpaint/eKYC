@@ -7,36 +7,11 @@ export const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: colors.white
     },
-    scrollViewContent: {
-        flexGrow: 1,
-    },
-    containerHeader: {
-        alignItems: 'center',
-    },
-    header: {
-        flexDirection: 'row',
-     
-        padding: 20,
-        alignItems: 'center',
-    },
-    backArrow: {
-        height: 25,
-        width: 25,
-        marginRight: 10,
-    },
-    title: {
-        flex: 1,
-        textAlign: 'center',
-        fontSize: 20,
-        color: 'black',
-        fontFamily: fonts.bold
-    },
     mainView: {
         flex: 1,
         padding: 10,
         marginVertical: 30,
         alignItems: 'center',
-       
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20
     },
@@ -69,7 +44,6 @@ export const styles = StyleSheet.create({
         alignItems: 'center',
     },
     selectedItem: {
-       
         backgroundColor: colors.purple_dim, // Changed background color for selected item
         opacity: 0.8, // Added opacity
         ...Platform.select({

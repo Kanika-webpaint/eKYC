@@ -10,6 +10,7 @@ const NavigationStack = () => {
     const isLogged = useSelector(state => state.login.isLogged);
     const isLoggedUser = useSelector(state => state.login.isLoggedUser);
     const dispatch = useDispatch()
+    const Stack = createStackNavigator();
     console.log("isLogged", isLogged)
     console.log("isLoggedUser", isLoggedUser)
 
@@ -43,10 +44,6 @@ const NavigationStack = () => {
         checkAuthenticationUser();
     }, [dispatch, isLoggedUser]);
 
-
-    const Stack = createStackNavigator();
-
-
     return (
         <NavigationContainer>
             <Stack.Navigator>
@@ -61,7 +58,6 @@ const NavigationStack = () => {
                 ) : isLoggedUser ? (
                     <>
                      <Stack.Screen options={{ headerShown: false }} name="IdScreen" component={routeNames.IdScreen} />
-                    {/* <Stack.Screen options={{ headerShown: false }} name="HomeUser" component={routeNames.HomeUser} /> */}
                     </>
                 ) : (
                     <>
@@ -71,7 +67,6 @@ const NavigationStack = () => {
                         <Stack.Screen options={{ headerShown: false }} name="Checkout" component={routeNames.Checkout} />
                         <Stack.Screen options={{ headerShown: false }} name="PlanDetails" component={routeNames.PlanDetails} />
                         <Stack.Screen options={{ headerShown: false }} name="SuccessScreen" component={routeNames.SuccessScreen} />
-                        <Stack.Screen options={{ headerShown: false }} name="ContactUs" component={routeNames.ContactUs} />
                     </>
                 )}
             </Stack.Navigator>

@@ -7,7 +7,6 @@
 
 import React from 'react';
 import {
-    StyleSheet,
     StatusBar
 } from 'react-native';
 import colors from '../common/colors';
@@ -21,10 +20,5 @@ function Status({ isLight, lightContent }) {
         </>
     );
 }
-
-const styles = StyleSheet.create({
-
-
-});
 
 export default Status;

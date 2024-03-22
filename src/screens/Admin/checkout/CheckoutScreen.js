@@ -6,7 +6,7 @@
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { SafeAreaView, View, Text, TouchableOpacity, Image, ScrollView, TextInput, FlatList, Dimensions } from 'react-native';
+import { SafeAreaView, View, Text, TouchableOpacity, Image, ScrollView, TextInput, FlatList, Dimensions, KeyboardAvoidingView } from 'react-native';
 import colors from '../../../common/colors';
 import RedButton from '../../../components/RedButton';
 import { back, close, coupan, down } from '../../../common/images';
@@ -24,6 +24,7 @@ import { styles } from './styles';
 import { useDispatch } from 'react-redux';
 import { stripeSubscriptionAction } from '../../../redux/actions/user';
 import CheckoutForm from '../../../components/CheckoutForm';
+import Header from '../../../components/Header';
 
 
 function CheckoutScreen({ route }) {
@@ -49,6 +50,7 @@ function CheckoutScreen({ route }) {
     const [discountedAmount, setDiscountedVal] = useState(0)
     const navigation = useNavigation();
     const dispatch = useDispatch()
+    const keyboardVerticalOffset = Platform.OS === 'ios' ? 40 : 0
 
     useEffect(() => {
         const nigeriaStatesData = State && State?.getStatesOfCountry('NG');
@@ -150,6 +152,7 @@ function CheckoutScreen({ route }) {
             } else {
                 try {
                     setIsLoading(true)
+                    showAlert('Subscribing..please wait!!')
                     const config = {
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded',
@@ -198,7 +201,7 @@ function CheckoutScreen({ route }) {
                                                     navigation.navigate('SuccessScreen')
 
                                                     // no need to do.........
-                                                    
+
                                                     // save success response
                                                     // let confirmPaymentIntent = await confirmPayment(resSubscription?.data?.clientSecret, {
                                                     //     paymentMethodType: 'Card', paymentMethodData: {
@@ -327,16 +330,11 @@ function CheckoutScreen({ route }) {
     return (
         <SafeAreaView style={styles.safeArea}>
             <StripeProvider publishableKey={PUBLISH_KEY}>
-                <Status isLight />
-                <ScrollView keyboardShouldPersistTaps='handled'>
-                    <View style={{ margin: 20 }}>
-                        <View style={styles.header}>
-                            <TouchableOpacity onPress={() => navigation.goBack()}>
-                                <Image source={back} style={styles.backArrow} />
-                            </TouchableOpacity>
-                            <Text style={styles.title}>Checkout</Text>
-                        </View>
-                        <View style={{ marginTop: 30 }}>
+                <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} keyboardVerticalOffset={keyboardVerticalOffset}>
+                    <ScrollView keyboardShouldPersistTaps='handled'>
+                        <Status isLight />
+                        <Header title={'Checkout'} />
+                        <View style={{ margin: 20 }}>
                             <CheckoutForm value={userData?.name} placeholder="Enter name here" onChangeText={(text) => handleInputChange('name', text)} title={'Name'} />
                             <ErrorMessageCheckout errorMessageText={errorMessages.name} />
                             <CheckoutForm value={userData?.email} placeholder="Enter email here" onChangeText={(text) => handleInputChange('email', text)} keyboardType="email-address" title={'Email'} />
@@ -462,8 +460,8 @@ function CheckoutScreen({ route }) {
                                 onPress={() => handleCheckout()}
                             />
                         </View>
-                    </View>
-                </ScrollView>
+                    </ScrollView>
+                </KeyboardAvoidingView>
             </StripeProvider>
         </SafeAreaView>
     );

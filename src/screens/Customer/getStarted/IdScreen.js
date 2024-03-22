@@ -6,7 +6,7 @@
  */
 
 import React, { useCallback, useEffect, useState } from 'react';
-import { SafeAreaView, View, Text, ScrollView, Dimensions } from 'react-native';
+import { SafeAreaView, View, Text, ScrollView, Dimensions, KeyboardAvoidingView } from 'react-native';
 import RedButton from '../../../components/RedButton';
 import { useNavigation } from '@react-navigation/native';
 import Logo from '../../../components/Logo';
@@ -28,21 +28,21 @@ function IdScreen() {
   const { height: screenHeight } = Dimensions.get('window');
   const [isPotrait, setIsPortrait] = useState(true)
   const dispatch = useDispatch();
-  const [userToken, setTokenUser]=useState('')
+  const [userToken, setTokenUser] = useState('')
   const phoneNumberToken = useSelector((state) => state?.login?.phoneNumber)
-
-  console.log(phoneNumberToken,"tokennnn")
+  const keyboardVerticalOffset = Platform.OS === 'ios' ? 40 : 0
+  console.log(phoneNumberToken, "tokennnn")
 
   useEffect(() => {
     AsyncStorage.getItem("token_user").then((value) => {
-        if (value) {
-            setTokenUser(value)
-        }
+      if (value) {
+        setTokenUser(value)
+      }
     })
-        .then(res => {
-            //do something else
-        });
-}, [dispatch,userToken]);
+      .then(res => {
+        //do something else
+      });
+  }, [dispatch, userToken]);
 
   useEffect(() => {
     const updateOrientation = () => {
@@ -137,24 +137,26 @@ function IdScreen() {
   console.log(verificationCardData, "dataaa verification")
   return (
     <SafeAreaView style={styles.safeArea}>
-      <Status lightContent />
-      <ScrollView keyboardShouldPersistTaps="handled">
-        <Logo styleContainer={{ marginTop: isPotrait ? '30%' : '5%' }} fingerPrintStyle={[styles.fingerPrintStyle, { left: isPotrait ? 60 : 310 }]} />
-        <View style={[styles.mainView, { height: screenHeight * 0.5 }]}>
-          <Text style={styles.textVerify}>
-            Simplify Identity Verification
-          </Text>
-          <Text style={styles.middleText}>
-            Validifyx provides seamless digital verification solutions, empowering businesses to securely and conveniently interact with their customers.
-          </Text>
-        </View>
-        <RedButton
-          buttonContainerStyle={[styles.buttonContainer, { marginBottom: isPotrait ? 0 : 20 }]}
-          ButtonContent={isLoading ? <Loader /> : "Let's get started ->"}
-          contentStyle={styles.buttonText}
-          onPress={() => onPressStarted()}
-        />
-      </ScrollView>
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} keyboardVerticalOffset={keyboardVerticalOffset}>
+      <ScrollView style={{ marginBottom: '10%' }} keyboardShouldPersistTaps='handled'>
+        <Status lightContent />
+          <Logo styleContainer={{ marginTop: isPotrait ? '30%' : '5%' }} fingerPrintStyle={[styles.fingerPrintStyle, { left: isPotrait ? 60 : 310 }]} />
+          <View style={[styles.mainView, { height: screenHeight * 0.5 }]}>
+            <Text style={styles.textVerify}>
+              Simplify Identity Verification
+            </Text>
+            <Text style={styles.middleText}>
+              Validifyx provides seamless digital verification solutions, empowering businesses to securely and conveniently interact with their customers.
+            </Text>
+          </View>
+          <RedButton
+            buttonContainerStyle={[styles.buttonContainer, { marginBottom: isPotrait ? 0 : 20 }]}
+            ButtonContent={isLoading ? <Loader /> : "Let's get started ->"}
+            contentStyle={styles.buttonText}
+            onPress={() => onPressStarted()}
+          />
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }

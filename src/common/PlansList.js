@@ -3,14 +3,6 @@ export const BasicPlanData = [
         id: 0,
         listItem: 'Users (1-50)'
     },
-    // {
-    //     id: 1,
-    //     listItem: 'Ads free content'
-    // },
-    // {
-    //     id: 2,
-    //     listItem: '3 devices login at a time'
-    // }
 ]
 
 
@@ -19,18 +11,6 @@ export const PreminumPlanData = [
         id: 0,
         listItem: 'Users (51-200)'
     },
-    // {
-    //     id: 1,
-    //     listItem: 'Ads free content'
-    // },
-    // {
-    //     id: 2,
-    //     listItem: '3 devices login at a time'
-    // },
-    // {
-    //     id: 3,
-    //     listItem: 'Ads free content'
-    // }
 ]
 
 

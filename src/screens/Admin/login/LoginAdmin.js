@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView, StyleSheet, View, TextInput, Image, Text, ScrollView, TouchableOpacity, Keyboard, Dimensions } from 'react-native';
+import { SafeAreaView, StyleSheet, View, TextInput, Image, Text, ScrollView, TouchableOpacity, Keyboard, Dimensions, KeyboardAvoidingView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useDispatch } from 'react-redux';
 import { LoginAdminAction } from '../../../redux/actions/user';
@@ -23,6 +23,7 @@ const LoginAdmin = ({ route }) => {
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
     const navigation = useNavigation();
     const dispatch = useDispatch();
+    const keyboardVerticalOffset = Platform.OS === 'ios' ? 40 : 0
 
     useEffect(() => {
         if (route?.params?.isOrgReg === true) {
@@ -85,49 +86,53 @@ const LoginAdmin = ({ route }) => {
 
     return (
         <SafeAreaView style={styles.safeArea}>
-            <Status lightContent />
-            <View style={styles.container}>
-                <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <Image source={back_arow} style={styles.backArrow} />
-                </TouchableOpacity>
+            <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} keyboardVerticalOffset={keyboardVerticalOffset}>
                 <ScrollView keyboardShouldPersistTaps='handled'>
-                    <View style={styles.content}>
-                        <Image source={logoValidyfy} style={{ marginTop: isPotrait ? '20%' : '5%' ,alignSelf:'center',resizeMode:'contain', width:'60%'}}/>
-                        <Text style={styles.title}>Login with your Admin (Portal) Details</Text>
-                        <View style={styles.inputContainer}>
-                            <Image source={mail} style={styles.icon} />
-                            <TextInput
-                                value={userData?.email}
-                                style={styles.input}
-                                placeholder="Email"
-                                placeholderTextColor={colors.placeholder_grey}
-                                onChangeText={(text) => handleInputChange('email', text)}
-                                keyboardType="email-address"
-                            />
+                    <Status lightContent />
+                    <View style={styles.container}>
+                        <TouchableOpacity onPress={() => navigation.goBack()}>
+                            <Image source={back_arow} style={styles.backArrow} />
+                        </TouchableOpacity>
+
+                        <View style={styles.content}>
+                            <Image source={logoValidyfy} style={{ marginTop: isPotrait ? '20%' : '5%', alignSelf: 'center', resizeMode: 'contain',  height: 80, width: '60%', }} />
+                            <Text style={styles.title}>Login with your Admin (Portal) Details</Text>
+                            <View style={styles.inputContainer}>
+                                <Image source={mail} style={styles.icon} />
+                                <TextInput
+                                    value={userData?.email}
+                                    style={styles.input}
+                                    placeholder="Email"
+                                    placeholderTextColor={colors.placeholder_grey}
+                                    onChangeText={(text) => handleInputChange('email', text)}
+                                    keyboardType="email-address"
+                                />
+                            </View>
+                            <ErrorMessage errorMessageText={errorMessages.email} />
+                            <View style={styles.inputContainer}>
+                                <Image source={padlock} style={styles.icon} />
+                                <TextInput
+                                    value={userData?.password}
+                                    style={styles.input}
+                                    placeholder="Password"
+                                    placeholderTextColor={colors.placeholder_grey}
+                                    onChangeText={(text) => handleInputChange('password', text)}
+                                    secureTextEntry={!isPasswordVisible}
+                                />
+                                {userData?.password && (
+                                    <TouchableOpacity onPress={togglePasswordVisibility}>
+                                        <Image source={isPasswordVisible ? view : hide} style={styles.icon} />
+                                    </TouchableOpacity>
+                                )}
+                            </View>
+                            <ErrorMessage errorMessageText={errorMessages.password} />
                         </View>
-                        <ErrorMessage errorMessageText={errorMessages.email} />
-                        <View style={styles.inputContainer}>
-                            <Image source={padlock} style={styles.icon} />
-                            <TextInput
-                                value={userData?.password}
-                                style={styles.input}
-                                placeholder="Password"
-                                placeholderTextColor={colors.placeholder_grey}
-                                onChangeText={(text) => handleInputChange('password', text)}
-                                secureTextEntry={!isPasswordVisible}
-                            />
-                            {userData?.password && (
-                                <TouchableOpacity onPress={togglePasswordVisibility}>
-                                    <Image source={isPasswordVisible ? view : hide} style={styles.icon} />
-                                </TouchableOpacity>
-                            )}
-                        </View>
-                        <ErrorMessage errorMessageText={errorMessages.password} />
+                        <RedButton buttonContainerStyle={styles.buttonContainer} ButtonContent={isLoading ? <Loader /> : 'SIGN IN'} contentStyle={styles.buttonText} onPress={() => handleLogin()} />
+                        {route?.params?.isOrgReg === true ? null : <SignInUp viewBottomSignup={[styles.bottomSignUpView, { marginTop: isPotrait ? '8%' : '1%', marginBottom: isPotrait ? 0 : 20 }]} signupContent={'Do not have an account?'} signUpText={' ' + 'Sign Up'} onPress={() => navigation.navigate('Plan')} />}
+
                     </View>
-                    <RedButton buttonContainerStyle={styles.buttonContainer} ButtonContent={isLoading ? <Loader /> : 'SIGN IN'} contentStyle={styles.buttonText} onPress={() => handleLogin()} />
-                    {route?.params?.isOrgReg === true ? null : <SignInUp viewBottomSignup={[styles.bottomSignUpView, { marginTop: isPotrait ? '8%' : '1%', marginBottom: isPotrait ? 0 : 20 }]} signupContent={'Do not have an account?'} signUpText={' ' + 'Sign Up'} onPress={() => navigation.navigate('Plan')} />}
                 </ScrollView>
-            </View>
+            </KeyboardAvoidingView>
         </SafeAreaView>
     );
 };

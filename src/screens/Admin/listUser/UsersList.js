@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, TextInput, FlatList, Text, Image, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { back, close, filter, plus,  profileGrey, rightArrow } from '../../../common/images';
+import { back, close, filter, plus, profileGrey, rightArrow } from '../../../common/images';
 import { useNavigation } from '@react-navigation/native';
 import { getUsersListAction } from '../../../redux/actions/user';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -10,6 +10,7 @@ import Status from '../../../components/Status';
 import { fonts } from '../../../common/fonts';
 import { styles } from './styles';
 import colors from '../../../common/colors';
+import Header from '../../../components/Header';
 
 const UserList = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -68,17 +69,10 @@ const UserList = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <Status isLight />
       <ScrollView keyboardShouldPersistTaps='handled'>
+        <Status isLight />
         <View style={{ margin: 20 }}>
-          <View style={styles.containerHeader}>
-            <View style={styles.header}>
-              <TouchableOpacity onPress={() => navigation.goBack()} hitSlop={{ top: 20, bottom: 20, left: 50, right: 50 }}>
-                <Image source={back} style={styles.backArrow} />
-              </TouchableOpacity>
-              <Text style={styles.title}>Users</Text>
-            </View>
-          </View>
+          <Header title={'Users'}/>
           {isLoading ? <Loader /> :
             <View style={{ marginTop: 20 }}>
               <View style={{ flexDirection: 'row' }}>

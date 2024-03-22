@@ -1,4 +1,4 @@
-import { SafeAreaView, View, Image, Text, ScrollView, TouchableOpacity, FlatList } from 'react-native';
+import { SafeAreaView, View, Image, Text, ScrollView, TouchableOpacity, FlatList, KeyboardAvoidingView } from 'react-native';
 import React, { useState, useEffect, useCallback } from 'react';
 import colors from '../../../common/colors';
 import { iconPlanGrey, iconPlanWhite, iconUsersGrey, iconUsersWhite, logoValidyfy, logout, planIcon, profileGrey, usersIcon, } from '../../../common/images';
@@ -26,6 +26,7 @@ function DashboardAdmin() {
     const [currentDate, setCurrentDateAndDay] = useState(null);
     const [verifiedUsers, setVerifiedUsers] = useState(null);
     const verifiedUsersList = useSelector((state) => state?.login?.verifiedDataListDashboard)
+    const keyboardVerticalOffset = Platform.OS === 'ios' ? 40 : 0
 
     const dataForTab2 = [
         { id: 1, title: 'Abrahim', status: 'completed' },
@@ -139,7 +140,7 @@ function DashboardAdmin() {
                     source={profileGrey}
                     style={styles.image}
                 />
-                <Text style={{ color: colors.black, fontSize: 15, fontFamily: fonts.regular }}>{item?.item?.username }</Text>
+                <Text style={{ color: colors.black, fontSize: 15, fontFamily: fonts.regular }}>{item?.item?.username}</Text>
             </View>
         );
     };
@@ -188,92 +189,93 @@ function DashboardAdmin() {
 
     return (
         <SafeAreaView style={styles.safeArea}>
-            <Status />
-            {/* <ScrollView keyboardShouldPersistTaps='handled'> */}
-            <View style={styles.insideView}>
-                <Image source={logoValidyfy} style={styles.logo}></Image>
-                <View style={{ marginTop: 20, flexDirection: 'row', justifyContent: 'space-between' }}>
-                    <View>
-                        <Text style={styles.org}>{"Hi," + " " + OrganizationHomeList?.organization?.name.replace(/[""]/g, '')}</Text>
-                        <Text style={styles.detailText}>Have A Nice Day</Text>
-                        <Text style={styles.dateStyle}>{currentDateAndDay}</Text>
-                    </View>
-                    <TouchableOpacity style={{ alignItems: 'center', justifyContent: 'center' }} onPress={() => logoutAccount()}>
-                        <Image source={logout} style={{ height: 25, width: 25, alignSelf: 'center' }}></Image>
-                    </TouchableOpacity>
-                </View>
-            </View>
-            <View style={styles.itemsUsersPlan}>
-                <View style={styles.insideUserPlan}>
-                    <View style={styles.UserTabTop}>
-                        <Image source={usersIcon} style={styles.itemImageUserPlan} />
-                        <Text style={styles.count}>{usersListing?.length || 0}</Text>
-                        <Text style={styles.textItemUserPlan}>Total users</Text>
-                    </View>
-                    <View style={styles.UserTabTop}>
-                        <Image source={planIcon} style={styles.itemImageUserPlan} />
-                        <Text style={styles.count}>Basic </Text>
-                        <Text style={styles.textItemUserPlan}>Current Plan</Text>
-                    </View>
-                </View>
-                <View style={styles.middleView}>
-                    <TouchableOpacity
-                        style={{ flex: 0.5, alignSelf: 'center', borderBottomWidth: 1, borderBottomColor: activeTab === 1 ? colors.app_red : colors.grey, borderRadius: 5, height: 40, justifyContent: 'space-evenly', alignItems: 'center', marginRight: 20 }}
-                        onPress={() => setActiveTab(1)}
-                    >
-                        <Text style={styles.verifyText}>Verified users ({verifiedUsersList?.documentUsers?.length})</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={{ flex: 0.5, alignSelf: 'center', borderBottomWidth: 1, borderBottomColor: activeTab === 2 ? colors.app_red : colors.grey, borderRadius: 5, height: 40, justifyContent: 'space-evenly', alignItems: 'center' }}
-                        onPress={() => setActiveTab(2)}
-                    >
-                        <Text style={styles.verifyText}>Unverified users</Text>
-                    </TouchableOpacity>
-                </View>
-                <View style={{ flex: 1 }}>
-                    {activeTab === 1 && verifiedUsersList && verifiedUsersList?.documentUsers?.length === 0 && (
-                        <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1 }}>
-                            <Text style={{ alignSelf: 'center' }}>No users found</Text>
+            <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} keyboardVerticalOffset={keyboardVerticalOffset}>
+                {/* <ScrollView keyboardShouldPersistTaps='handled'> */}
+                <Status />
+                <View style={styles.insideView}>
+                    <Image source={logoValidyfy} style={styles.logo}></Image>
+                    <View style={{ marginTop: 20, flexDirection: 'row', justifyContent: 'space-between' }}>
+                        <View>
+                            <Text style={styles.org}>{"Hi," + " " + OrganizationHomeList?.organization?.name.replace(/[""]/g, '')}</Text>
+                            <Text style={styles.detailText}>Have A Nice Day</Text>
+                            <Text style={styles.dateStyle}>{currentDateAndDay}</Text>
                         </View>
-                    )}
-                    {activeTab === 2 && usersListing && usersListing?.length === 0 && (
-                        <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1 }}>
-                            <Text style={{ alignSelf: 'center' }}>No users found</Text>
+                        <TouchableOpacity style={{ alignItems: 'center', justifyContent: 'center' }} onPress={() => logoutAccount()}>
+                            <Image source={logout} style={{ height: 25, width: 25, alignSelf: 'center' }}></Image>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+                <View style={styles.itemsUsersPlan}>
+                    <View style={styles.insideUserPlan}>
+                        <View style={styles.UserTabTop}>
+                            <Image source={usersIcon} style={styles.itemImageUserPlan} />
+                            <Text style={styles.count}>{usersListing?.length || 0}</Text>
+                            <Text style={styles.textItemUserPlan}>Total users</Text>
                         </View>
-                    )}
+                        <View style={styles.UserTabTop}>
+                            <Image source={planIcon} style={styles.itemImageUserPlan} />
+                            <Text style={styles.count}>Basic </Text>
+                            <Text style={styles.textItemUserPlan}>Current Plan</Text>
+                        </View>
+                    </View>
+                    <View style={styles.middleView}>
+                        <TouchableOpacity
+                            style={{ flex: 0.5, alignSelf: 'center', borderBottomWidth: 1, borderBottomColor: activeTab === 1 ? colors.app_red : colors.grey, borderRadius: 5, height: 40, justifyContent: 'space-evenly', alignItems: 'center', marginRight: 20 }}
+                            onPress={() => setActiveTab(1)}
+                        >
+                            <Text style={styles.verifyText}>Verified users ({verifiedUsersList?.documentUsers?.length})</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={{ flex: 0.5, alignSelf: 'center', borderBottomWidth: 1, borderBottomColor: activeTab === 2 ? colors.app_red : colors.grey, borderRadius: 5, height: 40, justifyContent: 'space-evenly', alignItems: 'center' }}
+                            onPress={() => setActiveTab(2)}
+                        >
+                            <Text style={styles.verifyText}>Unverified users</Text>
+                        </TouchableOpacity>
+                    </View>
+                    <View style={{ flex: 1 }}>
+                        {activeTab === 1 && verifiedUsersList && verifiedUsersList?.documentUsers?.length === 0 && (
+                            <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1 }}>
+                                <Text style={{ alignSelf: 'center' }}>No users found</Text>
+                            </View>
+                        )}
+                        {activeTab === 2 && usersListing && usersListing?.length === 0 && (
+                            <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1 }}>
+                                <Text style={{ alignSelf: 'center' }}>No users found</Text>
+                            </View>
+                        )}
 
-                    {/* {activeTab === 2 && filtertedData && filtertedData.length === 0 && (
+                        {/* {activeTab === 2 && filtertedData && filtertedData.length === 0 && (
                         <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1 }}>
                             <Text style={{ alignSelf: 'center' }}>No users found</Text>
                         </View>
                     )} */}
 
-                    {activeTab === 1 && verifiedUsersList && verifiedUsersList?.documentUsers?.length > 0 && (
-                        <FlatList
-                            style={{ width: '100%' }}
-                            nestedScrollEnabled
-                            data={verifiedUsersList?.documentUsers}
-                            renderItem={(item) => renderItemmVerified(item)}
-                            keyExtractor={(item) => item.id.toString()}
-                            getItemLayout={(data, index) => (
-                                { length: 50, offset: 50 * index, index }
-                            )}
-                        />
-                    )}
-                    {activeTab === 2 && usersListing && usersListing?.length > 0 && (
-                        <FlatList
-                            style={{ width: '100%' }}
-                            nestedScrollEnabled
-                            data={usersListing}  // convert it into filtered data
-                            renderItem={renderItemmUnVerified}
-                            keyExtractor={(item) => item.id.toString()}
-                            getItemLayout={(data, index) => (
-                                { length: 50, offset: 50 * index, index }
-                            )}
-                        />
-                    )}
+                        {activeTab === 1 && verifiedUsersList && verifiedUsersList?.documentUsers?.length > 0 && (
+                            <FlatList
+                                style={{ width: '100%' }}
+                                nestedScrollEnabled
+                                data={verifiedUsersList?.documentUsers}
+                                renderItem={(item) => renderItemmVerified(item)}
+                                keyExtractor={(item) => item.id.toString()}
+                                getItemLayout={(data, index) => (
+                                    { length: 50, offset: 50 * index, index }
+                                )}
+                            />
+                        )}
+                        {activeTab === 2 && usersListing && usersListing?.length > 0 && (
+                            <FlatList
+                                style={{ width: '100%' }}
+                                nestedScrollEnabled
+                                data={usersListing}  // convert it into filtered data
+                                renderItem={renderItemmUnVerified}
+                                keyExtractor={(item) => item.id.toString()}
+                                getItemLayout={(data, index) => (
+                                    { length: 50, offset: 50 * index, index }
+                                )}
+                            />
+                        )}
 
-                    {/* {activeTab === 2 && filtertedData && filtertedData.length > 0 && (
+                        {/* {activeTab === 2 && filtertedData && filtertedData.length > 0 && (
                         <FlatList
                             style={{ width: '100%' }}
                             nestedScrollEnabled
@@ -286,25 +288,26 @@ function DashboardAdmin() {
                         />
                     )} */}
 
+                    </View>
+                    <View style={styles.tabContainer}>
+                        <TouchableOpacity
+                            style={styles.tabButton}
+                            onPress={() => handleTabPressOnBottomTab(1)}
+                        >
+                            {activeBottomTab === 1 ? <Image source={iconUsersWhite} style={styles.bottomTabImg} /> : <Image source={iconUsersGrey} style={styles.bottomTabImg} />}
+                            <Text style={styles.bottomTabText}>Users</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={styles.tabButton}
+                            onPress={() => handleTabPressOnBottomTab(2)}
+                        >
+                            {activeBottomTab === 2 ? <Image source={iconPlanWhite} style={styles.bottomTabImg} /> : <Image source={iconPlanGrey} style={styles.bottomTabImg} />}
+                            <Text style={styles.bottomTabText}>My plan</Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
-                <View style={styles.tabContainer}>
-                    <TouchableOpacity
-                        style={styles.tabButton}
-                        onPress={() => handleTabPressOnBottomTab(1)}
-                    >
-                        {activeBottomTab === 1 ? <Image source={iconUsersWhite} style={styles.bottomTabImg} /> : <Image source={iconUsersGrey} style={styles.bottomTabImg} />}
-                        <Text style={styles.bottomTabText}>Users</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={styles.tabButton}
-                        onPress={() => handleTabPressOnBottomTab(2)}
-                    >
-                        {activeBottomTab === 2 ? <Image source={iconPlanWhite} style={styles.bottomTabImg} /> : <Image source={iconPlanGrey} style={styles.bottomTabImg} />}
-                        <Text style={styles.bottomTabText}>My plan</Text>
-                    </TouchableOpacity>
-                </View>
-            </View>
-            {/* </ScrollView> */}
+                {/* </ScrollView> */}
+            </KeyboardAvoidingView>
         </SafeAreaView>
     );
 }

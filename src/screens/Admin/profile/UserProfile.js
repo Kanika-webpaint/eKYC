@@ -16,6 +16,7 @@ import { fonts } from '../../../common/fonts';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Status from '../../../components/Status';
 import { styles } from './styles';
+import Header from '../../../components/Header';
 
 
 function UserProfile({ route }) {
@@ -40,14 +41,7 @@ function UserProfile({ route }) {
             <Status isLight />
             <ScrollView keyboardShouldPersistTaps='handled'>
                 <View style={{ margin: 20, justifyContent: 'center' }}>
-                    <View style={styles.containerHeader}>
-                        <View style={styles.header}>
-                            <TouchableOpacity onPress={() => navigation.navigate('UsersList')} hitSlop={{ top: 50, bottom: 50, left: 50, right: 50 }}>
-                                <Image source={back} style={styles.backArrow} />
-                            </TouchableOpacity>
-                            <Text style={styles.title}>Profile</Text>
-                        </View>
-                    </View>
+                    <Header title={'Profile'}/>
                     <View style={{ backgroundColor: colors.purple_dim, borderWidth: 1, justifyContent: 'center', alignItems: 'center', height: 70, width: 70, alignSelf: 'center', borderRadius: 40, borderColor: colors.app_red, elevation: 2, marginTop: 20 }}>
                         <Image source={userRed} style={{ height: 30, width: 30, resizeMode: 'contain', alignSelf: 'center' }} />
                     </View>

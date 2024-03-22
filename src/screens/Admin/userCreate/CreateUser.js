@@ -6,7 +6,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView, View, Text, ScrollView, TextInput, TouchableOpacity, Image, Dimensions } from 'react-native';
+import { SafeAreaView, View, Text, ScrollView, TextInput, TouchableOpacity, Image, Dimensions, KeyboardAvoidingView } from 'react-native';
 import colors from '../../../common/colors';
 import RedButton from '../../../components/RedButton';
 import { useNavigation } from '@react-navigation/native';
@@ -21,6 +21,7 @@ import Status from '../../../components/Status';
 import CountryPick from '../../../components/CountryPicker';
 import showAlert from '../../../components/showAlert';
 import { styles } from './styles';
+import Header from '../../../components/Header';
 
 
 function CreateUser() {
@@ -33,7 +34,7 @@ function CreateUser() {
     const [countryCode, setCountryCode] = useState('')
     const navigation = useNavigation();
     const dispatch = useDispatch()
-
+    const keyboardVerticalOffset = Platform.OS === 'ios' ? 40 : 0
     const OrganizationHomeList = useSelector((state) => state?.login?.orgDetails)
     const getUsersList = useSelector(state => state?.login?.getUsersList);
     const adminDataList = useSelector(state => state?.login?.adminLogin?.data);
@@ -123,56 +124,51 @@ function CreateUser() {
 
     return (
         <SafeAreaView style={styles.safeArea}>
-            <Status isLight />
-            <ScrollView style={styles.safeArea} keyboardShouldPersistTaps='handled'>
-                <View style={{ margin: 20 }}>
-                    <View style={styles.containerHeader}>
-                        <View style={styles.header}>
-                            <TouchableOpacity onPress={() => navigation.goBack()} hitSlop={{ top: 50, bottom: 50, right: 50, left: 50 }} style={{ height: 50, width: 50, alignItems: 'center', justifyContent: 'center' }}>
-                                <Image source={back} style={styles.backArrow} />
-                            </TouchableOpacity>
-                            <Text style={styles.title}>Create user</Text>
+            <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} keyboardVerticalOffset={keyboardVerticalOffset}>
+            <ScrollView style={{ marginBottom: '10%' }} keyboardShouldPersistTaps='handled'>
+                <Status isLight />
+                    <View style={{ margin: 20 }}>
+                        <Header title={'Create user'}/>
+                        <View style={{ marginTop: 30 }}>
+                            <Image source={userCreate} style={{ height: 150, width: 150, alignSelf: 'center', marginBottom: 20 }}></Image>
+                            <Text style={styles.userNameText}>
+                                Name
+                            </Text>
+                            <View style={styles.usernameinput}>
+                                <Image source={userRed} style={{ height: 20, width: 20, alignSelf: 'center', resizeMode: 'contain' }} />
+                                <TextInput
+                                    value={userData?.username}
+                                    style={{ fontSize: 20, fontFamily: fonts.regular, width: '90%', marginLeft: 10 }}
+                                    onChangeText={(text) => handleInputChange('username', text)}
+                                    keyboardType="email-address"
+                                />
+                            </View>
+                            <ErrorMessage errorMessageText={errorMessages.username} style={{ marginLeft: 5 }} />
+                            <Text style={{ margin: 5, color: colors.grey_text }}>
+                                Phone number
+                            </Text>
+                            <View style={styles.input}>
+                                <Image source={phone} style={{ height: 20, width: 20, alignSelf: 'center', marginLeft: 12, resizeMode: 'contain' }} />
+                                <TouchableOpacity style={{ height: 30, width: 50, marginRight: 10, marginTop: 10, justifyContent: 'center', alignItems: 'center' }} onPress={() => onChangeCountryCode()}>
+                                    <Text style={{ color: colors.black, alignSelf: 'center', fontSize: 14, fontFamily: fonts.regular }}>{countryCode ? countryCode : '+234'}</Text>
+                                </TouchableOpacity>
+                                <TextInput
+                                    style={{ width: '70%' }}
+                                    value={userData?.phoneNo}
+                                    onChangeText={(text) => handleInputChange('phoneNo', text)}
+                                    keyboardType="email-address"
+                                />
+                            </View>
+                            <ErrorMessage errorMessageText={errorMessages.phoneNo} style={{ marginLeft: 5 }} />
                         </View>
+                        <RedButton buttonContainerStyle={[styles.buttonContainer, { marginTop: isPotrait ? '15%' : '5%', }]} ButtonContent={isLoading ? <Loader /> : 'CREATE USER'} contentStyle={styles.buttonText} onPress={() => handleCreateUser()} />
+                        <CountryPick show={show} onBackdropPress={() => setShow(false)} pickerButtonOnPress={(item) => {
+                            setCountryCode(item.dial_code);
+                            setShow(false);
+                        }} />
                     </View>
-                    <View style={{ marginTop: 30 }}>
-                        <Image source={userCreate} style={{ height: 150, width: 150, alignSelf: 'center', marginBottom: 20 }}></Image>
-                        <Text style={styles.userNameText}>
-                            Name
-                        </Text>
-                        <View style={styles.usernameinput}>
-                            <Image source={userRed} style={{ height: 20, width: 20, alignSelf: 'center', resizeMode: 'contain' }} />
-                            <TextInput
-                                value={userData?.username}
-                                style={{ fontSize: 20, fontFamily: fonts.regular, width: '90%', marginLeft: 10 }}
-                                onChangeText={(text) => handleInputChange('username', text)}
-                                keyboardType="email-address"
-                            />
-                        </View>
-                        <ErrorMessage errorMessageText={errorMessages.username} style={{ marginLeft: 5 }} />
-                        <Text style={{ margin: 5, color: colors.grey_text }}>
-                            Phone number
-                        </Text>
-                        <View style={styles.input}>
-                            <Image source={phone} style={{ height: 20, width: 20, alignSelf: 'center', marginLeft: 12, resizeMode: 'contain' }} />
-                            <TouchableOpacity style={{ height: 30, width: 50, marginRight: 10, marginTop: 10, justifyContent: 'center', alignItems: 'center' }} onPress={() => onChangeCountryCode()}>
-                                <Text style={{ color: colors.black, alignSelf: 'center', fontSize: 14, fontFamily: fonts.regular }}>{countryCode ? countryCode : '+234'}</Text>
-                            </TouchableOpacity>
-                            <TextInput
-                                style={{ width: '70%' }}
-                                value={userData?.phoneNo}
-                                onChangeText={(text) => handleInputChange('phoneNo', text)}
-                                keyboardType="email-address"
-                            />
-                        </View>
-                        <ErrorMessage errorMessageText={errorMessages.phoneNo} style={{ marginLeft: 5 }} />
-                    </View>
-                    <RedButton buttonContainerStyle={[styles.buttonContainer, { marginTop: isPotrait ? '15%' : '5%', }]} ButtonContent={isLoading ? <Loader /> : 'CREATE USER'} contentStyle={styles.buttonText} onPress={() => handleCreateUser()} />
-                    <CountryPick show={show} onBackdropPress={() => setShow(false)} pickerButtonOnPress={(item) => {
-                        setCountryCode(item.dial_code);
-                        setShow(false);
-                    }} />
-                </View>
-            </ScrollView>
+                </ScrollView>
+            </KeyboardAvoidingView>
         </SafeAreaView>
     );
 }

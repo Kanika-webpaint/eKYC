@@ -6,6 +6,7 @@ export const styles = StyleSheet.create({
     safeArea: {
       flex: 1,
       backgroundColor: colors.app_blue,
+      justifyContent:'center',
     },
     container: {
       flexDirection: 'row',

@@ -6,7 +6,7 @@
  */
 
 import React, { useCallback, useEffect, useState } from 'react';
-import { SafeAreaView, StyleSheet, View, Text, TextInput, ScrollView, TouchableOpacity, Keyboard, Dimensions, Image } from 'react-native';
+import { SafeAreaView, StyleSheet, View, Text, TextInput, ScrollView, TouchableOpacity, Keyboard, Dimensions, Image, KeyboardAvoidingView } from 'react-native';
 import colors from '../../../common/colors';
 import { logoValidyfy, verification } from '../../../common/images';
 import MobileNumberCodeVerification from '../../../components/MobileNumberCodeVerification';
@@ -45,6 +45,7 @@ function MobileNumber() {
   const CELL_COUNT = 6;
   const navigation = useNavigation();
 
+  const keyboardVerticalOffset = Platform.OS === 'ios' ? 40 : 0
 
   useEffect(() => {
     const updateOrientation = () => {
@@ -286,10 +287,10 @@ function MobileNumber() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <Status lightContent />
-      <View style={{ flex: 1, backgroundColor: colors.app_blue }}>
-        <ScrollView style={{ marginBottom: 10 }} keyboardShouldPersistTaps='handled'>
-          <Image source={logoValidyfy} style={{ marginTop: isPotrait ? '30%' : '5%', alignSelf: 'center', resizeMode: 'contain', width: '60%' }} />
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} keyboardVerticalOffset={keyboardVerticalOffset}>
+        <ScrollView style={{ marginBottom: '10%' }} keyboardShouldPersistTaps='handled'>
+          <Status lightContent />
+          <Image source={logoValidyfy} style={{ flex: 1, alignSelf: 'center', height: 80, width: '60%', resizeMode: 'contain', marginTop:isPotrait ? 0 : '3%'}} />
           <MobileNumberCodeVerification verificationImageSource={verification} textFirst={'To begin, Please enter your'} textMiddle={showOTP ? 'Unique Registration code' : 'Mobile Number'} textLast={showOTP ? '(Received by SMS)' : '(Receive an OTP by SMS)'} />
           {showOTP ?
             <View style={styles.codeSection}>
@@ -317,9 +318,7 @@ function MobileNumber() {
             <>
               <View style={styles.container}>
                 <TouchableOpacity style={{ height: 30, width: 50, marginLeft: 10, marginRight: 10, borderRadius: 5, justifyContent: 'center', alignItems: 'center' }} onPress={() => onChangeCountryCode()}>
-                  {/* <Text style={{ color: colors.white }}>{countryCode ? countryCode : '+91'}</Text> */}
                   <Text style={{ color: colors.white }}>{countryCode ? countryCode : '+234'}</Text>
-                  {/* uncomment me to set country code Nigeria */}
                 </TouchableOpacity>
                 <TextInput
                   value={mobileNumber}
@@ -348,12 +347,10 @@ function MobileNumber() {
             setShow(false);
           }} />
         </ScrollView>
-      </View>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
-
-
 
 export default MobileNumber;
 
