@@ -40,9 +40,9 @@ function UserProfile({ route }) {
         <SafeAreaView style={styles.safeArea}>
             <Status isLight />
             <ScrollView keyboardShouldPersistTaps='handled'>
-                <View style={{ margin: 20, justifyContent: 'center' }}>
-                    <Header title={'Profile'}/>
-                    <View style={{ backgroundColor: colors.purple_dim, borderWidth: 1, justifyContent: 'center', alignItems: 'center', height: 70, width: 70, alignSelf: 'center', borderRadius: 40, borderColor: colors.app_red, elevation: 2, marginTop: 20 }}>
+                <View style={{ justifyContent: 'center' }}>
+                    <Header title={'Profile'} />
+                    <View style={{ backgroundColor: colors.purple_dim, borderWidth: 1, justifyContent: 'center', alignItems: 'center', marginLeft: '8%', height: 70, width: 70, alignSelf: 'center', borderRadius: 40, borderColor: colors.app_red, elevation: 2, marginTop: 20 }}>
                         <Image source={userRed} style={{ height: 30, width: 30, resizeMode: 'contain', alignSelf: 'center' }} />
                     </View>
                 </View>

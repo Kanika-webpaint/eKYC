@@ -34,8 +34,10 @@ export const styles = StyleSheet.create({
     color: colors.grey_text
   },
   searchInput: {
-    padding: 10,
     width: '100%',
+    height:40, 
+    marginLeft:10,
+    color:colors.black
   },
   containerHeader: {
     flex: 1,
@@ -72,7 +74,7 @@ export const styles = StyleSheet.create({
     alignSelf: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.8,
+    shadowOpacity: 0.3,
     shadowRadius: 2,
     elevation: 5,
     marginLeft: 8

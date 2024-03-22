@@ -108,7 +108,7 @@ const LoginAdmin = ({ route }) => {
                                     keyboardType="email-address"
                                 />
                             </View>
-                            <ErrorMessage errorMessageText={errorMessages.email} />
+                            <ErrorMessage errorMessageText={errorMessages.email} style={{marginLeft:0}}/>
                             <View style={styles.inputContainer}>
                                 <Image source={padlock} style={styles.icon} />
                                 <TextInput
@@ -125,7 +125,7 @@ const LoginAdmin = ({ route }) => {
                                     </TouchableOpacity>
                                 )}
                             </View>
-                            <ErrorMessage errorMessageText={errorMessages.password} />
+                            <ErrorMessage errorMessageText={errorMessages.password} style={{marginLeft:0}}/>
                         </View>
                         <RedButton buttonContainerStyle={styles.buttonContainer} ButtonContent={isLoading ? <Loader /> : 'SIGN IN'} contentStyle={styles.buttonText} onPress={() => handleLogin()} />
                         {route?.params?.isOrgReg === true ? null : <SignInUp viewBottomSignup={[styles.bottomSignUpView, { marginTop: isPotrait ? '8%' : '1%', marginBottom: isPotrait ? 0 : 20 }]} signupContent={'Do not have an account?'} signUpText={' ' + 'Sign Up'} onPress={() => navigation.navigate('Plan')} />}

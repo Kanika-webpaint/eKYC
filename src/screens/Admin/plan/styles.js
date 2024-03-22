@@ -45,16 +45,15 @@ export const styles = StyleSheet.create({
     },
     selectedItem: {
         backgroundColor: colors.purple_dim, // Changed background color for selected item
-        opacity: 0.8, // Added opacity
         ...Platform.select({
             ios: {
                 shadowColor: 'black',
                 shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.5,
+                shadowOpacity: 0.3,
                 shadowRadius: 4,
             },
             android: {
-                elevation: 5,
+                elevation: 2,
             },
         }),
     },

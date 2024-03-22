@@ -119,9 +119,9 @@ export const styles = StyleSheet.create({
         backgroundColor: colors.white,
         borderRadius: 5,
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.8,
-        shadowRadius: 2,
+        shadowOffset: { width: 0, height: 3 },
+        shadowOpacity: 0.2,
+        shadowRadius: 1,
         elevation: 5,
         height: 200,
         flex: 1 // Allow the container to expand

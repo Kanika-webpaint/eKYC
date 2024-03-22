@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { Platform, StyleSheet } from "react-native";
 import colors from "../../../common/colors";
 import { fonts } from "../../../common/fonts";
 
@@ -86,7 +86,7 @@ export const styles = StyleSheet.create({
         alignItems: 'center',
         padding: 10,
         paddingHorizontal: 20,
-        paddingBottom: 40,
+        paddingBottom: Platform.OS === 'ios' ? '20%' : '10%',
         borderTopLeftRadius: 40,
         borderTopRightRadius: 40,
         backgroundColor: colors.app_blue,
@@ -117,7 +117,7 @@ export const styles = StyleSheet.create({
     UserTabTop: {
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.8,
+        shadowOpacity: 0.2,
         shadowRadius: 2,
         elevation: 3, backgroundColor: colors.purple_dim, height: 110, width: 150, marginTop: -30, justifyContent: 'center', alignItems: 'center', alignSelf: 'center', borderRadius: 20
     },

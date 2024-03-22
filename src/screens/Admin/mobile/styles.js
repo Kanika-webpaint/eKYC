@@ -11,8 +11,6 @@ export const styles = StyleSheet.create({
     container: {
       flexDirection: 'row',
       alignItems: 'center',
-      backgroundColor: 'transparent',
-      borderWidth: 0,
       borderBottomColor: colors.white,
       borderBottomWidth: 1,
       marginHorizontal: 30,

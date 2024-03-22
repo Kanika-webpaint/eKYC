@@ -138,7 +138,9 @@ function CreateUser() {
                                 <Image source={userRed} style={{ height: 20, width: 20, alignSelf: 'center', resizeMode: 'contain' }} />
                                 <TextInput
                                     value={userData?.username}
-                                    style={{ fontSize: 20, fontFamily: fonts.regular, width: '90%', marginLeft: 10 }}
+                                    placeholderTextColor={colors.light_grey}
+                                    placeholder='Enter name here'
+                                    style={{ fontSize: 16, fontFamily: fonts.regular, width: '90%', marginLeft: 10,color:colors.black }}
                                     onChangeText={(text) => handleInputChange('username', text)}
                                     keyboardType="email-address"
                                 />
@@ -153,8 +155,10 @@ function CreateUser() {
                                     <Text style={{ color: colors.black, alignSelf: 'center', fontSize: 14, fontFamily: fonts.regular }}>{countryCode ? countryCode : '+234'}</Text>
                                 </TouchableOpacity>
                                 <TextInput
-                                    style={{ width: '70%' }}
                                     value={userData?.phoneNo}
+                                    placeholderTextColor={colors.light_grey}
+                                    placeholder='Enter phone number here'
+                                    style={{ fontSize: 16, fontFamily: fonts.regular, width: '70%', color:colors.black }}
                                     onChangeText={(text) => handleInputChange('phoneNo', text)}
                                     keyboardType="email-address"
                                 />

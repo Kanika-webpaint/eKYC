@@ -42,6 +42,8 @@ export const styles = StyleSheet.create({
         alignItems: 'center',
         borderBottomWidth: 1,
         borderBottomColor: colors.white,
+        paddingVertical:0,
+        height:50
     },
     input: {
         flex: 1,

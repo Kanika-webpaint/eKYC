@@ -71,12 +71,13 @@ const UserList = () => {
     <SafeAreaView style={styles.safeArea}>
       <ScrollView keyboardShouldPersistTaps='handled'>
         <Status isLight />
-        <View style={{ margin: 20 }}>
+        <View>
           <Header title={'Users'}/>
           {isLoading ? <Loader /> :
-            <View style={{ marginTop: 20 }}>
-              <View style={{ flexDirection: 'row' }}>
+            <View >
+              <View style={{ flexDirection: 'row' ,margin:20}}>
                 <View style={{
+                 
                   flex: 1, flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10,
                   borderWidth: 1,
                   borderColor: '#ccc',
@@ -88,6 +89,7 @@ const UserList = () => {
                 }}>
                   <Image source={filter} style={styles.filterIcon} />
                   <TextInput
+           
                     placeholder="Search user..."
                     onChangeText={handleSearch}
                     value={searchQuery}
@@ -106,6 +108,7 @@ const UserList = () => {
               </View>
               {usersListing && usersListing?.length > 0 ?
                 <FlatList
+                style={{margin:20}}
                   data={searchQuery ? filteredUsers : usersListing} // Render filtered users if search query exists, otherwise render all users
                   renderItem={renderItem}
                   keyExtractor={item => item?.id.toString()}
