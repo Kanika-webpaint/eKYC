@@ -11,36 +11,25 @@ const NavigationStack = () => {
     const isLoggedUser = useSelector(state => state.login.isLoggedUser);
     const dispatch = useDispatch()
     const Stack = createStackNavigator();
-    console.log("isLogged", isLogged)
-    console.log("isLoggedUser", isLoggedUser)
-
 
     useEffect(() => {
-        // Check AsyncStorage for login status when component mounts
         const checkAuthentication = async () => {
             const storedToken = await AsyncStorage.getItem('token');
             const storedRole = await AsyncStorage.getItem('role');
-
             if (storedRole && storedToken) {
-                // Dispatch the loginAdminslice action with true to indicate user is logged in
                 dispatch(loginAdminslice(true));
             }
         };
-
         checkAuthentication();
     }, [dispatch, isLogged]);
 
     useEffect(() => {
-        // Check AsyncStorage for login status when component mounts
         const checkAuthenticationUser = async () => {
-            // const storedTokenUser = await AsyncStorage.getItem('tokenUser');
             const storedRoleUser = await AsyncStorage.getItem('roleUser');
             if (storedRoleUser) {
-                // Dispatch the loginAdminslice action with true to indicate user is logged in
                 dispatch(verifyCodeslice(true));
             }
         };
-
         checkAuthenticationUser();
     }, [dispatch, isLoggedUser]);
 
@@ -57,7 +46,7 @@ const NavigationStack = () => {
                     </>
                 ) : isLoggedUser ? (
                     <>
-                     <Stack.Screen options={{ headerShown: false }} name="IdScreen" component={routeNames.IdScreen} />
+                        <Stack.Screen options={{ headerShown: false }} name="IdScreen" component={routeNames.IdScreen} />
                     </>
                 ) : (
                     <>

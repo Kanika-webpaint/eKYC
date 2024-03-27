@@ -5,55 +5,19 @@
  * @format
  */
 
-import React, { useState, useEffect } from 'react';
-import { SafeAreaView, View, Text, ScrollView, TouchableOpacity, Image, Dimensions, KeyboardAvoidingView } from 'react-native';
+import React from 'react';
+import { SafeAreaView, View, Text, ScrollView, KeyboardAvoidingView } from 'react-native';
 import colors from '../../../common/colors';
-import { useNavigation } from '@react-navigation/native';
-import { useDispatch } from 'react-redux';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import Loader from '../../../components/ActivityIndicator';
-import { back } from '../../../common/images';
+import { useSelector } from 'react-redux';
 import { fonts } from '../../../common/fonts';
 import Status from '../../../components/Status';
 import { styles } from './styles';
 import PlanItem from '../../../components/PlanItem';
-import { getPlanDetailsAction } from '../../../redux/actions/user';
 import Header from '../../../components/Header';
 
-
 function CurrentPlan() {
-    const [isPotrait, setIsPortrait] = useState(true)
-    const [isLoading, setIsLoading] = useState(false);
-    const [token, setAuthToken] = useState('')
-    const navigation = useNavigation();
-    const dispatch = useDispatch()
     const keyboardVerticalOffset = Platform.OS === 'ios' ? 40 : 0
-
-    // const planDetailsList = useSelector((state) => state?.login?.planDetailList)
-    // console.log(planDetailsList, "list plan detailss")
-    // useEffect(() => {
-    //     AsyncStorage.getItem("token").then((value) => {
-    //         if (value) {
-    //             dispatch(getPlanDetailsAction(value, setIsLoading))
-    //         }
-    //     })
-    //         .then(res => {
-    //             //do something else
-    //         });
-    // }, [dispatch]);
-
-
-    useEffect(() => {
-        AsyncStorage.getItem("token").then((value) => {
-            if (value) {
-                setAuthToken(value)
-            }
-        })
-            .then(res => {
-                //do something else
-            });
-    }, [token]);
-
+    const planDetailsList = useSelector((state) => state?.login?.orgDetails)
 
     return (
         <SafeAreaView style={styles.safeArea}>
@@ -63,32 +27,34 @@ function CurrentPlan() {
                     <Header title={'My Plan'} />
                     <View style={{ borderWidth: 0.3, borderColor: colors.light_grey }}></View>
                     <View style={{ backgroundColor: colors.purple_dim, margin: 20 }}>
-                        <Text style={{ fontSize: 20, fontFamily: fonts.bold, color: colors.black, padding: 10 }}>Details</Text>
-                        <PlanItem title={'Current Plan'} value={'Basic'} />
-                        <PlanItem title={'Billing Email'} value={'kanika.webpaint@gmail.com'} />
-                        <PlanItem title={'Status'} value={'Active'} styleText={{ backgroundColor: 'green', overflow: 'hidden', borderRadius: 10, padding: 5, color: colors.white }} />
-                        <PlanItem title={'Price'} value={'N14,999'} />
-                        <PlanItem title={'Billing period'} value={'Yearly'} />
-                        <PlanItem title={'Subscription renewal date'} value={'14-03-2025'} />
-
-                        {/* <PlanItem title={'Current Plan'} value={planDetailsList?.data?.planName} />
-                    <PlanItem title={'Billing Email'} value={planDetailsList?.data?.email} />
-                    <PlanItem title={'Status'} value={planDetailsList?.data?.status} styleText={{ backgroundColor: 'green', borderRadius: 10, padding: 3, color: colors.white }} />
-                    <PlanItem title={'Price'} value={planDetailsList?.data?.amount} />
-                    <PlanItem title={'Billing period'} value={planDetailsList?.data?.billingPeriod} />
-                    <PlanItem title={'Subscription renewal date'} value={planDetailsList?.data?.renewDate} /> */}
-
+                        <Text style={{ fontSize: 20, fontFamily: fonts.bold, color: colors.black, padding: 10 }}>Plan Details</Text>
+                        <PlanItem title={'Current Plan'} value={planDetailsList?.organization?.amount === 1499900 ? 'Basic' : 'Premium'} />
+                        <PlanItem title={'Billing Email'} value={planDetailsList?.organization?.email} />
+                        <PlanItem title={'Status'} value={planDetailsList?.organization?.status || 'Active'} styleText={{ backgroundColor: 'green', borderRadius: 10, padding: 3, color: colors.white }} />
+                        <PlanItem title={'Currency'} value={planDetailsList?.organization?.currency} />
+                        <PlanItem title={'Price'} value={planDetailsList?.organization?.amount.toString().slice(0, -2) + '.' + planDetailsList?.organization?.amount?.toString().slice(-2).padEnd(2, '0')} />
+                        <PlanItem title={'Billing period'} value={planDetailsList?.organization?.planInterval} />
+                        <PlanItem title={'Description'} value={planDetailsList?.organization?.planDescription} />
+                    </View>
+                    <View style={{ backgroundColor: colors.purple_dim, margin: 20 }}>
+                        <Text style={{ fontSize: 20, fontFamily: fonts.bold, color: colors.black, padding: 10 }}>Personal Details</Text>
+                        <PlanItem title={'Name'} value={planDetailsList?.organization?.name} />
+                        <PlanItem title={'Address'} value={planDetailsList?.organization?.address} />
+                        <PlanItem title={'City'} value={planDetailsList?.organization?.city} />
+                        <PlanItem title={'Country'} value={planDetailsList?.organization?.country} />
+                        <PlanItem title={'State'} value={planDetailsList?.organization?.state} />
+                        <PlanItem title={'Postal code'} value={planDetailsList?.organization?.zip} />
+                        <PlanItem title={'quantity'} value={planDetailsList?.organization?.quantity} />
                     </View>
                     <View style={{ backgroundColor: colors.purple_dim, margin: 20 }}>
                         <Text style={{ fontSize: 20, fontFamily: fonts.bold, color: colors.black, padding: 10 }}>Features</Text>
-                        <PlanItem title={'Users'} value={'1-50'} />
+                        <PlanItem title={'Users'} value={planDetailsList?.organization?.amount === 1499900 ? '1-50' : '51-200'} />
                     </View>
                 </ScrollView>
             </KeyboardAvoidingView>
         </SafeAreaView>
     );
 }
-
 
 export default CurrentPlan
 

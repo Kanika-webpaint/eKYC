@@ -19,7 +19,6 @@ import { useNavigation } from '@react-navigation/native';
 
 function Header({ title }) {
     const navigation = useNavigation();
-
     return (
         <View style={styles.header}>
             <TouchableOpacity onPress={() => navigation.goBack()} hitSlop={{ top: 50, bottom: 50, right: 50, left: 50 }}>

@@ -6,10 +6,6 @@ const reducer = combineReducers({
   login: authReducer,
 })
 
-// const store = configureStore({
-//     reducer,
-// })
-
 const store = configureStore({
   reducer: reducer,
   middleware: (getDefaultMiddleware) =>
@@ -17,6 +13,5 @@ const store = configureStore({
       serializableCheck: false,
     }),
 })
-
 
 export default store;

@@ -6,10 +6,8 @@ import { success } from '../../../common/images';
 import RedButton from '../../../components/RedButton';
 import Loader from '../../../components/ActivityIndicator';
 import { styles } from './styles';
-import showAlert from '../../../components/showAlert';
 
-
-const SuccessScreen = ({ route }) => {
+const SuccessScreen = () => {
     const navigation = useNavigation();
     const [isLoading, setIsLoading] = useState(false);
     const [isPotrait, setIsPortrait] = useState(true)
@@ -42,7 +40,6 @@ const SuccessScreen = ({ route }) => {
         );
         animateSpin.start();
         return () => {
-            // Clean up animation on unmount if necessary
             animateSpin.stop();
         };
     }, [spinValue]);
@@ -53,10 +50,6 @@ const SuccessScreen = ({ route }) => {
             setIsPortrait(height > width);
         };
         Dimensions.addEventListener('change', updateOrientation);
-        // Return a cleanup function
-        // return () => {
-        //     Dimensions?.removeEventListener('change', updateOrientation);
-        // };
     }, []);
 
     useEffect(() => {
@@ -64,9 +57,7 @@ const SuccessScreen = ({ route }) => {
             const { height, width } = Dimensions.get('window');
             setIsPortrait(height > width);
         };
-        // Add event listener when the screen focuses
         const unsubscribeFocus = navigation.addListener('focus', updateOrientation);
-        // Remove event listener when the screen unfocuses
         return unsubscribeFocus;
     }, [navigation]);
 
@@ -85,8 +76,8 @@ const SuccessScreen = ({ route }) => {
                         }}
                     >
                         <Image
-                            source={success} // Specify your image path here
-                            style={styles.successImg} // Set width and height as per your image size
+                            source={success} 
+                            style={styles.successImg}
                         />
                     </Animated.View>
                     <Text style={styles.pay}>Payment Successfully Processed!!</Text>
@@ -98,6 +89,5 @@ const SuccessScreen = ({ route }) => {
         </SafeAreaView>
     );
 };
-
 
 export default SuccessScreen;

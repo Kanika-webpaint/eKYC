@@ -1,22 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView, StyleSheet, View, TextInput, Image, Text, ScrollView, TouchableOpacity, Keyboard, Dimensions, KeyboardAvoidingView } from 'react-native';
+import { SafeAreaView, View, TextInput, Image, Text, ScrollView, TouchableOpacity, Keyboard, Dimensions, KeyboardAvoidingView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useDispatch } from 'react-redux';
-import { LoginAdminAction } from '../../../redux/actions/user';
 import Loader from '../../../components/ActivityIndicator';
 import ErrorMessage from '../../../components/ErrorMsg';
 import { mail, padlock, view, hide, back_arow, logoValidyfy } from '../../../common/images';
 import colors from '../../../common/colors';
-import Logo from '../../../components/Logo';
 import SignInUp from '../../../components/SignInUp';
-import { fonts } from '../../../common/fonts';
 import Status from '../../../components/Status';
 import RedButton from '../../../components/RedButton';
 import { styles } from './styles';
+import { LoginAdminAction } from '../../../redux/actions/Organization/organizationActions';
 
 const LoginAdmin = ({ route }) => {
     const [userData, setUserData] = useState({ email: '', password: '' });
-    // const [userData, setUserData] = useState({ email: '', password:, role: 'organization' '', role: 'organization' });   // uncomment it when role field added from bacakend.
     const [errorMessages, setErrorMessages] = useState({ email: '', password: '' });
     const [isLoading, setIsLoading] = useState(false);
     const [isPotrait, setIsPortrait] = useState(true)
@@ -37,10 +34,6 @@ const LoginAdmin = ({ route }) => {
             setIsPortrait(height > width);
         };
         Dimensions.addEventListener('change', updateOrientation);
-        // Return a cleanup function
-        // return () => {
-        //     Dimensions?.removeEventListener('change', updateOrientation);
-        // };
     }, []);
 
     useEffect(() => {
@@ -48,9 +41,7 @@ const LoginAdmin = ({ route }) => {
             const { height, width } = Dimensions.get('window');
             setIsPortrait(height > width);
         };
-        // Add event listener when the screen focuses
         const unsubscribeFocus = navigation.addListener('focus', updateOrientation);
-        // Remove event listener when the screen unfocuses
         return unsubscribeFocus;
     }, [navigation]);
 
@@ -93,9 +84,8 @@ const LoginAdmin = ({ route }) => {
                         <TouchableOpacity onPress={() => navigation.goBack()}>
                             <Image source={back_arow} style={styles.backArrow} />
                         </TouchableOpacity>
-
                         <View style={styles.content}>
-                            <Image source={logoValidyfy} style={{ marginTop: isPotrait ? '20%' : '5%', alignSelf: 'center', resizeMode: 'contain',  height: 80, width: '60%', }} />
+                            <Image source={logoValidyfy} style={{ marginTop: isPotrait ? '20%' : '5%', alignSelf: 'center', resizeMode: 'contain', height: 80, width: '60%', }} />
                             <Text style={styles.title}>Login with your Admin (Portal) Details</Text>
                             <View style={styles.inputContainer}>
                                 <Image source={mail} style={styles.icon} />
@@ -108,7 +98,7 @@ const LoginAdmin = ({ route }) => {
                                     keyboardType="email-address"
                                 />
                             </View>
-                            <ErrorMessage errorMessageText={errorMessages.email} style={{marginLeft:0}}/>
+                            <ErrorMessage errorMessageText={errorMessages.email} style={{ marginLeft: 0 }} />
                             <View style={styles.inputContainer}>
                                 <Image source={padlock} style={styles.icon} />
                                 <TextInput
@@ -125,7 +115,7 @@ const LoginAdmin = ({ route }) => {
                                     </TouchableOpacity>
                                 )}
                             </View>
-                            <ErrorMessage errorMessageText={errorMessages.password} style={{marginLeft:0}}/>
+                            <ErrorMessage errorMessageText={errorMessages.password} style={{ marginLeft: 0 }} />
                         </View>
                         <RedButton buttonContainerStyle={styles.buttonContainer} ButtonContent={isLoading ? <Loader /> : 'SIGN IN'} contentStyle={styles.buttonText} onPress={() => handleLogin()} />
                         {route?.params?.isOrgReg === true ? null : <SignInUp viewBottomSignup={[styles.bottomSignUpView, { marginTop: isPotrait ? '8%' : '1%', marginBottom: isPotrait ? 0 : 20 }]} signupContent={'Do not have an account?'} signUpText={' ' + 'Sign Up'} onPress={() => navigation.navigate('Plan')} />}
@@ -136,6 +126,5 @@ const LoginAdmin = ({ route }) => {
         </SafeAreaView>
     );
 };
-
 
 export default LoginAdmin;

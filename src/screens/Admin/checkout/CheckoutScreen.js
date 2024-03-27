@@ -9,23 +9,20 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { SafeAreaView, View, Text, TouchableOpacity, Image, ScrollView, TextInput, FlatList, Dimensions, KeyboardAvoidingView } from 'react-native';
 import colors from '../../../common/colors';
 import RedButton from '../../../components/RedButton';
-import { back, close, coupan, down } from '../../../common/images';
-import { useIsFocused, useNavigation } from '@react-navigation/native';
+import { down } from '../../../common/images';
+import { useNavigation } from '@react-navigation/native';
 import Loader from '../../../components/ActivityIndicator';
 import { State, City } from 'country-state-city';
 import ErrorMessageCheckout from '../../../components/ErrorMsgCheckout';
 import Status from '../../../components/Status';
 import { CardField, createToken } from '@stripe/stripe-react-native';
-import { PUBLISH_KEY, STRIPE_CLIENT_SECRET_KEY, API_URL, PRICE_BASIC_PLAN, PRICE_PREMIUM_PLAN } from '@env'
-import { StripeProvider, confirmPayment } from '@stripe/stripe-react-native';
+import { PUBLISH_KEY, STRIPE_CLIENT_SECRET_KEY, API_URL, PRICE_BASIC_PLAN, PRICE_PREMIUM_PLAN, STRIPE_PAYMENT_METHOD_API } from '@env'
+import { StripeProvider } from '@stripe/stripe-react-native';
 import axios from 'axios';
 import showAlert from '../../../components/showAlert';
 import { styles } from './styles';
-import { useDispatch } from 'react-redux';
-import { stripeSubscriptionAction } from '../../../redux/actions/user';
 import CheckoutForm from '../../../components/CheckoutForm';
 import Header from '../../../components/Header';
-
 
 function CheckoutScreen({ route }) {
     const [userData, setFormData] = useState({ email: '', cardNo: '', expDate: '', cvv: '', name: '', line1: '', line2: '', postalCode: '' });
@@ -35,21 +32,13 @@ function CheckoutScreen({ route }) {
     const [statesData, setStatesData] = useState();
     const [cardDetails, setCardDetails] = useState()
     const [cityData, setCitiesData] = useState();
-    const [showCity, setShowCity] = useState();
-    const [coupanCode, setCoupanCode] = useState()
-    const [grandTotalAmount, setTotalAmount] = useState()
-    const [resetAmount, setResetAmount] = useState(false)
     const [isLoading, setIsLoading] = useState(false);
     const [showState, setShowState] = useState(false);
     const [stateErrMsg, setStateErrorMsg] = useState(false)
     const [cityErrMsg, setCityErrorMsg] = useState(false)
     const [cardDetailsErrMsg, setCardDetailsErrMsg] = useState(false)
     const [isPotrait, setIsPortrait] = useState(true)
-    const [showSummary, setShowSummary] = useState(false)
-    const [load, setLoad] = useState(false)
-    const [discountedAmount, setDiscountedVal] = useState(0)
     const navigation = useNavigation();
-    const dispatch = useDispatch()
     const keyboardVerticalOffset = Platform.OS === 'ios' ? 40 : 0
 
     useEffect(() => {
@@ -100,15 +89,12 @@ function CheckoutScreen({ route }) {
     }
 
     const fetchCardDetails = (cardDetails) => {
-        console.log(cardDetails, "card DETAILS")
         if (cardDetails?.complete) {
             setCardDetails(cardDetails)
         } else {
             setCardDetails(null)
         }
     }
-
-    console.log(API_URL, PRICE_PREMIUM_PLAN, PRICE_BASIC_PLAN, STRIPE_CLIENT_SECRET_KEY, PUBLISH_KEY, "api url test")
 
     const handleCheckout = async () => {
         const newErrorMessages = {};
@@ -156,18 +142,17 @@ function CheckoutScreen({ route }) {
                     const config = {
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded',
-                            Authorization: `Bearer ${STRIPE_CLIENT_SECRET_KEY}`, // Add 'Bearer' prefix before token
+                            Authorization: `Bearer ${STRIPE_CLIENT_SECRET_KEY}`,
                         },
                     };
                     const resToken = await createToken({ ...cardDetails, type: 'Card' })
-                    console.log(resToken, "response tokenn")
                     if (resToken && resToken?.token && resToken?.token?.id) {
                         const data =
                         {
                             type: 'card',
                             card: { token: resToken?.token?.id },
                         }
-                        axios.post('https://api.stripe.com/v1/payment_methods', data, config)
+                        axios.post(STRIPE_PAYMENT_METHOD_API, data, config)
                             .then(async function (resPaymentMethod) {
                                 if (resPaymentMethod && resPaymentMethod?.data && resPaymentMethod?.data?.id) {
                                     const configSubscription = {
@@ -192,46 +177,50 @@ function CheckoutScreen({ route }) {
                                     const api_url = `${API_URL}/stripesubscription`
                                     await axios.post(api_url, JSON.stringify(subscriptionData), configSubscription)
                                         .then(async function (resSubscription) {
-                                            console.log(clientSecret, "secret client")
-                                            const clientSecret = resSubscription?.data?.clientSecret;
+                                            const clientSecret = resSubscription?.data?.clientSecret?.payment_intent?.client_secret;
                                             if (clientSecret) {
-                                                setIsLoading(true)
-                                                setTimeout(async () => {
-                                                    setIsLoading(false)
-                                                    navigation.navigate('SuccessScreen')
+                                                resSubscription?.data?.clientSecret?.lines?.data?.map(async item => {
+                                                    const responseSubs = {
+                                                        subscriptionId: resSubscription?.data?.clientSecret?.subscription,
+                                                        customerId: resSubscription?.data?.clientSecret?.customer,
+                                                        paymentIntentId: resSubscription?.data?.clientSecret?.payment_intent?.id,
+                                                        planStatus: item?.plan?.active,
+                                                        amount: resSubscription?.data?.clientSecret?.payment_intent?.amount,
+                                                        currency: resSubscription?.data?.clientSecret?.currency,
+                                                        planInterval: item?.plan?.interval,
+                                                        planDescription: item?.plan?.nickname,
+                                                        quantity: item?.quantity,
+                                                        city: resSubscription?.data?.clientSecret?.customer_address?.city,
+                                                        country: resSubscription?.data?.clientSecret?.customer_address?.country,
+                                                        address: resSubscription?.data?.clientSecret?.customer_address?.line1,
+                                                        zip: resSubscription?.data?.clientSecret?.customer_address?.postal_code,
+                                                        state: resSubscription?.data?.clientSecret?.customer_address?.state,
+                                                        email: resSubscription?.data?.clientSecret?.customer_email,
+                                                        name: resSubscription?.data?.clientSecret?.customer_name
+                                                    }
+                                                    const api_url = `${API_URL}/orgcheckout`
+                                                    await axios.post(api_url, JSON.stringify(responseSubs), configSubscription)
+                                                        .then(async function (subsResData) {
+                                                            if (subsResData?.status === 201) {
+                                                                setIsLoading(false)
+                                                                setTimeout(async () => {
+                                                                    setIsLoading(false)
+                                                                    showAlert('Password has been sent on your email.')
+                                                                    navigation.navigate('SuccessScreen')
+                                                                }, 500);
 
-                                                    // no need to do.........
-
-                                                    // save success response
-                                                    // let confirmPaymentIntent = await confirmPayment(resSubscription?.data?.clientSecret, {
-                                                    //     paymentMethodType: 'Card', paymentMethodData: {
-                                                    //         paymentMethodId: resPaymentMethod?.data?.id
-                                                    //     }
-                                                    // })
-
-                                                    // try {
-                                                    //     if (confirmPaymentIntent?.paymentIntent?.status == 'Succeeded') {
-                                                    //         setIsLoading(false)
-                                                    //         navigation.navigate('SuccessScreen')
-                                                    //         // call the API to save data to DB
-
-                                                    //         // const confirmationSubsData = {
-                                                    //         //     dataSubscription: confirmPaymentIntent?.paymentIntent
-                                                    //         // }
-                                                    //         // dispatch(stripeSubscriptionAction(confirmationSubsData, navigation, setIsLoading))
-
-                                                    //     } else {
-                                                    //         setIsLoading(false)
-                                                    //     }
-                                                    // } catch (error) {
-                                                    //     setIsLoading(false)
-                                                    //     console.log(error, "error")
-                                                    // };
-                                                }, 500);
-
+                                                            } else {
+                                                                setIsLoading(false)
+                                                                showAlert('Please try again later.')
+                                                            }
+                                                        })
+                                                        .catch(function (error) {
+                                                            console.log(error, "error")
+                                                        });
+                                                })
                                             } else {
                                                 setIsLoading(false)
-                                                showAlert('Apologies for the inconvenience, please try again later.')
+                                                showAlert('Apologies for the inconvenience,\nplease try again later.')
                                             }
                                         })
                                         .catch(function (error) {
@@ -240,10 +229,9 @@ function CheckoutScreen({ route }) {
                                 }
                             })
                     }
-
                 } catch (error) {
                     setIsLoading(false)
-                    showAlert('Error', 'Something went wrong. Please try again later.');
+                    showAlert('Error', 'Something went wrong.\nPlease try again later.');
                 }
             }
         }
@@ -265,67 +253,13 @@ function CheckoutScreen({ route }) {
         )
     }
 
-    const removeCoupanCode = useCallback(() => {
-        const resetedAmount = route?.params?.amount === 'N4999' ? 4999 : 4499
-        setCoupanCode('');
-        setShowSummary(false)
-        setResetAmount(true)
-        setTotalAmount(resetedAmount)
-    }, [coupanCode, resetAmount, grandTotalAmount])
-
-    const handleCoupan = useCallback((text) => {
-        if (text) {
-            setCoupanCode(text);
-        } else {
-            const resetedAmount = route?.params?.amount === 'N4999' ? 4999 : 4499
-            setCoupanCode('');
-            setShowSummary(false)
-            setResetAmount(true)
-            setTotalAmount(resetedAmount)
-        }
-    }, [coupanCode, resetAmount, grandTotalAmount]);
-
     const buttonContent = useCallback(() => {
         if (isLoading) {
             return <Loader />;
-        } else if (grandTotalAmount) {
-            return `PAY N${grandTotalAmount}`;
-        } else if (!showSummary && resetAmount && route?.params?.amount) {
-            return route?.params?.amount === 'N13499' ? ' PAY N13,499' : 'PAY N14,999';
         } else {
             return route?.params?.amount === 'N13499' ? ' PAY N13,499' : 'PAY N14,999';
         }
-    }, [resetAmount, grandTotalAmount, isLoading, route?.params?.amount]);
-
-    const handleCoupanCode = useCallback(() => {
-        setLoad(true); // Show loader
-
-        setTimeout(() => {
-            const previousAmount = route?.params?.amount === 'N4999' ? 4999 : 4499; // Parse to number
-
-            if (!coupanCode.trim()) {
-                showAlert('Please enter a valid coupon code.');
-                setLoad(false); // Hide loader
-                return;
-            }
-
-            setShowSummary(true);
-
-            const discountPercentage = 10; // static 10% discount for now, change it later
-            const discountedAmount = previousAmount * (1 - discountPercentage / 100);
-            const discountAmount = previousAmount * (discountPercentage / 100);
-
-            if (discountedAmount > 0) {
-                setLoad(false); // Hide loader
-                setDiscountedVal(discountAmount.toFixed(0));
-                setTotalAmount(discountedAmount.toFixed(0));
-                showAlert('Coupon Code Applied successfully!');
-            } else {
-                setLoad(false); // Hide loader
-                showAlert('Coupon amount exceeds total amount.');
-            }
-        }, 1000); // Delay execution of the main code by 1000 milliseconds
-    }, [route?.params?.amount, coupanCode]);
+    }, [isLoading, route?.params?.amount]);
 
     return (
         <SafeAreaView style={styles.safeArea}>
@@ -385,7 +319,6 @@ function CheckoutScreen({ route }) {
                             <ErrorMessageCheckout errorMessageText={errorMessages.postalCode} />
                             <Text style={styles.titleText}>Card details</Text>
                             <CardField
-                                // postalCodeEnabled={false}
                                 placeholders={{
                                     number: 'Enter card number',
                                 }}
@@ -402,57 +335,6 @@ function CheckoutScreen({ route }) {
                             {cardDetailsErrMsg && <Text style={styles.errorText}>
                                 Card details are required
                             </Text>}
-                            {/* <Text style={[styles.titleText, { marginTop: 30, marginBottom: 3 }]}>Have a coupan code?</Text> */}
-                            {/* <View style={{ flexDirection: 'row' }}>
-                                    <View style={styles.coupanCodeView}>
-                                        <Image source={coupan} style={{ resizeMode: 'contain', height: 20, width: 20, alignSelf: 'center', marginLeft: 10 }} />
-                                        <TextInput
-                                            value={coupanCode}
-                                            style={[styles.input, { borderRadius: 0, width: '70%' }]}
-                                            placeholder="Enter coupan code"
-                                            placeholderTextColor={colors.light_grey}
-                                            onChangeText={(text) => handleCoupan(text)}
-                                        />
-                                        {coupanCode?.length > 0 && (
-                                            <TouchableOpacity style={{ justifyContent: 'center', width: 30 }} onPress={() => removeCoupanCode()}>
-                                                <Image source={close} style={{ resizeMode: 'contain', height: 13, width: 13, alignSelf: 'center', }} />
-                                            </TouchableOpacity>
-                                        )}
-                                    </View>
-                                    <TouchableOpacity onPress={() => {
-                                        if (!coupanCode) {
-                                            showAlert('Please enter a valid coupon code.');
-                                        } else {
-                                            handleCoupanCode();
-                                        }
-                                    }} style={[styles.input, { shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.8, shadowRadius: 2, elevation: 5, width: '28%', marginLeft: 10, borderWidth: 1, justifyContent: 'center', alignSelf: 'center' }]}>
-                                        <Text style={styles.applyText}>{'APPLY'}</Text>
-                                    </TouchableOpacity>
-                                </View> */}
-                            {/* {load ?
-                                    <ActivityIndicator size="small" color={colors.app_red} style={{ marginTop: 20 }} /> :
-                                    showSummary ?
-                                        <View style={styles.summaryView}>
-                                            <Text style={styles.ordersummaryText}>Order summary</Text>
-                                            <View style={styles.viewAll}>
-                                                <Text style={styles.subTotal}>Subtotal</Text>
-                                                <Text style={styles.subTotal}>{route?.params?.amount === 'N4999' ? 'N4999' : 'N4499'}</Text>
-                                            </View>
-                                            <View style={styles.viewAll}>
-                                                <View style={styles.coupanView}>
-                                                    <Image source={coupan} style={styles.imgCoupan} />
-                                                    <Text style={styles.subTotal}>{coupanCode}</Text>
-                                                </View>
-                                                <Text style={styles.subTotal}>{'-' + 'N' + discountedAmount}</Text>
-                                            </View>
-                                            <View style={styles.viewAll}>
-                                                <Text style={styles.subTotal}>Grand total</Text>
-                                                <Text style={styles.subTotal}>{'N' + grandTotalAmount}</Text>
-                                            </View>
-                                        </View>
-                                        :
-                                        null
-                                } */}
                             <RedButton
                                 buttonContainerStyle={[styles.buttonContainer, { marginTop: isPotrait ? '8%' : '8%' }]}
                                 ButtonContent={buttonContent()}

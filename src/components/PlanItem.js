@@ -14,9 +14,7 @@ import {
 import colors from '../common/colors';
 import { fonts } from '../common/fonts';
 
-
-
-function PlanItem({ title, value,styleText }) {
+function PlanItem({ title, value, styleText }) {
     return (
         <>
             <View style={styles.containerView}>
@@ -32,13 +30,9 @@ function PlanItem({ title, value,styleText }) {
 }
 
 const styles = StyleSheet.create({
-    containerView: {
-        flexDirection: 'row', justifyContent: 'space-between', margin: 10
-    },
+    containerView: { flexDirection: 'row', justifyContent: 'space-between', margin: 10 },
     titleStyle: { fontSize: 16, color: colors.black, fontFamily: fonts.regular, flex: 0.4, marginRight: 20 },
     valueStyle: { fontSize: 16, color: colors.black, fontFamily: fonts.regular, flex: 0.6 }
-
-
 });
 
 export default PlanItem;

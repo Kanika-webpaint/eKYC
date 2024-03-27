@@ -13,7 +13,6 @@ import {
 } from 'react-native';
 import { fonts } from '../common/fonts';
 
-
 function SignInUp({ onPress, signupContent, signUpText ,viewBottomSignup}) {
     return (
         <>

@@ -7,14 +7,6 @@ export const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: colors.white
     },
-    title: {
-        flex: 1, // Allow text to take remaining space
-        textAlign: 'center', // Center the text horizontally
-        fontSize: 20,
-        marginLeft: -30,
-        fontFamily: fonts.bold,
-        color: 'black', // Assuming text color
-    },
     input: {
         height: 50,
         borderWidth: 1,
@@ -29,20 +21,6 @@ export const styles = StyleSheet.create({
         fontFamily: fonts.regular,
         marginBottom: 20
     },
-    containerHeader: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    header: {
-        flexDirection: 'row',
-        padding: 5,
-        alignItems: 'center', // Vertical alignment
-        width: '100%', // Take full width of the screen
-    },
-    backArrow: {
-        height: 25,
-        width: 25,
-        marginRight: 10, // Add some space between back arrow and text
-    },
+    imageView: { backgroundColor: colors.purple_dim, borderWidth: 1, justifyContent: 'center', alignItems: 'center', marginLeft: '8%', height: 70, width: 70, alignSelf: 'center', borderRadius: 40, borderColor: colors.app_red, elevation: 2, marginTop: 20 },
+    img: { height: 30, width: 30, resizeMode: 'contain', alignSelf: 'center' }
 });

@@ -7,11 +7,6 @@ export const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: colors.white
     },
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        padding: 16,
-    },
     input: {
         height: 50,
         borderWidth: 1,
@@ -38,7 +33,6 @@ export const styles = StyleSheet.create({
         borderColor: colors.white,
         backgroundColor: colors.purple_dim,
         paddingLeft: 15,
-
     },
     buttonContainer: {
         backgroundColor: colors.app_red,
@@ -50,7 +44,7 @@ export const styles = StyleSheet.create({
         height: 45,
         justifyContent: 'center',
         alignItems: 'center',
-        elevation:2
+        elevation: 2
     },
     buttonText: {
         color: colors.white,
@@ -58,32 +52,23 @@ export const styles = StyleSheet.create({
         alignSelf: 'center',
         fontFamily: fonts.bold
     },
-    containerHeader: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
     header: {
         flexDirection: 'row',
         padding: 5,
         alignItems: 'center', // Vertical alignment
         width: '100%', // Take full width of the screen
     },
-    backArrow: {
-        height: 25,
-        width: 25,
-        marginRight: 10, // Add some space between back arrow and text
-    },
-    title: {
-        flex: 1, // Allow text to take remaining space
-        textAlign: 'center', // Center the text horizontally
-        fontSize: 20,
-        fontFamily: fonts.bold,
-        color: 'black', // Assuming text color
-    },
     userNameText: {
         margin: 5,
         color: colors.grey_text,
         fontFamily: fonts.medium
-    }
+    },
+    addButton: { height: 150, width: 150, alignSelf: 'center', marginBottom: 20 },
+    userRed: { height: 20, width: 20, alignSelf: 'center', resizeMode: 'contain' },
+    emailAddress: { fontSize: 16, fontFamily: fonts.regular, width: '90%', marginLeft: 10, color: colors.black },
+    phoneText: { margin: 5, color: colors.grey_text },
+    imagePhone: { height: 20, width: 20, alignSelf: 'center', marginLeft: 12, resizeMode: 'contain' },
+    code: { height: 30, width: 50, marginRight: 10, marginTop: 10, justifyContent: 'center', alignItems: 'center' },
+    number: { fontSize: 16, fontFamily: fonts.regular, width: '70%', color: colors.black },
+    textCountryCode: { color: colors.black, alignSelf: 'center', fontSize: 14, fontFamily: fonts.regular }
 });

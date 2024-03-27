@@ -13,7 +13,6 @@ import {
 } from 'react-native';
 import colors from '../common/colors';
 
-
 function Loader() {
     return (
         <>
@@ -30,7 +29,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-
 });
 
 export default Loader;

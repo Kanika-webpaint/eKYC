@@ -83,58 +83,51 @@ function MobileNumber() {
     );
   };
 
+  console.log("call function", API_URL)
   const checkUserRegister = async () => {
-
-    console.log("call function")
-    if (mobileNumber === '') {
-      setIsLoading(true)
-      setShowError(true)
-      setIsLoading(false)
-    } else {
-      setIsLoading(true)
-      let mobileNumberCode = countryCode ? countryCode : '+91'
-      console.log(mobileNumberCode + mobileNumber, "mobileee")
-      setNumberWithCode(mobileNumberCode + mobileNumber)
-      const requestData = {
-        phoneNumber: mobileNumberCode + mobileNumber
-      };
-      const api_url = `${API_URL}/sendOTP`
-      const res = await axios.post(api_url, requestData)
-      console.log(res, "response send OTP")
-      if (res?.status === 200) {
-        console.log(res, "response register userr")
-        await AsyncStorage.setItem('token', res?.data?.token);
-        await AsyncStorage.setItem('role', "user");
-        const storedToken = await AsyncStorage.getItem('token_user');
-        const storedRole = await AsyncStorage.getItem('role_user');
-        console.log(storedToken, storedRole, "token roleee")
-        if (storedRole && storedToken) {
-          // handleSendCode(numberWithCode)  // firebase call then 
-        }
+    try {
+      if (mobileNumber === '') {
+        setIsLoading(true)
+        setShowError(true)
+        setIsLoading(false)
       } else {
-        showAlert(res?.data?.message)
-      }
-      await dispatch(phoneNumberslice(res))
+        setIsLoading(true)
+        let mobileNumberCode = countryCode ? countryCode : '+91'
+        console.log(mobileNumberCode + mobileNumber, "mobileee")
+        setNumberWithCode(mobileNumberCode + mobileNumber)
+        const requestData = {
+          phoneNumber: mobileNumberCode + mobileNumber
+        };
+        const api_url = `${API_URL}/validateuser`
+        const res = await axios.post(api_url, requestData)
+        console.log(res.status, res?.data?.token, "response validateuser")
+        if (res?.status === 200 && res?.data?.token) {
+          console.log(res, "response register userr")
+          await AsyncStorage.setItem('token_user', res?.data?.token);
+          await AsyncStorage.setItem('role_user', "user");
+          const storedToken = await AsyncStorage.getItem('token_user');
+          const storedRole = await AsyncStorage.getItem('role_user');
+          console.log(storedToken, storedRole, "checkkkk")
+          if (storedRole && storedToken) {
 
-      // dispatch(PhoneNumberAction(requestData, navigation, setShowOTP, setIsLoading))
-    };
+            console.log("yes call")
+            handleSendCode(numberWithCode)  // firebase call then 
+          }
+        } else {
+          showAlert(res?.data?.message)
+        }
+        // await dispatch(phoneNumberslice(res))
+
+        // dispatch(PhoneNumberAction(requestData, navigation, setShowOTP, setIsLoading))
+      };
+    } catch (e) {
+      setIsLoading(false)
+      showAlert(e?.response?.data?.message)
+    }
   }
-
-
-
 
   const handleSendCode = async (numberWithCode) => {
     console.log(numberWithCode, "codeee with number")
-    // if (mobileNumber === '') {
-    //   setIsLoading(true)
-    //   setShowError(true)
-    //   setIsLoading(false)
-    // } 
-    // else {
-    //   setIsLoading(true)
-    //   // Request to send OTP
-    //   setShowError(false)
-    //   let mobileNumberCode = countryCode ? countryCode : '+91'
     if (numberWithCode) {
       await auth().signInWithPhoneNumber(numberWithCode, true) //true added for resend code
         .then(confirmResult => {
@@ -154,7 +147,7 @@ function MobileNumber() {
           setIsLoading(false)
           switch (error.code) {
             case 'auth/too-many-requests' || 'auth/app-not-authorized':
-              showAlert('Too many attempts with One-Time Passwords. Please try again later.')
+              showAlert('Too many attempts with One-Time Passwords.\nPlease try again later.')
               break;
             case 'auth/invalid-phone-number':
               showAlert('Please enter valid phone number')
@@ -173,7 +166,6 @@ function MobileNumber() {
     }
     else {
       setIsLoading(false)
-      showAlert('Please enter valid phone number')
     }
     // }
   }
@@ -197,7 +189,7 @@ function MobileNumber() {
           switch (error.code) {
             case 'auth/invalid-verification-code':
               console.log(error.code, 'case 1')
-              showAlert('Invalid verification code. Please enter a valid code.')
+              showAlert('Invalid verification code.\nPlease enter a valid code.')
               break;
             case 'auth/missing-verification-code':
               console.log(error.code, 'case 2')
@@ -290,7 +282,7 @@ function MobileNumber() {
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} keyboardVerticalOffset={keyboardVerticalOffset}>
         <ScrollView style={{ marginBottom: '10%' }} keyboardShouldPersistTaps='handled' contentContainerStyle={{ flexGrow: 1 }}>
           <Status lightContent />
-          <Image source={logoValidyfy} style={{ flex: 1, alignSelf: 'center', height: 80, width: '60%', resizeMode: 'contain', marginTop:isPotrait ? 0 : '3%'}} />
+          <Image source={logoValidyfy} style={{ flex: 1, alignSelf: 'center', height: 80, width: '60%', resizeMode: 'contain', marginTop: isPotrait ? 0 : '3%' }} />
           <MobileNumberCodeVerification verificationImageSource={verification} textFirst={'To begin, Please enter your'} textMiddle={showOTP ? 'Unique Registration code' : 'Mobile Number'} textLast={showOTP ? '(Received by SMS)' : '(Receive an OTP by SMS)'} />
           {showOTP ?
             <View style={styles.codeSection}>

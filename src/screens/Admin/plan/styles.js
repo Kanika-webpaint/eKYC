@@ -20,7 +20,7 @@ export const styles = StyleSheet.create({
         fontSize: 16,
         textAlign: 'center',
         marginBottom: 10,
-        marginTop: 0, // Adjusted marginTop to 0
+        marginTop: 0,
         fontFamily: fonts.regular
     },
     imagePlanSelect: {
@@ -44,7 +44,7 @@ export const styles = StyleSheet.create({
         alignItems: 'center',
     },
     selectedItem: {
-        backgroundColor: colors.purple_dim, // Changed background color for selected item
+        backgroundColor: colors.purple_dim,
         ...Platform.select({
             ios: {
                 shadowColor: 'black',

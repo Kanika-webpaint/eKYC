@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView, View, Image, Text, ScrollView, TouchableOpacity, FlatList, Dimensions, KeyboardAvoidingView } from 'react-native';
-import { back, check, plan_select } from '../../../common/images';
+import { SafeAreaView, View, Image, Text, ScrollView, FlatList, Dimensions, KeyboardAvoidingView } from 'react-native';
+import { check, plan_select } from '../../../common/images';
 import { useNavigation } from '@react-navigation/native';
-import { BasicPlanData, EnterprisePlanData, PreminumPlanData } from '../../../common/PlansList';
+import { BasicPlanData, PreminumPlanData } from '../../../common/PlansList';
 import RedButton from '../../../components/RedButton';
 import Loader from '../../../components/ActivityIndicator';
 import Status from '../../../components/Status';
@@ -21,10 +21,6 @@ function PlanDetails({ route }) {
             setIsPortrait(height > width);
         };
         Dimensions.addEventListener('change', updateOrientation);
-        // Return a cleanup function
-        // return () => {
-        //     Dimensions?.removeEventListener('change', updateOrientation);
-        // };
     }, []);
 
     useEffect(() => {
@@ -32,9 +28,7 @@ function PlanDetails({ route }) {
             const { height, width } = Dimensions.get('window');
             setIsPortrait(height > width);
         };
-        // Add event listener when the screen focuses
         const unsubscribeFocus = navigation.addListener('focus', updateOrientation);
-        // Remove event listener when the screen unfocuses
         return unsubscribeFocus;
     }, [navigation]);
 
@@ -65,8 +59,8 @@ function PlanDetails({ route }) {
                         <Image source={plan_select} style={styles.imagePlanSelect} />
                         <Text style={styles.amount}>{route?.params?.amount === 'N14999' ? 'N14,999' : 'N13,499'}</Text>
                         <FlatList scrollEnabled={false} data={route?.params?.plan === 'Basic' ?
-                            BasicPlanData : route?.params?.plan === 'Premium' ?
-                                PreminumPlanData : EnterprisePlanData}
+                            BasicPlanData :
+                            PreminumPlanData}
                             renderItem={(item) => renderPlanItem(item)}
                         />
                         <RedButton buttonContainerStyle={[styles.buttonContainer, { marginBottom: isPotrait ? '3%' : '5%' }]} ButtonContent={isLoading ? <Loader /> : 'CHECKOUT'} contentStyle={styles.buttonText} onPress={() => NavigateToCheckout()} />

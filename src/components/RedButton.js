@@ -12,8 +12,6 @@ import {
     Text,
     TouchableOpacity
 } from 'react-native';
-import { download } from '../common/images';
-
 
 function RedButton({ buttonContainerStyle, ButtonContent, contentStyle ,onPress}) {
     return (

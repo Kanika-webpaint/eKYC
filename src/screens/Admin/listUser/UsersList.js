@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { View, TextInput, FlatList, Text, Image, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, TextInput, FlatList, Text, Image,  ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { back, close, filter, plus, profileGrey, rightArrow } from '../../../common/images';
 import { useNavigation } from '@react-navigation/native';
-import { getUsersListAction } from '../../../redux/actions/user';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useDispatch, useSelector } from 'react-redux';
 import Status from '../../../components/Status';
@@ -11,6 +10,7 @@ import { fonts } from '../../../common/fonts';
 import { styles } from './styles';
 import colors from '../../../common/colors';
 import Header from '../../../components/Header';
+import { getUsersListAction } from '../../../redux/actions/Organization/organizationActions';
 
 const UserList = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -27,7 +27,6 @@ const UserList = () => {
       }
     })
       .then(res => {
-        //do something else
       });
   }, [dispatch]);
 
@@ -77,7 +76,6 @@ const UserList = () => {
             <View >
               <View style={{ flexDirection: 'row' ,margin:20}}>
                 <View style={{
-                 
                   flex: 1, flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10,
                   borderWidth: 1,
                   borderColor: '#ccc',
@@ -85,11 +83,9 @@ const UserList = () => {
                   borderRadius: 5,
                   width: '80%',
                   elevation: 3
-
                 }}>
                   <Image source={filter} style={styles.filterIcon} />
                   <TextInput
-           
                     placeholder="Search user..."
                     onChangeText={handleSearch}
                     value={searchQuery}
@@ -100,7 +96,6 @@ const UserList = () => {
                       <Image source={close} style={styles.close} />
                     </TouchableOpacity>
                   )}
-
                 </View>
                 <TouchableOpacity onPress={() => navigation.navigate('CreateUser')} style={styles.addView}>
                   <Image source={plus} style={styles.plusIcon} />
@@ -109,7 +104,7 @@ const UserList = () => {
               {usersListing && usersListing?.length > 0 ?
                 <FlatList
                 style={{margin:20}}
-                  data={searchQuery ? filteredUsers : usersListing} // Render filtered users if search query exists, otherwise render all users
+                  data={searchQuery ? filteredUsers : usersListing} 
                   renderItem={renderItem}
                   keyExtractor={item => item?.id.toString()}
                 />
@@ -125,6 +120,5 @@ const UserList = () => {
     </SafeAreaView>
   );
 };
-
 
 export default UserList;

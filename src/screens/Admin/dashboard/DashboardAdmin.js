@@ -1,18 +1,16 @@
-import { SafeAreaView, View, Image, Text, ScrollView, TouchableOpacity, FlatList, KeyboardAvoidingView } from 'react-native';
+import { SafeAreaView, View, Image, Text, TouchableOpacity, FlatList, KeyboardAvoidingView } from 'react-native';
 import React, { useState, useEffect, useCallback } from 'react';
 import colors from '../../../common/colors';
 import { iconPlanGrey, iconPlanWhite, iconUsersGrey, iconUsersWhite, logoValidyfy, logout, planIcon, profileGrey, usersIcon, } from '../../../common/images';
 import { useNavigation } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
-import { getOrgDetailsAction, getUsersListAction, getVerifiedUserAction } from '../../../redux/actions/user';
-import Loader from '../../../components/ActivityIndicator';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { fonts } from '../../../common/fonts';
 import Status from '../../../components/Status';
 import { loginAdminslice } from '../../../redux/slices/user';
 import showAlert from '../../../components/showAlert';
 import { styles } from './styles';
-import { items } from '../../../common/PlansList';
+import { getOrgDetailsAction, getUsersListAction } from '../../../redux/actions/Organization/organizationActions';
 
 function DashboardAdmin() {
     const [isLoading, setIsLoading] = useState(false);
@@ -24,31 +22,8 @@ function DashboardAdmin() {
     const [activeBottomTab, setActiveBottomTab] = useState(1);
     const [orgDetails, setOrgDetails] = useState(null);
     const [currentDate, setCurrentDateAndDay] = useState(null);
-    const [verifiedUsers, setVerifiedUsers] = useState(null);
-    const verifiedUsersList = useSelector((state) => state?.login?.verifiedDataListDashboard)
     const keyboardVerticalOffset = Platform.OS === 'ios' ? 40 : 0
-
-    const dataForTab2 = [
-        { id: 1, title: 'Abrahim', status: 'completed' },
-        { id: 2, title: 'Major', status: 'completed' },
-        { id: 3, title: 'Shivani', status: 'incomplete' },
-        { id: 4, title: 'Kanika', status: 'incomplete' },
-        { id: 5, title: 'Tanvi', status: 'incomplete' },
-        { id: 6, title: 'Narvinder', status: 'completed' },
-    ];
-
-
-    useEffect(() => {
-        AsyncStorage.getItem("token").then((value) => {
-            if (value) {
-                dispatch(getUsersListAction(value, setIsLoading))
-            }
-        })
-            .then(res => {
-                //do something else
-            });
-    }, [dispatch]);
-
+    const usersList = useSelector((state) => state?.login?.getUsersList)
 
     useEffect(() => {
         const fetchData = async () => {
@@ -59,59 +34,36 @@ function DashboardAdmin() {
                 const currentDateAndDayData = await getCurrentDateAndDay();
                 setCurrentDateAndDay(currentDateAndDayData);
 
-                const verifiedUsersData = await getVerifiedUsers();
-                setVerifiedUsers(verifiedUsersData);
             } catch (error) {
                 console.error('Error fetching data:', error);
-                // Handle error appropriately, e.g., set state to indicate error
             }
         };
-
         fetchData();
     }, []);
-
-
 
     useEffect(() => {
         AsyncStorage.getItem("token").then((value) => {
             if (value) {
-                dispatch(getUsersListAction(value, setIsLoading))   // TO GET USERS LIST COUNT
+                dispatch(getUsersListAction(value, setIsLoading));
             }
         })
             .then(res => {
-                //do something else
             });
-    }, [dispatch]);
+    }, [dispatch, setIsLoading]);
 
 
     const getOrgDetails = useCallback(async () => {
         try {
             const storedToken = await AsyncStorage.getItem('token');
             if (storedToken) {
-                dispatch(getOrgDetailsAction(storedToken, setIsLoading));   // TO GET ORGANIZATION NAME
+                dispatch(getOrgDetailsAction(storedToken, setIsLoading));
             } else {
                 // Handle case where token is not found
             }
         } catch (error) {
             console.error('Error retrieving token from AsyncStorage:', error);
-            // Handle error
         }
     }, [dispatch, setIsLoading]);
-
-    const getVerifiedUsers = useCallback(async () => {
-        try {
-            const storedToken = await AsyncStorage.getItem('token');
-            if (storedToken) {
-                dispatch(getVerifiedUserAction(storedToken, setIsLoading));   // TO GET ORGANIZATION NAME
-            } else {
-                // Handle case where token is not found
-            }
-        } catch (error) {
-            console.error('Error retrieving token from AsyncStorage:', error);
-            // Handle error
-        }
-    }, [dispatch, setIsLoading]);
-
 
     const getCurrentDateAndDay = () => {
         const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -131,8 +83,6 @@ function DashboardAdmin() {
         showAlert('Logout successfully!');
     }, [dispatch]);
 
-
-
     const renderItemmUnVerified = (item) => {
         return (
             <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 10, marginTop: 10 }}>
@@ -140,24 +90,10 @@ function DashboardAdmin() {
                     source={profileGrey}
                     style={styles.image}
                 />
-                <Text style={{ color: colors.black, fontSize: 15, fontFamily: fonts.regular }}>{item?.item?.username}</Text>
+                <Text style={{ color: colors.black, fontSize: 15, fontFamily: fonts.regular }}>{item?.username}</Text>
             </View>
         );
     };
-
-
-    // const renderItemm = ({ item }) => (
-    //     console.log(item,"item heereeee")
-    //     <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 10, marginTop: 10 }}>
-    //         <Image
-    //             source={profileGrey}
-    //             style={styles.image}
-    //         />
-    //         <Text style={{ color: colors.black, fontSize: 15, fontFamily: fonts.regular }}>{item.title}</Text>
-    //     </View>
-    // );
-
-
 
     const renderItemmVerified = (item) => {
         return (
@@ -166,11 +102,10 @@ function DashboardAdmin() {
                     source={profileGrey}
                     style={styles.image}
                 />
-                <Text style={{ color: colors.black, fontSize: 15, fontFamily: fonts.regular }}>{item?.item?.nameFirst + item?.item?.nameLast}</Text>
+                <Text style={{ color: colors.black, fontSize: 15, fontFamily: fonts.regular }}>{item?.username}</Text>
             </View>
         );
     };
-
 
     const currentDateAndDay = getCurrentDateAndDay();
     const handleTabPressOnBottomTab = (tabNumber) => {
@@ -182,10 +117,16 @@ function DashboardAdmin() {
         }
     };
 
-    // const filtertedData = usersListing?.filter(item => item.status === 'completed')
-    // console.log(filtertedData, "filtered dataaa")
+    const verifiedData = usersList.filter(item => item.isVerified === true);
+    const unverifiedData = usersList.filter(item => item.isVerified !== true);
 
-    const completedData = dataForTab2.filter(item => item.status === 'completed');
+    const renderItem = ({ item }) => {
+        if (item.isVerified) {
+            return renderItemmVerified(item);
+        } else {
+            return renderItemmUnVerified(item);
+        }
+    };
 
     return (
         <SafeAreaView style={styles.safeArea}>
@@ -214,7 +155,7 @@ function DashboardAdmin() {
                         </View>
                         <View style={styles.UserTabTop}>
                             <Image source={planIcon} style={styles.itemImageUserPlan} />
-                            <Text style={styles.count}>Basic </Text>
+                            <Text style={styles.count}>{OrganizationHomeList?.organization?.amount === 1499900 ? 'Basic' : 'Premium'} </Text>
                             <Text style={styles.textItemUserPlan}>Current Plan</Text>
                         </View>
                     </View>
@@ -223,71 +164,30 @@ function DashboardAdmin() {
                             style={{ flex: 0.5, alignSelf: 'center', borderBottomWidth: 1, borderBottomColor: activeTab === 1 ? colors.app_red : colors.grey, borderRadius: 5, height: 40, justifyContent: 'space-evenly', alignItems: 'center', marginRight: 20 }}
                             onPress={() => setActiveTab(1)}
                         >
-                            <Text style={styles.verifyText}>Verified users ({verifiedUsersList?.documentUsers?.length})</Text>
+                            <Text style={styles.verifyText}>Verified users ({verifiedData?.length > 0 ? verifiedData?.length : 0})</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
                             style={{ flex: 0.5, alignSelf: 'center', borderBottomWidth: 1, borderBottomColor: activeTab === 2 ? colors.app_red : colors.grey, borderRadius: 5, height: 40, justifyContent: 'space-evenly', alignItems: 'center' }}
                             onPress={() => setActiveTab(2)}
                         >
-                            <Text style={styles.verifyText}>Unverified users</Text>
+                            <Text style={styles.verifyText}>Unverified users ({unverifiedData?.length > 0 ? unverifiedData?.length : 0})</Text>
                         </TouchableOpacity>
                     </View>
                     <View style={{ flex: 1 }}>
-                        {activeTab === 1 && verifiedUsersList && verifiedUsersList?.documentUsers?.length === 0 && (
-                            <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1 }}>
-                                <Text style={{ alignSelf: 'center' }}>No users found</Text>
-                            </View>
-                        )}
-                        {activeTab === 2 && usersListing && usersListing?.length === 0 && (
-                            <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1 }}>
-                                <Text style={{ alignSelf: 'center' }}>No users found</Text>
-                            </View>
-                        )}
-
-                        {/* {activeTab === 2 && filtertedData && filtertedData.length === 0 && (
-                        <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1 }}>
-                            <Text style={{ alignSelf: 'center' }}>No users found</Text>
-                        </View>
-                    )} */}
-
-                        {activeTab === 1 && verifiedUsersList && verifiedUsersList?.documentUsers?.length > 0 && (
-                            <FlatList
-                                style={{ width: '100%' }}
-                                nestedScrollEnabled
-                                data={verifiedUsersList?.documentUsers}
-                                renderItem={(item) => renderItemmVerified(item)}
-                                keyExtractor={(item) => item.id.toString()}
-                                getItemLayout={(data, index) => (
-                                    { length: 50, offset: 50 * index, index }
-                                )}
-                            />
-                        )}
-                        {activeTab === 2 && usersListing && usersListing?.length > 0 && (
-                            <FlatList
-                                style={{ width: '100%' }}
-                                nestedScrollEnabled
-                                data={usersListing}  // convert it into filtered data
-                                renderItem={renderItemmUnVerified}
-                                keyExtractor={(item) => item.id.toString()}
-                                getItemLayout={(data, index) => (
-                                    { length: 50, offset: 50 * index, index }
-                                )}
-                            />
-                        )}
-
-                        {/* {activeTab === 2 && filtertedData && filtertedData.length > 0 && (
+                        {((activeTab === 1 && (!verifiedData || verifiedData.length === 0)) ||
+                            (activeTab === 2 && (!unverifiedData || unverifiedData.length === 0))) && (
+                                <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1 }}>
+                                    <Text style={{ alignSelf: 'center' }}>No users found</Text>
+                                </View>
+                            )}
                         <FlatList
                             style={{ width: '100%' }}
                             nestedScrollEnabled
-                            data={filtertedData}
-                            renderItem={renderItemm}
+                            data={usersList.filter(item => (activeTab === 1 ? item?.isVerified : !item?.isVerified))}
+                            renderItem={renderItem}
                             keyExtractor={(item) => item.id.toString()}
-                            getItemLayout={(data, index) => (
-                                { length: 50, offset: 50 * index, index }
-                            )}
+                            getItemLayout={(data, index) => ({ length: 50, offset: 50 * index, index })}
                         />
-                    )} */}
-
                     </View>
                     <View style={styles.tabContainer}>
                         <TouchableOpacity
@@ -311,6 +211,5 @@ function DashboardAdmin() {
         </SafeAreaView>
     );
 }
-
 
 export default DashboardAdmin;

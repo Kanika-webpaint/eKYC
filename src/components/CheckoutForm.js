@@ -37,7 +37,7 @@ function CheckoutForm({value, placeholder, onChangeText,title,keyboardType,edita
 
 const styles = StyleSheet.create({
     titleText: {
-        marginVertical: 2, // Adjusted for spacing
+        marginVertical: 2,
         color: colors.grey,
         fontFamily: fonts.regular,
     },
@@ -51,9 +51,8 @@ const styles = StyleSheet.create({
         backgroundColor: colors.purple_dim,
         fontFamily: fonts.regular,
         fontSize: 16,
-        width: '100%', // Adjusted for full width
+        width: '100%', 
     },
-
 });
 
 export default CheckoutForm;
