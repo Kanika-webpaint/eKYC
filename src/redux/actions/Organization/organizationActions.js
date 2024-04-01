@@ -202,5 +202,36 @@ export const editProfileAction =
             }
         }
 
+export const updatePassowrdAction =
+    (
+        data,
+        token,
+        navigation,
+        setIsLoading
+    ) =>
+        async (dispatch) => {
+            try {
+                const config = {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `${token}`,
+                    },
+                }
+                const api_url = `${API_URL}/updatepassword`
+                const res = await axios.put(api_url, data, config)
+                if (res.status === 200) {
+                    setTimeout(() => {
+                        setIsLoading(false)
+                        showAlert(res?.data?.message)
+                        navigation.goBack()
+                    }, 200);
 
+                } else {
+                    showAlert(res?.data?.message)
+                }
+            } catch (e) {
+                setIsLoading(false)
+                showAlert(e?.response?.data?.message)
+            }
+        }
 

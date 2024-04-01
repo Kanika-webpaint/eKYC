@@ -80,7 +80,7 @@ function AdminProfile() {
                         ButtonContent={isLoading ? <Loader /> : "SUBMIT"}
                         contentStyle={styles.buttonText}
                         onPress={() => showAlert('edit profile in progress')}
-                    // onPress={() => handleEditProfile()}
+                    
                     />
                 </ScrollView>
             </KeyboardAvoidingView>

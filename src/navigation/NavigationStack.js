@@ -45,7 +45,8 @@ const NavigationStack = () => {
                         <Stack.Screen options={{ headerShown: false }} name="UserProfile" component={routeNames.UserProfile} />
                         <Stack.Screen options={{ headerShown: false }} name="CurrentPlan" component={routeNames.CurrentPlan} />
                         <Stack.Screen options={{ headerShown: false }} name="Settings" component={routeNames.Settings} />
-                        <Stack.Screen options={{ headerShown: false }} name="AdminProfile" component={routeNames.AdminProfile} />
+                        <Stack.Screen options={{ headerShown: false }} name="AdminProfile" component={routeNames.AdminProfile} />   
+                        <Stack.Screen options={{ headerShown: false }} name="ChangePassword" component={routeNames.ChangePassword} />
                     </>
                 ) : isLoggedUser ? (
                     <>

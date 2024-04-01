@@ -12,6 +12,7 @@ import IdScreen from "../screens/Customer/getStarted/IdScreen";
 import CurrentPlan from "../screens/Admin/currentPlanDetail/CurrentPlan";
 import AdminProfile from "../screens/Admin/adminProfile/AdminProfile";
 import Settings from "../screens/Admin/settings/Settings";
+import ChangePassword from "../screens/Admin/changePassword/ChangePassword";
 
 export const routeNames = {
     MobileVerification: MobileNumber,
@@ -27,5 +28,6 @@ export const routeNames = {
     IdScreen:IdScreen ,
     CurrentPlan: CurrentPlan,
     AdminProfile:AdminProfile,
-    Settings:Settings
+    Settings:Settings,
+    ChangePassword:ChangePassword
 }

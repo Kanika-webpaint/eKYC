@@ -40,9 +40,7 @@ function Settings({ route }) {
             },
         ]);
 
-    const changePassword = () => {
-        showAlert('change password in progress')
-    }
+  
     return (
         <SafeAreaView style={styles.safeArea}>
             <Status isLight />
@@ -64,7 +62,7 @@ function Settings({ route }) {
                             <Image source={rightArrow} style={{ height: 20, width: 20, resizeMode: 'contain', alignSelf: 'center' }}></Image>
                         </View>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.input} onPress={() => changePassword()}>
+                    <TouchableOpacity style={styles.input} onPress={() => navigation.navigate('ChangePassword')}>
                         <View style={{ flexDirection: 'row' }}>
                             <Image source={lock} style={{ height: 20, width: 20, resizeMode: 'contain', alignSelf: 'center' }}></Image>
                             <Text style={styles.itemSetting}>Change password</Text>
