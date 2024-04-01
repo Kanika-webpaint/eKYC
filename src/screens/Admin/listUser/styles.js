@@ -10,9 +10,10 @@ export const styles = StyleSheet.create({
   itemContainer: {
     flexDirection: 'row',
     padding: 10,
-    alignItems: 'center',
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   image: {
     width: 50,
@@ -21,8 +22,8 @@ export const styles = StyleSheet.create({
     marginRight: 10,
   },
   userInfoContainer: {
+    flexDirection: 'row',
     flex: 1,
-    justifyContent: 'space-between',
   },
   userName: {
     fontSize: 16,
@@ -35,9 +36,9 @@ export const styles = StyleSheet.create({
   },
   searchInput: {
     width: '100%',
-    height:40, 
-    marginLeft:10,
-    color:colors.black
+    height: 40,
+    marginLeft: 10,
+    color: colors.black
   },
   containerHeader: {
     flex: 1,
@@ -84,5 +85,24 @@ export const styles = StyleSheet.create({
     width: 20,
     alignSelf: 'center', marginLeft: 10
   },
-  close: { height: 15, width: 20, alignSelf: 'center', marginRight: 10 }
+  close: { height: 15, width: 20, alignSelf: 'center', marginRight: 10 },
+  item: {
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+  },
+  rightActions: {
+    height:60,
+    width: 70,
+    alignItems: 'center',
+  },
+  imageRightAction: {
+    height: 30,
+    width: 30,
+    resizeMode: 'contain'
+  },
+  rightItem: {
+    backgroundColor: colors.app_red, height: 60,
+    width: 60, justifyContent: 'center', alignItems: 'center'
+  }
 });

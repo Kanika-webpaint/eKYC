@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { API_URL } from "@env"
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { verifiedDataSlice, verifyCodeslice } from '../../slices/user';
+import { verifiedDataSlice, verifyCodeslice } from '../../slices/user/userSlice';
 
 export const verifedCustomerDataAction =
     (data,
@@ -58,6 +58,31 @@ export const verificationStatusAction =
                 }, 500);
             } else {
                 showAlert(res?.data?.message)
+            }
+        } catch (e) {
+            setIsLoading(false)
+            showAlert(e?.response?.data?.message)
+        }
+    }
+
+
+export const loginUserAction =
+    (data,
+        navigation,
+        setIsLoading
+    ) => async (dispatch) => {
+        try {
+            const api_url = `${API_URL}/loginuser`
+            const res = await axios.post(api_url, data)
+            if (res?.status == 200) {
+                setIsLoading(false);
+                await AsyncStorage.setItem('token_user', res?.data?.token);
+                await AsyncStorage.setItem('role_user', "user");
+                const storedToken = await AsyncStorage.getItem('token_user');
+                const storedRole = await AsyncStorage.getItem('role_user');
+                if (storedRole && storedToken) {
+                    await dispatch(verifyCodeslice(true));
+                }
             }
         } catch (e) {
             setIsLoading(false)

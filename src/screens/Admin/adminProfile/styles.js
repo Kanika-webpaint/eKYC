@@ -35,7 +35,7 @@ export const styles = StyleSheet.create({
         color: colors.white,
         fontSize: 16,
         paddingLeft: 10,
-        paddingRight:10,
+        paddingRight: 10,
         fontFamily: fonts.regular,
         backgroundColor: 'green',
         maxWidth: '32%',
@@ -47,5 +47,19 @@ export const styles = StyleSheet.create({
         paddingLeft: 12,
         borderRadius: 5,
         justifyContent: 'center',
-    }
+    },
+    buttonContainer: {
+        backgroundColor: colors.app_red,
+        width: '90%',
+        height: 45,
+        borderRadius: 8,
+        alignSelf: 'center',
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    buttonText: {
+        color: colors.white,
+        fontSize: 16,
+        fontFamily: fonts.bold,
+    },
 });

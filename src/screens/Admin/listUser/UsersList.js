@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { View, TextInput, FlatList, Text, Image,  ScrollView, TouchableOpacity } from 'react-native';
+import { View, TextInput, FlatList, Text, Image, ScrollView, TouchableOpacity, TouchableHighlight } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { back, close, filter, plus, profileGrey, rightArrow } from '../../../common/images';
+import { bin, close, filter, plus, profileGrey } from '../../../common/images';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useDispatch, useSelector } from 'react-redux';
@@ -10,19 +10,24 @@ import { fonts } from '../../../common/fonts';
 import { styles } from './styles';
 import colors from '../../../common/colors';
 import Header from '../../../components/Header';
-import { getUsersListAction } from '../../../redux/actions/Organization/organizationActions';
+import { deleteUserAction, getUsersListAction } from '../../../redux/actions/Organization/organizationActions';
+import { Swipeable } from 'react-native-gesture-handler';
+import showAlert from '../../../components/showAlert';
+import Loader from '../../../components/ActivityIndicator';
 
 const UserList = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [token, setToken] = useState('')
   const navigation = useNavigation();
   const dispatch = useDispatch()
-  const usersListing = useSelector((state) => state?.login?.getUsersList)
+  const usersListing = useSelector((state) => state?.org?.getUsersList)
 
   useEffect(() => {
     AsyncStorage.getItem("token").then((value) => {
       if (value) {
+        setToken(value)
         dispatch(getUsersListAction(value, setIsLoading))
       }
     })
@@ -42,23 +47,46 @@ const UserList = () => {
     navigation.navigate('UserProfile', { id: item?.id })
   }
 
+  const handleDelete = (id) => {
+    dispatch(deleteUserAction(id, token, navigation, setIsLoading));
+  }
+
+  const renderRightActions = (id) => {
+    return (
+      <View style={styles.rightActions}>
+        <TouchableOpacity style={styles.rightItem} onPress={() => handleDelete(id)}>
+          {isLoading ?
+            <Loader /> :
+            <Image
+              source={bin}
+              style={styles.imageRightAction}
+            />
+          }
+        </TouchableOpacity>
+
+      </View>
+    );
+  };
+
   const renderItem = ({ item }) => {
     return (
-      <View style={{ justifyContent: 'space-between' }}>
-        <TouchableOpacity style={styles.itemContainer} onPress={() => navigateToUserProfile(item)}>
-          <Image
-            source={profileGrey}
-            style={styles.image}
-          />
-          <View style={styles.userInfoContainer}>
-            <Text style={styles.userName}>{item?.username || ''}</Text>
-            <Text style={styles.phoneNumber}>{item?.phoneNumber || ''}</Text>
-          </View>
-          <TouchableOpacity onPress={() => navigateToUserProfile(item)}>
-            <Image source={rightArrow} style={{ height: 15, width: 15, resizeMode: 'contain' }} />
-          </TouchableOpacity>
-        </TouchableOpacity>
-      </View>
+      <Swipeable underlayColor="transparent" renderRightActions={() => renderRightActions(item.id)}>
+        <View style={{ justifyContent: 'space-between' }}>
+
+          <TouchableHighlight underlayColor='transparent' hitSlop={{ top: 100, bottom: 100, left: 200, right: 200 }} style={styles.itemContainer} onPress={() => navigateToUserProfile(item)}>
+            <View style={styles.userInfoContainer}>
+              <Image
+                source={profileGrey}
+                style={styles.image}
+              />
+              <View>
+                <Text style={styles.userName}>{item?.username || ''}</Text>
+                <Text style={styles.phoneNumber}>{item?.phoneNumber || ''}</Text>
+              </View>
+            </View>
+          </TouchableHighlight>
+        </View>
+      </Swipeable>
     )
   }
 
@@ -71,10 +99,10 @@ const UserList = () => {
       <ScrollView keyboardShouldPersistTaps='handled'>
         <Status isLight />
         <View>
-          <Header title={'Users'}/>
+          <Header title={'Users'} />
           {isLoading ? <Loader /> :
             <View >
-              <View style={{ flexDirection: 'row' ,margin:20}}>
+              <View style={{ flexDirection: 'row', margin: 20 }}>
                 <View style={{
                   flex: 1, flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10,
                   borderWidth: 1,
@@ -103,8 +131,9 @@ const UserList = () => {
               </View>
               {usersListing && usersListing?.length > 0 ?
                 <FlatList
-                style={{margin:20}}
-                  data={searchQuery ? filteredUsers : usersListing} 
+                  nestedScrollEnabled
+                  style={{ margin: 15 }}
+                  data={searchQuery ? filteredUsers : usersListing}
                   renderItem={renderItem}
                   keyExtractor={item => item?.id.toString()}
                 />

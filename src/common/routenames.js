@@ -10,6 +10,8 @@ import SuccessScreen from "../screens/Admin/success/SuccessScreen";
 import UserProfile from "../screens/Admin/profile/UserProfile";
 import IdScreen from "../screens/Customer/getStarted/IdScreen";
 import CurrentPlan from "../screens/Admin/currentPlanDetail/CurrentPlan";
+import AdminProfile from "../screens/Admin/adminProfile/AdminProfile";
+import Settings from "../screens/Admin/settings/Settings";
 
 export const routeNames = {
     MobileVerification: MobileNumber,
@@ -23,5 +25,7 @@ export const routeNames = {
     SuccessScreen:SuccessScreen,
     UserProfile:UserProfile,
     IdScreen:IdScreen ,
-    CurrentPlan: CurrentPlan
+    CurrentPlan: CurrentPlan,
+    AdminProfile:AdminProfile,
+    Settings:Settings
 }

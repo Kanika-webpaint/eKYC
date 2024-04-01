@@ -33,14 +33,8 @@ function CreateUser() {
     const navigation = useNavigation();
     const dispatch = useDispatch()
     const keyboardVerticalOffset = Platform.OS === 'ios' ? 40 : 0
-    const OrganizationHomeList = useSelector((state) => state?.login?.orgDetails)
-    const getUsersList = useSelector(state => state?.login?.getUsersList);
-    const planDetailsList = useSelector((state) => state?.login?.orgDetails)
-    const handleInputChange = (field, value) => {
-        setFormData({ ...userData, [field]: value });
-        setErrorMessages({ ...errorMessages, [field]: '' });
-    };
-
+    const getUsersList = useSelector(state => state?.org?.getUsersList);
+    const planDetailsList = useSelector((state) => state?.org?.orgDetails)
     useEffect(() => {
         AsyncStorage.getItem("token").then((value) => {
             if (value) {
@@ -69,6 +63,12 @@ function CreateUser() {
         return unsubscribeFocus;
     }, [navigation]);
 
+    const handleInputChange = (field, value) => {
+        setFormData({ ...userData, [field]: value });
+        setErrorMessages({ ...errorMessages, [field]: '' });
+    };
+
+
     const handleCreateUser = () => {
         const newErrorMessages = {};
 
@@ -90,23 +90,31 @@ function CreateUser() {
             {
                 username: userData?.username,
                 phoneNumber: countryCodeSelected + userData?.phoneNo,
-                organizationId: OrganizationHomeList?.organization?.id || ''
             }
-            if (planDetailsList?.organization?.amount === 1499900 && getUsersList?.length <= 49) {
-                dispatch(CreateUserAction(requestData, token, navigation, setIsLoading));
-            } else if (planDetailsList?.organization?.amount === 1349900 && getUsersList?.length <= 199) {
-                dispatch(CreateUserAction(requestData, token, navigation, setIsLoading));
-            } else {
-                if (planDetailsList?.organization?.amount === 1499900) {
-                    setIsLoading(false)
-                    showAlert('Please purchase premium plan to add more users.');
-                } else if (planDetailsList?.organization?.amount === 1349900) {
-                    setIsLoading(false)
-                    showAlert('Please purchase enterprise plan to add more users.');
+
+            const isBasicPlan = planDetailsList?.organization?.amount === 1499900 ? true : false
+            const isPlanActive = planDetailsList?.organization?.planStatus == 1 ? true : false
+            if (isPlanActive) {
+                if (isBasicPlan && getUsersList?.length <= 49) {
+                    dispatch(CreateUserAction(requestData, token, navigation, setIsLoading));
+                } else if (!isBasicPlan && getUsersList?.length <= 199) {
+                    dispatch(CreateUserAction(requestData, token, navigation, setIsLoading));
+                } else {
+                    setIsLoading(false);
+                    if (isBasicPlan) {
+                        showAlert('Please purchase premium plan to add more users.');
+                    } else {
+                        showAlert('Please purchase enterprise plan to add more users.');
+                    }
                 }
+            } else {
+                setIsLoading(false);
+                showAlert('Your subscription plan is inactive.Please activate to create users.');
             }
         }
     };
+
+
 
     const onChangeCountryCode = () => {
         setShow(true)

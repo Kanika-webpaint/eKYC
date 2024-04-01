@@ -6,7 +6,7 @@
  */
 
 import React, { useCallback, useEffect, useState } from 'react';
-import { SafeAreaView, StyleSheet, View, Text, TextInput, ScrollView, TouchableOpacity, Keyboard, Dimensions, Image, KeyboardAvoidingView } from 'react-native';
+import { SafeAreaView, View, Text, TextInput, ScrollView, TouchableOpacity, Keyboard, Dimensions, Image, KeyboardAvoidingView } from 'react-native';
 import colors from '../../../common/colors';
 import { logoValidyfy, verification } from '../../../common/images';
 import MobileNumberCodeVerification from '../../../components/MobileNumberCodeVerification';
@@ -15,18 +15,14 @@ import { useNavigation } from '@react-navigation/native';
 import RedButton from '../../../components/RedButton';
 import auth from '@react-native-firebase/auth';
 import Loader from '../../../components/ActivityIndicator';
-import Logo from '../../../components/Logo';
 import CountryPick from '../../../components/CountryPicker';
-import { PhoneNumberAction, VerifyCodeAction } from '../../../redux/actions/user';
 import { useDispatch } from 'react-redux';
-import { fonts } from '../../../common/fonts';
 import Status from '../../../components/Status';
 import showAlert from '../../../components/showAlert';
 import { styles } from './styles';
-import { phoneNumberslice, verifyCodeslice } from '../../../redux/slices/user';
 import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_URL } from "@env"
+import { loginUserAction } from '../../../redux/actions/user/userAction';
 
 function MobileNumber() {
   const [value, setValue] = useState('');
@@ -44,6 +40,7 @@ function MobileNumber() {
   const [props, getCellOnLayoutHandler] = useClearByFocusCell({ value, setValue });
   const CELL_COUNT = 6;
   const navigation = useNavigation();
+  const [enable, setDisabled] = useState(true)
 
   const keyboardVerticalOffset = Platform.OS === 'ios' ? 40 : 0
 
@@ -53,10 +50,6 @@ function MobileNumber() {
       setIsPortrait(height > width);
     };
     Dimensions.addEventListener('change', updateOrientation);
-    // Return a cleanup function
-    // return () => {
-    //   Dimensions?.removeEventListener('change', updateOrientation);
-    // };
   }, []);
 
   useEffect(() => {
@@ -64,9 +57,7 @@ function MobileNumber() {
       const { height, width } = Dimensions.get('window');
       setIsPortrait(height > width);
     };
-    // Add event listener when the screen focuses
     const unsubscribeFocus = navigation.addListener('focus', updateOrientation);
-    // Remove event listener when the screen unfocuses
     return unsubscribeFocus;
   }, [navigation]);
 
@@ -79,11 +70,10 @@ function MobileNumber() {
 
   const SubmitOTP = () => {
     return (
-      <RedButton buttonContainerStyle={styles.buttonContainer} ButtonContent={isLoading ? <Loader /> : 'SUBMIT'} contentStyle={styles.buttonText} onPress={() => submitOTP()} />
+      <RedButton disabled={enable} buttonContainerStyle={styles.buttonContainer} ButtonContent={isLoading ? <Loader /> : 'SUBMIT'} contentStyle={styles.buttonText} onPress={() => submitOTP()} />
     );
   };
 
-  console.log("call function", API_URL)
   const checkUserRegister = async () => {
     try {
       if (mobileNumber === '') {
@@ -100,25 +90,11 @@ function MobileNumber() {
         };
         const api_url = `${API_URL}/validateuser`
         const res = await axios.post(api_url, requestData)
-        console.log(res.status, res?.data?.token, "response validateuser")
-        if (res?.status === 200 && res?.data?.token) {
-          console.log(res, "response register userr")
-          await AsyncStorage.setItem('token_user', res?.data?.token);
-          await AsyncStorage.setItem('role_user', "user");
-          const storedToken = await AsyncStorage.getItem('token_user');
-          const storedRole = await AsyncStorage.getItem('role_user');
-          console.log(storedToken, storedRole, "checkkkk")
-          if (storedRole && storedToken) {
-
-            console.log("yes call")
-            handleSendCode(numberWithCode)  // firebase call then 
-          }
+        if (res?.status === 200) {
+          handleSendCode(numberWithCode)
         } else {
           showAlert(res?.data?.message)
         }
-        // await dispatch(phoneNumberslice(res))
-
-        // dispatch(PhoneNumberAction(requestData, navigation, setShowOTP, setIsLoading))
       };
     } catch (e) {
       setIsLoading(false)
@@ -127,11 +103,9 @@ function MobileNumber() {
   }
 
   const handleSendCode = async (numberWithCode) => {
-    console.log(numberWithCode, "codeee with number")
     if (numberWithCode) {
-      await auth().signInWithPhoneNumber(numberWithCode, true) //true added for resend code
+      await auth().signInWithPhoneNumber(numberWithCode, true)
         .then(confirmResult => {
-          console.log(confirmResult, "resulttt")
           setIsLoading(false)
           setConfirmResult(confirmResult)
           if (confirmResult._verificationId) {
@@ -143,7 +117,6 @@ function MobileNumber() {
           }
         })
         .catch(error => {
-          console.log(error, ">>>")
           setIsLoading(false)
           switch (error.code) {
             case 'auth/too-many-requests' || 'auth/app-not-authorized':
@@ -158,7 +131,6 @@ function MobileNumber() {
             case 'auth/missing-phone-number':
               showAlert('Phone number is missing.')
               break;
-
             default:
               break;
           }
@@ -167,21 +139,15 @@ function MobileNumber() {
     else {
       setIsLoading(false)
     }
-    // }
   }
 
-
-  const handleVerifyCode = () => {
-    // Request for OTP verification
-    setIsLoading(true)
-    if (value.length == 6) {
+  const handleVerifyCode = (text) => {
+    if (text && text.length == 6) {
       confirmResult
-        .confirm(value)
+        .confirm(text)
         .then(user => {
-          setIsLoading(false)
           if (user) {
-            console.log("callll")
-            dispatch(verifyCodeslice(true));
+            setDisabled(false)
           }
         })
         .catch(error => {
@@ -201,41 +167,22 @@ function MobileNumber() {
         })
     } else {
       setIsLoading(false)
-      Alert.alert('Please enter a 6 digit OTP code.')
+      showAlert('Please enter a 6 digit OTP code.')
     }
   }
 
-  // const handleVerifyCode = useCallback(async (setLoggedIn) => {
-  //   // Request for OTP verification
-  //   setIsLoading(true)
-  //   if (value.length == 6) {
-  //     // const requestData = {
-  //     //   phoneNumber: numberWithCode,
-  //     //   receivedotp: value ? value : '1234'  //value should be '1234' for now, will check with static data
-  //     //   role:'user'
-  //     // };
-  //     const requestData = {
-  //       phoneNumber: numberWithCode,
-  //       receivedotp: value ? value : 123456 //value should be '1234' for now, will check with static data
-  //     };
-  //     dispatch(VerifyCodeAction(requestData, setIsLoading, setLoggedIn))
-  //     // dispatch(VerifyCodeAction(requestData, setIsLoading, setLoggedIn))
-  //   } else {
-  //     setIsLoading(false)
-  //     showAlert('Please enter a 6 digit OTP code.')
-  //   }
-  // }, [numberWithCode, value])
-
-
   const submitMobileNumber = () => {
     Keyboard.dismiss();
-    // handleSendCode()
     checkUserRegister()
   }
 
   const submitOTP = () => {
     Keyboard.dismiss();
-    handleVerifyCode()
+    const requestData = {
+      phoneNumber: numberWithCode
+    };
+    setIsLoading(true)
+    dispatch(loginUserAction(requestData, navigation, setIsLoading))
   }
 
   const onChangeMobile = (text) => {
@@ -263,9 +210,8 @@ function MobileNumber() {
   };
 
   useEffect(() => {
-    // Check if the value reaches the desired length
     if (value.length === CELL_COUNT) {
-      Keyboard.dismiss(); // Dismiss the keyboard
+      Keyboard.dismiss();
     }
   }, [value]);
 
@@ -289,11 +235,15 @@ function MobileNumber() {
               <CodeField
                 ref={ref}
                 {...props}
-                // Use `caretHidden={false}` when users can't paste a text value, because context menu doesn't appear
                 value={value}
-                onChangeText={(text) => setValue(text)}
+                onChangeText={(text) => {
+                  setValue(text);
+                  console.log(text.length, CELL_COUNT, "hellooo")
+                  if (text.length === CELL_COUNT) {
+                    handleVerifyCode(text)
+                  }
+                }}
                 cellCount={CELL_COUNT}
-                // rootStyle={styles.codeFieldRoot}
                 keyboardType="number-pad"
                 textContentType="oneTimeCode"
                 renderCell={({ index, symbol, isFocused }) => (

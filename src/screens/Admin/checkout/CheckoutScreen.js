@@ -38,6 +38,7 @@ function CheckoutScreen({ route }) {
     const [cityErrMsg, setCityErrorMsg] = useState(false)
     const [cardDetailsErrMsg, setCardDetailsErrMsg] = useState(false)
     const [isPotrait, setIsPortrait] = useState(true)
+    const [showCity, setShowCity] = useState(false)
     const navigation = useNavigation();
     const keyboardVerticalOffset = Platform.OS === 'ios' ? 40 : 0
 
@@ -136,6 +137,9 @@ function CheckoutScreen({ route }) {
                 showAlert('Please enter valid card details');
                 return;
             } else {
+                setCardDetailsErrMsg(false)
+                setStateErrorMsg(false)
+                setCityErrorMsg(false)
                 try {
                     setIsLoading(true)
                     showAlert('Subscribing..please wait!!')
@@ -171,7 +175,7 @@ function CheckoutScreen({ route }) {
                                             postal_code: userData?.postalCode,
                                             state: selectedState
                                         },
-                                        price_id: route?.params?.amount == 'N14999' ? PRICE_BASIC_PLAN : PRICE_PREMIUM_PLAN,   // check issue here
+                                        price_id: route?.params?.amount == 'N14999' ? PRICE_BASIC_PLAN : PRICE_PREMIUM_PLAN,
                                         paymentMethod: resPaymentMethod?.data?.id
                                     }
                                     const api_url = `${API_URL}/stripesubscription`
@@ -184,7 +188,7 @@ function CheckoutScreen({ route }) {
                                                         subscriptionId: resSubscription?.data?.clientSecret?.subscription,
                                                         customerId: resSubscription?.data?.clientSecret?.customer,
                                                         paymentIntentId: resSubscription?.data?.clientSecret?.payment_intent?.id,
-                                                        planStatus: item?.plan?.active,
+                                                        planStatus: item?.plan?.active, // this should be in the api
                                                         amount: resSubscription?.data?.clientSecret?.payment_intent?.amount,
                                                         currency: resSubscription?.data?.clientSecret?.currency,
                                                         planInterval: item?.plan?.interval,
@@ -208,7 +212,6 @@ function CheckoutScreen({ route }) {
                                                                     showAlert('Password has been sent on your email.')
                                                                     navigation.navigate('SuccessScreen')
                                                                 }, 500);
-
                                                             } else {
                                                                 setIsLoading(false)
                                                                 showAlert('Please try again later.')
@@ -260,6 +263,8 @@ function CheckoutScreen({ route }) {
             return route?.params?.amount === 'N13499' ? ' PAY N13,499' : 'PAY N14,999';
         }
     }, [isLoading, route?.params?.amount]);
+
+    console.log(PUBLISH_KEY, STRIPE_CLIENT_SECRET_KEY, API_URL, PRICE_BASIC_PLAN, PRICE_PREMIUM_PLAN, STRIPE_PAYMENT_METHOD_API, "from env")
 
     return (
         <SafeAreaView style={styles.safeArea}>

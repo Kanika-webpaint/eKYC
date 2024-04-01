@@ -40,3 +40,7 @@ export const filter = require('./assets/filter.png');
 export const userCreate = require('./assets/userCreate.png');
 export const userRed = require('./assets/userRed.png');
 export const splashLogo = require('./assets/splashLogo.png');
+export const verifiedUser = require('./assets/shield.png');
+export const bin = require('./assets/bin.png');
+export const edit = require('./assets/draw.png');
+export const lock = require('./assets/lock.png');

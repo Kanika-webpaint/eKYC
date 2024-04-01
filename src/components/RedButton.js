@@ -13,10 +13,10 @@ import {
     TouchableOpacity
 } from 'react-native';
 
-function RedButton({ buttonContainerStyle, ButtonContent, contentStyle ,onPress}) {
+function RedButton({ buttonContainerStyle, ButtonContent, contentStyle ,onPress, disabled}) {
     return (
         <>
-            <TouchableOpacity style={buttonContainerStyle} onPress={onPress}>
+            <TouchableOpacity style={buttonContainerStyle} onPress={onPress} disabled={disabled}>
                 <Text style={[styles.buttonText, contentStyle]}>{ButtonContent}</Text>
             </TouchableOpacity>
         </>

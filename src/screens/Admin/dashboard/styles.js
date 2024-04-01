@@ -86,10 +86,11 @@ export const styles = StyleSheet.create({
         alignItems: 'center',
         padding: 10,
         paddingHorizontal: 20,
-        paddingBottom: Platform.OS === 'ios' ? '20%' : '10%',
+        // paddingBottom: Platform.OS === 'ios' ? '20%' : '10%',
         borderTopLeftRadius: 40,
         borderTopRightRadius: 40,
         backgroundColor: colors.app_blue,
+        position:'absolute',bottom:0
     },
     tabButton: {
         flex: 1,

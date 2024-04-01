@@ -9,17 +9,12 @@ export const styles = StyleSheet.create({
     },
     input: {
         height: 50,
-        borderWidth: 1,
         paddingLeft: 12,
         borderRadius: 5,
-        color: colors.black,
-        borderWidth: 1,
-        width: '100%',
-        fontSize: 16,
-        borderColor: colors.white,
         backgroundColor: colors.purple_dim,
-        fontFamily: fonts.regular,
-        marginBottom: 20
+        marginBottom: 20,
+        flexDirection:'row',
+        justifyContent:'space-between'
     },
     imageView: { backgroundColor: colors.purple_dim, borderWidth: 1, justifyContent: 'center', alignItems: 'center', marginLeft: '8%', height: 70, width: 70, alignSelf: 'center', borderRadius: 40, borderColor: colors.app_red, elevation: 2, marginTop: 20 },
     img: { height: 30, width: 30, resizeMode: 'contain', alignSelf: 'center' },
@@ -47,5 +42,13 @@ export const styles = StyleSheet.create({
         paddingLeft: 12,
         borderRadius: 5,
         justifyContent: 'center',
-    }
+    },
+    itemSetting:{
+        fontFamily:fonts.regular,
+        color:colors.black,
+        fontSize:16   ,
+        alignSelf:'center',
+        marginLeft:10
+    },
+
 });

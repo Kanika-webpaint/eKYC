@@ -4,11 +4,12 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { routeNames } from '../common/routenames';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useDispatch, useSelector } from 'react-redux';
-import { loginAdminslice, verifyCodeslice } from '../redux/slices/user';
+import { loginAdminslice } from '../redux/slices/organization/organizationSlice';
+import { verifyCodeslice } from '../redux/slices/user/userSlice';
 
 const NavigationStack = () => {
-    const isLogged = useSelector(state => state.login.isLogged);
-    const isLoggedUser = useSelector(state => state.login.isLoggedUser);
+    const isLogged = useSelector(state => state.org.isLogged);
+    const isLoggedUser = useSelector(state => state.user.isLoggedUser);
     const dispatch = useDispatch()
     const Stack = createStackNavigator();
 
@@ -43,6 +44,8 @@ const NavigationStack = () => {
                         <Stack.Screen options={{ headerShown: false }} name="UsersList" component={routeNames.UserList} />
                         <Stack.Screen options={{ headerShown: false }} name="UserProfile" component={routeNames.UserProfile} />
                         <Stack.Screen options={{ headerShown: false }} name="CurrentPlan" component={routeNames.CurrentPlan} />
+                        <Stack.Screen options={{ headerShown: false }} name="Settings" component={routeNames.Settings} />
+                        <Stack.Screen options={{ headerShown: false }} name="AdminProfile" component={routeNames.AdminProfile} />
                     </>
                 ) : isLoggedUser ? (
                     <>

@@ -6,9 +6,9 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { SafeAreaView, View, TextInput, Image, ScrollView } from 'react-native';
+import { SafeAreaView, View, TextInput, Image, ScrollView, Text } from 'react-native';
 import colors from '../../../common/colors';
-import {  userRed } from '../../../common/images';
+import { userRed, verifiedUser } from '../../../common/images';
 import { useDispatch, useSelector } from 'react-redux'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Status from '../../../components/Status';
@@ -17,7 +17,7 @@ import Header from '../../../components/Header';
 import { getUserByIdAction } from '../../../redux/actions/Organization/organizationActions';
 
 function UserProfile({ route }) {
-    const userDetail = useSelector((state) => state?.login?.getUser)
+    const userDetail = useSelector((state) => state?.org?.getUser)
     const [isLoading, setIsLoading] = useState(false);
     const dispatch = useDispatch()
 
@@ -30,7 +30,6 @@ function UserProfile({ route }) {
             .then(res => {
             });
     }, [dispatch]);
-
     return (
         <SafeAreaView style={styles.safeArea}>
             <Status isLight />
@@ -39,6 +38,7 @@ function UserProfile({ route }) {
                     <Header title={'Profile'} />
                     <View style={styles.imageView}>
                         <Image source={userRed} style={styles.img} />
+                        {userDetail?.isVerified && <Image source={verifiedUser} style={styles.verifyImg} />}
                     </View>
                 </View>
                 <View style={{ margin: 20 }}>
@@ -59,6 +59,9 @@ function UserProfile({ route }) {
                         placeholderTextColor={colors.grey}
                         onChangeText={(text) => handleInputChange('phNo', text)}
                     />
+                    <View style={styles.verifyView}>
+                        <Text style={styles.verifiedStatus}>{userDetail?.isVerified === true ? 'Verified' : 'Not Verified'}</Text>
+                    </View>
                 </View>
             </ScrollView>
         </SafeAreaView>
