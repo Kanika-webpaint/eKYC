@@ -81,7 +81,7 @@ const LoginAdmin = ({ route }) => {
                 <ScrollView keyboardShouldPersistTaps='handled'>
                     <Status lightContent />
                     <View style={styles.container}>
-                        <TouchableOpacity onPress={() => navigation.goBack()}>
+                        <TouchableOpacity onPress={() => navigation.goBack()} hitSlop={{ top: 50, bottom: 50, left: 50, right: 50 }} style={{ height: 60, width: 60 }}>
                             <Image source={back_arow} style={styles.backArrow} />
                         </TouchableOpacity>
                         <View style={styles.content}>

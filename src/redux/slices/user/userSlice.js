@@ -6,6 +6,7 @@ const userSlice = createSlice({
         phoneNumber: [],
         verifyCode: [],
         isLoggedUser: false,
+        verified: []
     },
     reducers: {
         phoneNumberslice: (state, action) => {
@@ -18,6 +19,9 @@ const userSlice = createSlice({
         verifiedDataSlice: (state, action) => {
             state.verifiedDataList = action?.payload?.data
         },
+        getUserVerfiedSlice: (state, action) => {
+            state.verified = action?.payload?.data
+        },
     }
 })
 
@@ -27,4 +31,5 @@ export const {
     phoneNumberslice,
     verifyCodeslice,
     verifiedDataSlice,
+    getUserVerfiedSlice
 } = userSlice.actions

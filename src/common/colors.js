@@ -9,5 +9,6 @@ export default colors = {
     placeholder_grey:"#999",
     purple:"#6E1CF5",
     purple_dim:'#FAF9FF',
-    grey_text:'#575C69'
+    grey_text:'#575C69',
+    green:"#7cd49f"
 }

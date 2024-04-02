@@ -17,8 +17,9 @@ import { TEMPLATE_ID } from '@env';
 import showAlert from '../../../components/showAlert';
 import { styles } from './styles';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useDispatch } from 'react-redux';
-import { verifedCustomerDataAction } from '../../../redux/actions/user/userAction';
+import { useDispatch, useSelector } from 'react-redux';
+import { checkverifiedUser, verifedCustomerDataAction } from '../../../redux/actions/user/userAction';
+import { verifyCodeslice } from '../../../redux/slices/user/userSlice';
 
 function IdScreen() {
   const navigation = useNavigation();
@@ -28,11 +29,13 @@ function IdScreen() {
   const dispatch = useDispatch();
   const [userToken, setTokenUser] = useState('')
   const keyboardVerticalOffset = Platform.OS === 'ios' ? 40 : 0
+  const isCheckStatus = useSelector(state => state.user.verified);
 
   useEffect(() => {
     AsyncStorage.getItem("token_user").then((value) => {
       if (value) {
         setTokenUser(value)
+        dispatch(checkverifiedUser(navigation, userToken, setIsLoading));
       }
     })
       .then(res => {
@@ -61,55 +64,61 @@ function IdScreen() {
     setTimeout(() => onPressGo(), 1000);
   };
 
-  const onPressGo = () => {
-    setIsLoading(false);
-    Inquiry.fromTemplate(TEMPLATE_ID)
-      .environment(Environment.SANDBOX)
-      .onComplete((inquiryId, status, fields) => {
-        setTimeout(() => {
-          try {
-            setIsLoading(true)
-            if (status === 'completed') {
-              const requestData =
-              {
-                addressCity: fields?.addressCity?.value ? fields?.addressCity?.value : '',
-                addressCountryCode: fields?.addressCountryCode?.value ? fields?.addressCountryCode?.value : '',
-                addressPostalCode: fields?.addressPostalCode?.value ? fields?.addressPostalCode?.value : '',
-                addressStreet1: fields?.addressStreet1?.value ? fields?.addressStreet1?.value : '',
-                addressStreet2: fields?.addressStreet2?.value ? fields?.addressStreet2?.value : '',
-                addressSubdivision: fields?.addressSubdivision?.value ? fields?.addressSubdivision?.value : '',
-                birthdate: fields?.birthdate?.value ? fields?.birthdate?.value : '',
-                currentGovernmentId: fields?.currentGovernmentId?.value ? fields?.currentGovernmentId?.value : '',
-                currentSelfie: fields?.currentSelfie?.value ? fields?.currentSelfie?.value : '',
-                emailAddress: fields?.emailAddress?.value ? fields?.emailAddress?.value : '',
-                expirationDate: fields?.expirationDate?.value ? fields?.expirationDate?.value : '',
-                identificationClass: fields?.identificationClass?.value ? fields?.identificationClass?.value : '',
-                identificationNumber: fields?.identificationNumber?.value ? fields?.identificationNumber?.value : '',
-                nameFirst: fields?.nameFirst?.value ? fields?.nameFirst?.value : '',
-                nameLast: fields?.nameLast?.value ? fields?.nameLast?.value : '',
-                nameMiddle: fields?.nameMiddle?.value ? fields?.nameMiddle?.value : '',
-                phoneNumber: fields?.phoneNumber?.value ? fields?.phoneNumber?.value : '',
-                selectedCountryCode: fields?.selectedCountryCode?.value ? fields?.selectedCountryCode?.value : '',
-                selectedIdClass: fields?.selectedIdClass?.value ? fields?.selectedIdClass?.value : '',
-                inquiryId: inquiryId,
-                status: status
+  const onPressGo = async () => {
+    if (isCheckStatus?.isVerified == 1) {
+      showAlert('You are already verified')
+      setIsLoading(false);
+      await AsyncStorage.clear();
+      dispatch(verifyCodeslice(false));
+    } else {
+      setIsLoading(false);
+      Inquiry.fromTemplate(TEMPLATE_ID)
+        .environment(Environment.SANDBOX)
+        .onComplete((inquiryId, status, fields) => {
+          setTimeout(async () => {
+            try {
+              setIsLoading(true)
+              if (status === 'completed') {
+                const requestData =
+                {
+                  addressCity: fields?.addressCity?.value ? fields?.addressCity?.value : '',
+                  addressCountryCode: fields?.addressCountryCode?.value ? fields?.addressCountryCode?.value : '',
+                  addressPostalCode: fields?.addressPostalCode?.value ? fields?.addressPostalCode?.value : '',
+                  addressStreet1: fields?.addressStreet1?.value ? fields?.addressStreet1?.value : '',
+                  addressStreet2: fields?.addressStreet2?.value ? fields?.addressStreet2?.value : '',
+                  addressSubdivision: fields?.addressSubdivision?.value ? fields?.addressSubdivision?.value : '',
+                  birthdate: fields?.birthdate?.value ? fields?.birthdate?.value : '',
+                  currentGovernmentId: fields?.currentGovernmentId?.value ? fields?.currentGovernmentId?.value : '',
+                  currentSelfie: fields?.currentSelfie?.value ? fields?.currentSelfie?.value : '',
+                  emailAddress: fields?.emailAddress?.value ? fields?.emailAddress?.value : '',
+                  expirationDate: fields?.expirationDate?.value ? fields?.expirationDate?.value : '',
+                  identificationClass: fields?.identificationClass?.value ? fields?.identificationClass?.value : '',
+                  identificationNumber: fields?.identificationNumber?.value ? fields?.identificationNumber?.value : '',
+                  nameFirst: fields?.nameFirst?.value ? fields?.nameFirst?.value : '',
+                  nameLast: fields?.nameLast?.value ? fields?.nameLast?.value : '',
+                  nameMiddle: fields?.nameMiddle?.value ? fields?.nameMiddle?.value : '',
+                  phoneNumber: fields?.phoneNumber?.value ? fields?.phoneNumber?.value : '',
+                  selectedCountryCode: fields?.selectedCountryCode?.value ? fields?.selectedCountryCode?.value : '',
+                  selectedIdClass: fields?.selectedIdClass?.value ? fields?.selectedIdClass?.value : '',
+                  inquiryId: inquiryId,
+                  status: status
+                }
+                dispatch(verifedCustomerDataAction(requestData, navigation, userToken, setIsLoading));
               }
-              dispatch(verifedCustomerDataAction(requestData, navigation, userToken, setIsLoading));
+            } catch (e) {
+              console.log(e, 'catch error');
             }
-          } catch (e) {
-            console.log(e, 'catch error');
-          }
-        }, 500);
-
-      })
-      .onCanceled(
-        (inquiryId, sessionToken) =>
-          showAlert('You have canceled verification,\nplease verify'),
-        navigation.navigate('IdScreen'),
-      )
-      .onError(error => showAlert(error?.message))
-      .build()
-      .start();
+          }, 500);
+        })
+        .onCanceled(
+          (inquiryId, sessionToken) =>
+            showAlert('You have canceled verification,\nplease verify'),
+          navigation.navigate('IdScreen'),
+        )
+        .onError(error => showAlert(error?.message))
+        .build()
+        .start();
+    }
   };
 
   return (

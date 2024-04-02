@@ -4,7 +4,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import showAlert from '../../../components/showAlert';
 import { createUserSlice, getOrgDetailsslice, getUserListSlice, getUserSlice, loginAdminslice } from '../../slices/organization/organizationSlice';
 
-console.log(API_URL, "URL")
 export const LoginAdminAction = (data, setIsLoading, setLoggedIn) => async (dispatch) => {
     try {
         const api_url = `${API_URL}/loginorganization`;
@@ -174,33 +173,6 @@ export const deleteUserAction =
             }
         }
 
-export const editProfileAction =
-    (
-        data,
-        token,
-        navigation,
-        setIsLoading
-    ) =>
-        async (dispatch) => {
-            try {
-                const config = {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `${token}`,
-                    },
-                }
-                const api_url = `${API_URL}/edit`
-                const res = await axios.post(api_url, data, config)
-                if (res.status === 200) {
-                    dispatch(getOrgDetailsAction(token, setIsLoading))
-                } else {
-                    showAlert(res?.data?.message)
-                }
-            } catch (e) {
-                setIsLoading(false)
-                showAlert(e?.response?.data?.message)
-            }
-        }
 
 export const updatePassowrdAction =
     (

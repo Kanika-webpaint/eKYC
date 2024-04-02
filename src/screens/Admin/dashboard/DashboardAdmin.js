@@ -121,7 +121,7 @@ function DashboardAdmin() {
         }
     };
 
-    const verifiedData = usersList.filter(item => item.isVerified === true);
+    const verifiedData = usersList.filter(item => item.isVerified == 1 ? true : false);
     const unverifiedData = usersList.filter(item => item.isVerified !== true);
 
     const renderItem = ({ item }) => {
@@ -198,7 +198,6 @@ function DashboardAdmin() {
                                 getItemLayout={(data, index) => ({ length: 50, offset: 50 * index, index })}
                             />
                         </View>
-
                     </View>
                 </ScrollView>
                 <View style={styles.tabContainer}>

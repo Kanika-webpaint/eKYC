@@ -5,7 +5,8 @@ import { routeNames } from '../common/routenames';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginAdminslice } from '../redux/slices/organization/organizationSlice';
-import { verifyCodeslice } from '../redux/slices/user/userSlice';
+import {  verifyCodeslice } from '../redux/slices/user/userSlice';
+
 
 const NavigationStack = () => {
     const isLogged = useSelector(state => state.org.isLogged);
@@ -24,15 +25,16 @@ const NavigationStack = () => {
         checkAuthentication();
     }, [dispatch, isLogged]);
 
-    useEffect(() => {
-        const checkAuthenticationUser = async () => {
-            const storedRoleUser = await AsyncStorage.getItem('roleUser');
-            if (storedRoleUser) {
-                dispatch(verifyCodeslice(true));
-            }
-        };
-        checkAuthenticationUser();
-    }, [dispatch, isLoggedUser]);
+    // useEffect(() => {
+    //     const checkAuthenticationUser = async () => {
+    //         const storedToken = await AsyncStorage.getItem('token_user');
+    //         const storedRoleUser = await AsyncStorage.getItem('role_user');
+    //         if (storedToken && storedRoleUser) {
+    //             dispatch(verifyCodeslice(true));
+    //         }
+    //     };
+    //     checkAuthenticationUser();
+    // }, [dispatch, isLoggedUser]);
 
     return (
         <NavigationContainer>
@@ -45,7 +47,7 @@ const NavigationStack = () => {
                         <Stack.Screen options={{ headerShown: false }} name="UserProfile" component={routeNames.UserProfile} />
                         <Stack.Screen options={{ headerShown: false }} name="CurrentPlan" component={routeNames.CurrentPlan} />
                         <Stack.Screen options={{ headerShown: false }} name="Settings" component={routeNames.Settings} />
-                        <Stack.Screen options={{ headerShown: false }} name="AdminProfile" component={routeNames.AdminProfile} />   
+                        <Stack.Screen options={{ headerShown: false }} name="AdminProfile" component={routeNames.AdminProfile} />
                         <Stack.Screen options={{ headerShown: false }} name="ChangePassword" component={routeNames.ChangePassword} />
                     </>
                 ) : isLoggedUser ? (

@@ -17,12 +17,12 @@ import { fonts } from '../common/fonts';
 import { back } from '../common/images';
 import { useNavigation } from '@react-navigation/native';
 
-function Header({ title }) {
+function Header({ title, backHide }) {
     const navigation = useNavigation();
     return (
         <View style={styles.header}>
             <TouchableOpacity onPress={() => navigation.goBack()} hitSlop={{ top: 50, bottom: 50, right: 50, left: 50 }}>
-                <Image source={back} style={styles.backArrow} />
+             {!backHide && <Image source={back} style={styles.backArrow} />}   
             </TouchableOpacity>
             <Text style={styles.title}>{title}</Text>
         </View>

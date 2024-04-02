@@ -41,7 +41,6 @@ function MobileNumber() {
   const CELL_COUNT = 6;
   const navigation = useNavigation();
   const [enable, setDisabled] = useState(true)
-
   const keyboardVerticalOffset = Platform.OS === 'ios' ? 40 : 0
 
   useEffect(() => {
@@ -76,31 +75,42 @@ function MobileNumber() {
 
   const checkUserRegister = async () => {
     try {
+      setIsLoading(true);
+
       if (mobileNumber === '') {
-        setIsLoading(true)
-        setShowError(true)
-        setIsLoading(false)
-      } else {
-        setIsLoading(true)
-        let mobileNumberCode = countryCode ? countryCode : '+91'
-        console.log(mobileNumberCode + mobileNumber, "mobileee")
-        setNumberWithCode(mobileNumberCode + mobileNumber)
-        const requestData = {
-          phoneNumber: mobileNumberCode + mobileNumber
-        };
-        const api_url = `${API_URL}/validateuser`
-        const res = await axios.post(api_url, requestData)
-        if (res?.status === 200) {
-          handleSendCode(numberWithCode)
-        } else {
-          showAlert(res?.data?.message)
-        }
+        setShowError(true);
+        setIsLoading(false);
+        return;
+      }
+
+      let mobileNumberCode = countryCode ? countryCode : '+91';
+      const phoneNumber = mobileNumberCode + mobileNumber;
+
+      console.log(phoneNumber, "mobileee");
+
+      setNumberWithCode(phoneNumber);
+
+      const requestData = {
+        phoneNumber: phoneNumber
       };
-    } catch (e) {
-      setIsLoading(false)
-      showAlert(e?.response?.data?.message)
+
+      const api_url = `${API_URL}/validateuser`;
+
+      const res = await axios.post(api_url, requestData);
+
+      if (res.status === 200) {
+        handleSendCode(phoneNumber);
+      } else {
+        showAlert(res.data.message);
+        setIsLoading(false);
+      }
+    } catch (error) {
+      setIsLoading(false);
+      showAlert(error.response?.data?.message || error.message);
+    } finally {
+      // setIsLoading(false);
     }
-  }
+  };
 
   const handleSendCode = async (numberWithCode) => {
     if (numberWithCode) {
@@ -177,11 +187,11 @@ function MobileNumber() {
   }
 
   const submitOTP = () => {
+    setIsLoading(true)
     Keyboard.dismiss();
     const requestData = {
       phoneNumber: numberWithCode
-    };
-    setIsLoading(true)
+    };   
     dispatch(loginUserAction(requestData, navigation, setIsLoading))
   }
 

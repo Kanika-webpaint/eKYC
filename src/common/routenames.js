@@ -29,5 +29,5 @@ export const routeNames = {
     CurrentPlan: CurrentPlan,
     AdminProfile:AdminProfile,
     Settings:Settings,
-    ChangePassword:ChangePassword
+    ChangePassword:ChangePassword,
 }

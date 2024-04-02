@@ -60,7 +60,7 @@ function UserProfile({ route }) {
                         onChangeText={(text) => handleInputChange('phNo', text)}
                     />
                     <View style={styles.verifyView}>
-                        <Text style={styles.verifiedStatus}>{userDetail?.isVerified === true ? 'Verified' : 'Not Verified'}</Text>
+                        <Text style={styles.verifiedStatus}>{userDetail?.isVerified == 1 ? 'Verified' : 'Not Verified'}</Text>
                     </View>
                 </View>
             </ScrollView>

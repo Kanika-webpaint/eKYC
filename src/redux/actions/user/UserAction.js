@@ -1,7 +1,9 @@
 import axios from 'axios'
 import { API_URL } from "@env"
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { verifiedDataSlice, verifyCodeslice } from '../../slices/user/userSlice';
+import { getUserVerfiedSlice, verifiedDataSlice, verifyCodeslice } from '../../slices/user/userSlice';
+import showAlert from '../../../components/showAlert';
+
 
 export const verifedCustomerDataAction =
     (data,
@@ -22,7 +24,7 @@ export const verifedCustomerDataAction =
                 const requestBody = {
                     isVerified: "true"
                 }
-                await dispatch(verificationStatusAction(requestBody, token, setIsLoading))
+                await dispatch(verificationStatusAction(requestBody, navigation, token, setIsLoading))
             } else {
                 showAlert(res?.data?.message)
             }
@@ -36,11 +38,11 @@ export const verifedCustomerDataAction =
 
 export const verificationStatusAction =
     (data,
+        navigation,
         token,
         setIsLoading
     ) => async (dispatch) => {
         try {
-            console.log(token, data, "token in status API")
             const config = {
                 headers: {
                     'Content-Type': 'application/json',
@@ -75,13 +77,15 @@ export const loginUserAction =
             const api_url = `${API_URL}/loginuser`
             const res = await axios.post(api_url, data)
             if (res?.status == 200) {
-                setIsLoading(false);
+
                 await AsyncStorage.setItem('token_user', res?.data?.token);
                 await AsyncStorage.setItem('role_user', "user");
                 const storedToken = await AsyncStorage.getItem('token_user');
                 const storedRole = await AsyncStorage.getItem('role_user');
                 if (storedRole && storedToken) {
+                    setIsLoading(false);
                     await dispatch(verifyCodeslice(true));
+
                 }
             }
         } catch (e) {
@@ -89,3 +93,35 @@ export const loginUserAction =
             showAlert(e?.response?.data?.message)
         }
     }
+
+export const checkverifiedUser =
+    (
+        navigation,
+        token,
+        setIsLoading
+    ) =>
+        async (dispatch) => {
+            try {
+                const config = {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `${token}`,
+                    },
+                }
+                const api_url = `${API_URL}/user`
+                const res = await axios.get(api_url, config)
+                if (res.status === 200) {
+                    setIsLoading(false)
+                } else {
+                    showAlert(res?.data?.message)
+                }
+                await dispatch(getUserVerfiedSlice(res))
+            } catch (e) {
+                setIsLoading(false)
+                // showAlert(e?.response?.data?.message)
+            }
+        }
+
+
+
+
