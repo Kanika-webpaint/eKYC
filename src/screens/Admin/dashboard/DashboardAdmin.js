@@ -187,7 +187,7 @@ function DashboardAdmin() {
                         <View style={{ flex: 1 }}>
                             {activeTab === 1 && (
                                 <>
-                                    {usersList && usersList?.length > 0 ? (
+                                    {usersList && usersList?.length > 0 && verifiedData?.length > 0 ? (
                                         <FlatList
                                             nestedScrollEnabled
                                             data={usersList.filter(item => item?.isVerified == 1)}
@@ -205,7 +205,7 @@ function DashboardAdmin() {
 
                             {activeTab === 2 && (
                                 <>
-                                    {usersList && usersList.length > 0 ? (
+                                    {usersList && usersList.length > 0 && unverifiedData?.length > 0 ? (
                                         <FlatList
                                             nestedScrollEnabled
                                             data={usersList.filter(item => item?.isVerified == null || item?.isVerified == 0)}
