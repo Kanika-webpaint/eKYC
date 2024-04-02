@@ -18,21 +18,21 @@ export const styles = StyleSheet.create({
     },
     middleText: {
       marginTop: 30,
-      fontSize: 16, // Adjusted font size for better readability
+      fontSize: 16, 
       fontFamily: fonts.regular,
       color: colors.grey,
-      lineHeight: 22, // Adjusted line height for better readability
+      lineHeight: 22, 
     },
     textVerify: {
-      fontSize: 32, // Adjusted font size for better visual hierarchy
+      fontSize: 32, 
       fontFamily: fonts.bold,
       color: colors.black,
-      marginBottom: 10, // Added margin bottom for spacing
+      marginBottom: 10, 
     },
     buttonContainer: {
       marginTop: '5%',
       backgroundColor: colors.app_red,
-      paddingVertical: 10, // Adjusted padding for better button appearance
+      paddingVertical: 10,
       borderRadius: 20,
       alignItems: 'center',
       marginHorizontal: 30,

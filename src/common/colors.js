@@ -1,5 +1,5 @@
 export default colors = {
-    app_blue: '#001229',
+    app_blue: '#00081B',
     light_grey:'#CCD0D4',
     app_red:'#CE1010',
     black:'#000000',
@@ -7,5 +7,8 @@ export default colors = {
     white:'#ffffff',
     grey:'#575C69',
     placeholder_grey:"#999",
-    purple:"#6E1CF5"
+    purple:"#6E1CF5",
+    purple_dim:'#FAF9FF',
+    grey_text:'#575C69',
+    green:"#7cd49f"
 }

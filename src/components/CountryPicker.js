@@ -15,14 +15,12 @@ function CountryPick({ show, onBackdropPress, pickerButtonOnPress }) {
                 show={show}
                 lang={'en'}
                 style={{
-                    // Styles for whole modal [View]
                     modal: {
                         height: 500,
                     },
                     itemsList: {
                         color: colors.black,
                     },
-                    // Styles for input [TextInput]
                     textInput: {
                         height: 80,
                         borderRadius: 0,
@@ -32,7 +30,6 @@ function CountryPick({ show, onBackdropPress, pickerButtonOnPress }) {
                     countryName: {
                         color: colors.grey,
                     },
-                    // Styles for country button [TouchableOpacity]
                     countryButtonStyles: {
                         height: 80,
                         color: colors.black

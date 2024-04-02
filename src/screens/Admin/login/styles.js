@@ -10,12 +10,13 @@ export const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: colors.app_blue,
+        margin:20,
+        justifyContent:'center'
     },
     backArrow: {
-        height: 20,
-        width: 20,
-        margin: 20,
-        resizeMode: 'contain',
+        height: 25,
+        width: 25,
+        resizeMode:'contain'
     },
     bottomSignUpView: {
         flexDirection: 'row',
@@ -41,7 +42,8 @@ export const styles = StyleSheet.create({
         alignItems: 'center',
         borderBottomWidth: 1,
         borderBottomColor: colors.white,
-        marginHorizontal: 30,
+        paddingVertical:0,
+        height:50
     },
     input: {
         flex: 1,
@@ -60,10 +62,10 @@ export const styles = StyleSheet.create({
         marginTop: '10%',
         marginBottom: '3%',
         backgroundColor: colors.app_red,
-        paddingVertical: 12,
+        paddingVertical: 10,
         borderRadius: 8,
         alignItems: 'center',
-        marginHorizontal: 30,
+
     },
     buttonText: {
         color: colors.white,

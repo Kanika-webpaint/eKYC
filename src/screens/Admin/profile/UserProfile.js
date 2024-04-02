@@ -6,21 +6,18 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { SafeAreaView, StyleSheet,  View,  TextInput,Image, Text, ScrollView, TouchableOpacity} from 'react-native';
+import { SafeAreaView, View, TextInput, Image, ScrollView, Text } from 'react-native';
 import colors from '../../../common/colors';
-import { back,  profile } from '../../../common/images';
-import { useNavigation } from '@react-navigation/native';
+import { userRed, verifiedUser } from '../../../common/images';
 import { useDispatch, useSelector } from 'react-redux'
-import {  getUserByIdAction } from '../../../redux/actions/user';
-import { fonts } from '../../../common/fonts';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Status from '../../../components/Status';
 import { styles } from './styles';
-
+import Header from '../../../components/Header';
+import { getUserByIdAction } from '../../../redux/actions/Organization/organizationActions';
 
 function UserProfile({ route }) {
-    const navigation = useNavigation();
-    const userDetail = useSelector((state) => state?.login?.getUser)
+    const userDetail = useSelector((state) => state?.org?.getUser)
     const [isLoading, setIsLoading] = useState(false);
     const dispatch = useDispatch()
 
@@ -31,24 +28,18 @@ function UserProfile({ route }) {
             }
         })
             .then(res => {
-                //do something else
             });
     }, [dispatch]);
-
     return (
         <SafeAreaView style={styles.safeArea}>
             <Status isLight />
             <ScrollView keyboardShouldPersistTaps='handled'>
-                <View style={{ margin: 20, justifyContent: 'center' }}>
-                    <View style={styles.containerHeader}>
-                        <View style={styles.header}>
-                            <TouchableOpacity onPress={() => navigation.navigate('UsersList')} hitSlop={{ top: 50, bottom: 50, left: 50, right: 50 }}>
-                                <Image source={back} style={styles.backArrow} />
-                            </TouchableOpacity>
-                            <Text style={styles.title}>Profile</Text>
-                        </View>
+                <View style={{ justifyContent: 'center' }}>
+                    <Header title={'Profile'} />
+                    <View style={styles.imageView}>
+                        <Image source={userRed} style={styles.img} />
+                        {userDetail?.isVerified && <Image source={verifiedUser} style={styles.verifyImg} />}
                     </View>
-                    <Image source={profile} style={{ marginTop: 20, height: 100, width: 100, resizeMode: 'contain', alignSelf: 'center' }} />
                 </View>
                 <View style={{ margin: 20 }}>
                     <TextInput
@@ -68,13 +59,14 @@ function UserProfile({ route }) {
                         placeholderTextColor={colors.grey}
                         onChangeText={(text) => handleInputChange('phNo', text)}
                     />
+                    <View style={styles.verifyView}>
+                        <Text style={styles.verifiedStatus}>{userDetail?.isVerified == 1 ? 'Verified' : 'Not Verified'}</Text>
+                    </View>
                 </View>
             </ScrollView>
         </SafeAreaView>
     );
 }
-
-
 
 export default UserProfile;
 

@@ -5,7 +5,7 @@ import { fonts } from "../../../common/fonts";
 export const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
-        backgroundColor: colors.light_purple,
+        backgroundColor: colors.white,
     },
     mainView: {
         flex: 1,

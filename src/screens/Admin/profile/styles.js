@@ -5,45 +5,47 @@ import { fonts } from "../../../common/fonts";
 export const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
-        backgroundColor: colors.light_purple
-    },
-    title: {
-        flex: 1, // Allow text to take remaining space
-        textAlign: 'center', // Center the text horizontally
-        fontSize: 20,
-        marginLeft: -30,
-        fontFamily: fonts.bold,
-        color: 'black', // Assuming text color
+        backgroundColor: colors.white
     },
     input: {
         height: 50,
         borderWidth: 1,
-        paddingLeft: 8,
+        paddingLeft: 12,
         borderRadius: 5,
         color: colors.black,
         borderWidth: 1,
         width: '100%',
         fontSize: 16,
         borderColor: colors.white,
-        backgroundColor: colors.white,
+        backgroundColor: colors.purple_dim,
         fontFamily: fonts.regular,
         marginBottom: 20
     },
-    containerHeader: {
-        flex: 1,
+    imageView: { backgroundColor: colors.purple_dim, borderWidth: 1, justifyContent: 'center', alignItems: 'center', marginLeft: '8%', height: 70, width: 70, alignSelf: 'center', borderRadius: 40, borderColor: colors.app_red, elevation: 2, marginTop: 20 },
+    img: { height: 30, width: 30, resizeMode: 'contain', alignSelf: 'center' },
+    verifyImg: {
+        height: 30,
+        width: 30,
+        resizeMode: 'contain',
+        position: 'absolute',
+        left: 45,
+        bottom: 40
+    },
+    verifiedStatus: {
+        color: colors.white,
+        fontSize: 16,
+        paddingLeft: 10,
+        paddingRight:10,
+        fontFamily: fonts.regular,
+        backgroundColor: 'green',
+        maxWidth: '32%',
+        borderRadius: 5
+    },
+    verifyView: {
+        backgroundColor: colors.purple_dim,
+        height: 50,
+        paddingLeft: 12,
+        borderRadius: 5,
         justifyContent: 'center',
-        alignItems: 'center',
-    },
-    header: {
-        flexDirection: 'row',
-        backgroundColor: colors.light_purple,
-        padding: 5,
-        alignItems: 'center', // Vertical alignment
-        width: '100%', // Take full width of the screen
-    },
-    backArrow: {
-        height: 25,
-        width: 25,
-        marginRight: 10, // Add some space between back arrow and text
-    },
+    }
 });

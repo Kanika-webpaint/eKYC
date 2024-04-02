@@ -1,35 +1,22 @@
 import { createSlice } from '@reduxjs/toolkit'
 
-const authSlice = createSlice({
-    name: 'user',
+const orgSlice = createSlice({
+    name: 'org',
     initialState: {
-        phoneNumber: [],
-        verifyCode: [],
         adminLogin: [],
-        adminRegister: [],
         orgDetails: [],
         userCreateAdmin: [],
         getUsersList: [],
         getUser: [],
-        contact: [],
-        isLogged:false,
-        isLoggedUser:false
+        isLogged: false,
+        stripeSubs: [],
+        planDetailList: []
     },
 
     reducers: {
-        phoneNumberslice: (state, action) => {
-            state.phoneNumber = action?.payload?.data
-        },
-        verifyCodeslice: (state, action) => {
-            state.verifyCode = action?.payload?.data
-            state.isLoggedUser = true
-        },
         loginAdminslice: (state, action) => {
             state.adminLogin = action?.payload?.data;
             state.isLogged = action.payload
-        },
-        registerAdminslice: (state, action) => {
-            state.adminRegister = action?.payload?.data
         },
         getOrgDetailsslice: (state, action) => {
             state.orgDetails = action?.payload?.data
@@ -43,26 +30,24 @@ const authSlice = createSlice({
         getUserSlice: (state, action) => {
             state.getUser = action?.payload?.data
         },
-        contactUsSlice: (state, action) => {
-            state.contact = action?.payload?.data
+        stripeSubscriptionSlice: (state, action) => {
+            state.stripeSubs = action?.payload?.data
         },
-        //add more slices here
+        getPlanDetailSlice: (state, action) => {
+            state.planDetailList = action?.payload?.data
+        }
     }
 })
 
-export const authReducer = authSlice.reducer
+export const orgReducer = orgSlice.reducer
 
 export const {
     loginslice,
-    registerslice,
-    phoneNumberslice,
-    verifyCodeslice,
     loginAdminslice,
-    registerAdminslice,
     getOrgDetailsslice,
     createUserSlice,
     getUserListSlice,
     getUserSlice,
-    contactUsSlice
-    // add more slices here
-} = authSlice.actions
+    stripeSubscriptionSlice,
+    getPlanDetailSlice
+} = orgSlice.actions

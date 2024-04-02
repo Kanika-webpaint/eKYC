@@ -4,48 +4,37 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { routeNames } from '../common/routenames';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useDispatch, useSelector } from 'react-redux';
-import { loginAdminslice, verifyCodeslice } from '../redux/slices/user';
+import { loginAdminslice } from '../redux/slices/organization/organizationSlice';
+import {  verifyCodeslice } from '../redux/slices/user/userSlice';
+
 
 const NavigationStack = () => {
-    const isLogged = useSelector(state => state.login.isLogged);
-    const isLoggedUser = useSelector(state => state.login.isLoggedUser);
+    const isLogged = useSelector(state => state.org.isLogged);
+    const isLoggedUser = useSelector(state => state.user.isLoggedUser);
     const dispatch = useDispatch()
-    console.log("isLogged", isLogged)
-    console.log("isLoggedUser", isLoggedUser)
-
+    const Stack = createStackNavigator();
 
     useEffect(() => {
-        // Check AsyncStorage for login status when component mounts
         const checkAuthentication = async () => {
             const storedToken = await AsyncStorage.getItem('token');
             const storedRole = await AsyncStorage.getItem('role');
-
             if (storedRole && storedToken) {
-                // Dispatch the loginAdminslice action with true to indicate user is logged in
                 dispatch(loginAdminslice(true));
             }
         };
-
         checkAuthentication();
     }, [dispatch, isLogged]);
 
-    useEffect(() => {
-        // Check AsyncStorage for login status when component mounts
-        const checkAuthenticationUser = async () => {
-            // const storedTokenUser = await AsyncStorage.getItem('tokenUser');
-            const storedRoleUser = await AsyncStorage.getItem('roleUser');
-            if (storedRoleUser) {
-                // Dispatch the loginAdminslice action with true to indicate user is logged in
-                dispatch(verifyCodeslice(true));
-            }
-        };
-
-        checkAuthenticationUser();
-    }, [dispatch, isLoggedUser]);
-
-
-    const Stack = createStackNavigator();
-
+    // useEffect(() => {
+    //     const checkAuthenticationUser = async () => {
+    //         const storedToken = await AsyncStorage.getItem('token_user');
+    //         const storedRoleUser = await AsyncStorage.getItem('role_user');
+    //         if (storedToken && storedRoleUser) {
+    //             dispatch(verifyCodeslice(true));
+    //         }
+    //     };
+    //     checkAuthenticationUser();
+    // }, [dispatch, isLoggedUser]);
 
     return (
         <NavigationContainer>
@@ -56,11 +45,14 @@ const NavigationStack = () => {
                         <Stack.Screen options={{ headerShown: false }} name="CreateUser" component={routeNames.CreateUser} />
                         <Stack.Screen options={{ headerShown: false }} name="UsersList" component={routeNames.UserList} />
                         <Stack.Screen options={{ headerShown: false }} name="UserProfile" component={routeNames.UserProfile} />
+                        <Stack.Screen options={{ headerShown: false }} name="CurrentPlan" component={routeNames.CurrentPlan} />
+                        <Stack.Screen options={{ headerShown: false }} name="Settings" component={routeNames.Settings} />
+                        <Stack.Screen options={{ headerShown: false }} name="AdminProfile" component={routeNames.AdminProfile} />
+                        <Stack.Screen options={{ headerShown: false }} name="ChangePassword" component={routeNames.ChangePassword} />
                     </>
                 ) : isLoggedUser ? (
                     <>
-                     <Stack.Screen options={{ headerShown: false }} name="IdScreen" component={routeNames.IdScreen} />
-                    <Stack.Screen options={{ headerShown: false }} name="HomeUser" component={routeNames.HomeUser} />
+                        <Stack.Screen options={{ headerShown: false }} name="IdScreen" component={routeNames.IdScreen} />
                     </>
                 ) : (
                     <>
@@ -70,7 +62,6 @@ const NavigationStack = () => {
                         <Stack.Screen options={{ headerShown: false }} name="Checkout" component={routeNames.Checkout} />
                         <Stack.Screen options={{ headerShown: false }} name="PlanDetails" component={routeNames.PlanDetails} />
                         <Stack.Screen options={{ headerShown: false }} name="SuccessScreen" component={routeNames.SuccessScreen} />
-                        <Stack.Screen options={{ headerShown: false }} name="ContactUs" component={routeNames.ContactUs} />
                     </>
                 )}
             </Stack.Navigator>

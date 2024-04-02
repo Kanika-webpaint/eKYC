@@ -6,12 +6,11 @@ export const styles = StyleSheet.create({
     safeArea: {
       flex: 1,
       backgroundColor: colors.app_blue,
+      justifyContent:'center',
     },
     container: {
       flexDirection: 'row',
       alignItems: 'center',
-      backgroundColor: 'transparent',
-      borderWidth: 0,
       borderBottomColor: colors.white,
       borderBottomWidth: 1,
       marginHorizontal: 30,
@@ -29,14 +28,14 @@ export const styles = StyleSheet.create({
       marginTop: '10%',
       marginBottom: '3%',
       backgroundColor: colors.app_red,
-      paddingVertical: 12,
+      paddingVertical: 10,
       borderRadius: 8,
       alignItems: 'center',
       marginHorizontal: 30,
     },
     buttonText: {
       color: 'white',
-      fontSize: 18,
+      fontSize: 16,
       fontFamily: fonts.bold,
     },
     bottomView: {

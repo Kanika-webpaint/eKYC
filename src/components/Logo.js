@@ -28,20 +28,20 @@ function Logo({ fingerPrintStyle, logoStyle, styleContainer }) {
 const styles = StyleSheet.create({
     imageContainer: {
         width: '100%',
-        alignItems: 'center', // Align items in the center horizontally
+        alignItems: 'center',
         marginTop: '20%',
-        position: 'relative', // Necessary for absolute positioning inside
+        position: 'relative',
     },
     backgroundImage: {
-        left: 60, // Position 60 units to the left
-        top: 0, // Adjust the top position as needed
-        position: 'absolute', // Position the fingerprint image absolutely
+        left: 60,
+        top: 0,
+        position: 'absolute',
         height: 70,
         width: 70,
     },
     logo: {
         height: 70,
-        width: '80%', // Reduce the width slightly to cover the fingerprint image
+        width: '80%',
         resizeMode: 'contain'
     },
 });

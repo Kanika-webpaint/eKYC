@@ -10,24 +10,24 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 import colors from './src/common/colors';
-import { validifyX_logo, x_logo } from './src/common/images';
+import { splashLogo, x_logo } from './src/common/images';
 import NavigationStack from './src/navigation/NavigationStack';
 import NetworkLogger from 'react-native-network-logger';
 
-function App() {
+const App = () => {
   const [showSplash, setShowSplash] = useState(true);
-  const [openLogs, setOpenLogs] = useState(false); // State for controlling NetworkLogger visibility
+  const [openLogs, setOpenLogs] = useState(false);
 
   useEffect(() => {
     const splashTimeout = setTimeout(() => {
       setShowSplash(false);
-    }, 3000); // 3000 milliseconds (3 seconds) timeout
+    }, 3000);
 
     return () => clearTimeout(splashTimeout);
-  }, []); // Empty dependency array to run the effect only once on mount
+  }, []);
 
   const handleToggleLogs = () => {
-    setOpenLogs(!openLogs);
+    setOpenLogs(prevState => !prevState);
   };
 
   const handleCloseLogs = () => {
@@ -35,16 +35,14 @@ function App() {
   };
 
   const renderNavigation = useCallback(() => {
-    if (showSplash) {
-      return (
-        <View style={styles.splashContainer}>
-          <Image source={x_logo} style={styles.backgroundImage} />
-          <Image source={validifyX_logo} style={styles.logo} />
-        </View>
-      );
-    } else {
-      return <NavigationStack />;
-    }
+    return showSplash ? (
+      <View style={styles.splashContainer}>
+        <Image source={x_logo} style={styles.backgroundImage} />
+        <Image source={splashLogo} style={styles.logo} />
+      </View>
+    ) : (
+      <NavigationStack />
+    );
   }, [showSplash]);
 
   return (
@@ -53,27 +51,15 @@ function App() {
         <View style={styles.container}>
           <StatusBar backgroundColor={colors.app_blue} />
           {renderNavigation()}
-          <TouchableOpacity
-            style={{
-              position: 'absolute',
-              bottom: 20,
-              right: 20,
-              height: 50,
-              width: 50,
-              borderRadius: 25,
-              backgroundColor: colors.app_red,
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
-            onPress={handleToggleLogs}>
-            <Text style={{ alignSelf: 'center', color: colors.white }}>Logs</Text>
+          <TouchableOpacity style={styles.logButton} onPress={handleToggleLogs}>
+            <Text style={styles.logButtonText}>Logs</Text>
           </TouchableOpacity>
           {openLogs && <NetworkLogger />}
         </View>
       </TouchableWithoutFeedback>
     </SafeAreaView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   safeArea: {
@@ -91,6 +77,9 @@ const styles = StyleSheet.create({
   logo: {
     alignSelf: 'center',
     justifyContent: 'center',
+    resizeMode: 'contain',
+    height: 80,
+    width: '80%'
   },
   backgroundImage: {
     position: 'absolute',
@@ -100,6 +89,21 @@ const styles = StyleSheet.create({
     width: 250,
     alignSelf: 'center',
     justifyContent: 'center',
+  },
+  logButton: {
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
+    height: 50,
+    width: 50,
+    borderRadius: 25,
+    backgroundColor: colors.app_red,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  logButtonText: {
+    alignSelf: 'center',
+    color: colors.white,
   },
 });
 

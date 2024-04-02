@@ -6,57 +6,41 @@
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { SafeAreaView, View, Text, TouchableOpacity, Image, ScrollView, TextInput, FlatList, Dimensions, ActivityIndicator, Linking } from 'react-native';
+import { SafeAreaView, View, Text, TouchableOpacity, Image, ScrollView, TextInput, FlatList, Dimensions, KeyboardAvoidingView } from 'react-native';
 import colors from '../../../common/colors';
 import RedButton from '../../../components/RedButton';
-import { back, close, coupan, down } from '../../../common/images';
+import { down } from '../../../common/images';
 import { useNavigation } from '@react-navigation/native';
 import Loader from '../../../components/ActivityIndicator';
-import { Country, State, City } from 'country-state-city';
+import { State, City } from 'country-state-city';
 import ErrorMessageCheckout from '../../../components/ErrorMsgCheckout';
 import Status from '../../../components/Status';
-import { CardField, createToken, createPaymentMethod, initPaymentSheet } from '@stripe/stripe-react-native';
-import { PUBLISH_KEY, API_URL } from '@env'
-import { StripeProvider, confirmPayment } from '@stripe/stripe-react-native';
+import { CardField, createToken } from '@stripe/stripe-react-native';
+import { PUBLISH_KEY, STRIPE_CLIENT_SECRET_KEY, API_URL, PRICE_BASIC_PLAN, PRICE_PREMIUM_PLAN, STRIPE_PAYMENT_METHOD_API } from '@env'
+import { StripeProvider } from '@stripe/stripe-react-native';
 import axios from 'axios';
 import showAlert from '../../../components/showAlert';
 import { styles } from './styles';
-
+import CheckoutForm from '../../../components/CheckoutForm';
+import Header from '../../../components/Header';
 
 function CheckoutScreen({ route }) {
-    const [userData, setFormData] = useState({ email: '', cardNo: '', expDate: '', cvv: '', name: '', address: '' });
-    const [errorMessages, setErrorMessages] = useState({ email: '', name: '', address: '', country: '' });
-    const [countryData, setCountryData] = useState([]);
-    const [selectedOption, setSelectedOption] = useState(null);
+    const [userData, setFormData] = useState({ email: '', cardNo: '', expDate: '', cvv: '', name: '', line1: '', line2: '', postalCode: '' });
+    const [errorMessages, setErrorMessages] = useState({ email: '', name: '', address: '', country: '', line1: '', line2: '', postalCode: '' });
     const [selectedState, setSelectedState] = useState(null);
     const [selectedCity, setSelectedCity] = useState(null);
     const [statesData, setStatesData] = useState();
     const [cardDetails, setCardDetails] = useState()
     const [cityData, setCitiesData] = useState();
-    const [showCity, setShowCity] = useState();
-    const [coupanCode, setCoupanCode] = useState()
-    const [grandTotalAmount, setTotalAmount] = useState()
-    const [resetAmount, setResetAmount] = useState(false)
     const [isLoading, setIsLoading] = useState(false);
-    const [showOptions, setShowOptions] = useState(false);
     const [showState, setShowState] = useState(false);
-    const [countryErrMsg, setCountryErrorMsg] = useState(false)
     const [stateErrMsg, setStateErrorMsg] = useState(false)
     const [cityErrMsg, setCityErrorMsg] = useState(false)
     const [cardDetailsErrMsg, setCardDetailsErrMsg] = useState(false)
     const [isPotrait, setIsPortrait] = useState(true)
-    const [showSummary, setShowSummary] = useState(false)
-    const [load, setLoad] = useState(false)
-    const [discountedAmount, setDiscountedVal] = useState(0)
+    const [showCity, setShowCity] = useState(false)
     const navigation = useNavigation();
-
-
-    useEffect(() => {
-        const nigeriaData = Country && Country?.getCountryByCode('NG');
-        if (nigeriaData) {
-            setCountryData([nigeriaData]);
-        }
-    }, []);
+    const keyboardVerticalOffset = Platform.OS === 'ios' ? 40 : 0
 
     useEffect(() => {
         const nigeriaStatesData = State && State?.getStatesOfCountry('NG');
@@ -65,17 +49,12 @@ function CheckoutScreen({ route }) {
         }
     }, []);
 
-
     useEffect(() => {
         const updateOrientation = () => {
             const { height, width } = Dimensions.get('window');
             setIsPortrait(height > width);
         };
         Dimensions.addEventListener('change', updateOrientation);
-        // Return a cleanup function
-        // return () => {
-        //     Dimensions?.removeEventListener('change', updateOrientation);
-        // };
     }, []);
 
     useEffect(() => {
@@ -83,9 +62,7 @@ function CheckoutScreen({ route }) {
             const { height, width } = Dimensions.get('window');
             setIsPortrait(height > width);
         };
-        // Add event listener when the screen focuses
         const unsubscribeFocus = navigation.addListener('focus', updateOrientation);
-        // Remove event listener when the screen unfocuses
         return unsubscribeFocus;
     }, [navigation]);
 
@@ -94,10 +71,12 @@ function CheckoutScreen({ route }) {
         setErrorMessages({ ...errorMessages, [field]: '' });
     };
 
-    const handleOptionPress = (option) => {
-        setSelectedOption(option?.name);
-        setShowOptions(false);
-    };
+    const getCities = async (option) => {
+        const nigeriaStatesCitiesData = await City && City?.getCitiesOfState('NG', option?.isoCode);
+        if (nigeriaStatesCitiesData && option?.isoCode) {
+            setCitiesData(nigeriaStatesCitiesData);
+        }
+    }
 
     const handleStatePress = (option) => {
         setSelectedState(option?.name)
@@ -110,13 +89,6 @@ function CheckoutScreen({ route }) {
         setShowCity(false)
     }
 
-    const getCities = async (option) => {
-        const nigeriaStatesCitiesData = await City && City?.getCitiesOfState('NG', option?.isoCode);
-        if (nigeriaStatesCitiesData && option?.isoCode) {
-            setCitiesData(nigeriaStatesCitiesData);
-        }
-    }
-
     const fetchCardDetails = (cardDetails) => {
         if (cardDetails?.complete) {
             setCardDetails(cardDetails)
@@ -125,236 +97,25 @@ function CheckoutScreen({ route }) {
         }
     }
 
-    const creatPaymentIntent = (data) => {
-        console.log(data, "dataaaaaa")
-        return new Promise((resolve, reject) => {
-            // axios.post('http://192.168.1.24:8080/api/stripecheckout', data).then(function (res) {
-            //     resolve(res)
-            // }).catch(function (error) {
-            //     reject(error)
-            // })
-
-            axios.post(`${API_URL}/stripecheckout`, data).then(function (res) {
-                resolve(res)
-            }).catch(function (error) {
-                reject(error)
-            })
-        })
-    }
-
-
-    const createCustomer = (data) => {
-        return new Promise((resolve, reject) => {
-            const config = {
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    Authorization: 'Bearer sk_test_51OmCVYSEL02qr6meHFYch0kudum5OKF73YC3YcR14IMDKFa22xFJolqFlLn4DzlNEnznGgtFkj78NlTbE3yvxB6e00Izgz8l7l', // Add 'Bearer' prefix before token
-                },
-            };
-            axios.post('https://api.stripe.com/v1/customers', JSON.stringify(data), config)
-                .then(function (res) {
-                    resolve(res);
-                })
-                .catch(function (error) {
-                    reject(error);
-                });
-        });
-    };
-
-    const createPrice = (data) => {
-        return new Promise((resolve, reject) => {
-            const config = {
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    Authorization: 'Bearer sk_test_51OmCVYSEL02qr6meHFYch0kudum5OKF73YC3YcR14IMDKFa22xFJolqFlLn4DzlNEnznGgtFkj78NlTbE3yvxB6e00Izgz8l7l', // Add 'Bearer' prefix before token
-                },
-            };
-            axios.post('https://api.stripe.com/v1/prices', data, config)
-                .then(function (res) {
-                    resolve(res);
-                })
-                .catch(function (error) {
-                    reject(error);
-                });
-        });
-    };
-
-    // const createSubscription = (customerId, priceId) => {
-    //     console.log(customerId, priceId, "idssss in function")
-    //     return new Promise((resolve, reject) => {
-    //         const config = {
-    //             headers: {
-    //                 'Content-Type': 'application/json',
-    //             },
-    //         };
-    //         axios.post('http://192.168.1.24:8080/api/stripesubscription', { customerId, priceId }, config)
-    //             .then(function (res) {
-    //                 resolve(res);
-    //             })
-    //             .catch(function (error) {
-    //                 reject(error);
-    //             });
-    //     });
-    // };
-
-
-    const customAppearance = {
-        // font: {
-        //   family:
-        //     Platform.OS === 'android' ? 'avenirnextregular' : 'AvenirNext-Regular',
-        // },
-        shapes: {
-            borderRadius: 12,
-            borderWidth: 0.5,
-        },
-        primaryButton: {
-            shapes: {
-                borderRadius: 20,
-            },
-        },
-        colors: {
-            primary: '#fcfdff',
-            background: '#ffffff',
-            componentBackground: '#f3f8fa',
-            componentBorder: '#f3f8fa',
-            componentDivider: '#000000',
-            primaryText: '#000000',
-            secondaryText: '#000000',
-            componentText: '#000000',
-            placeholderText: '#73757b',
-        },
-    };
-
-    async function openPaymentSheet() {
-        try {
-            const billingDetails = {
-                name: 'Jane Doe',
-                email: 'foo@bar.com',
-                phone: '555-555-555',
-                address: 'test',
-            };
-            const dataaaa = await initPaymentSheet({
-                customerId: 'cus_PhNF4ZYQKqNPFz',
-                customFlow: true,
-                appearance: customAppearance,
-                merchantDisplayName: 'Merchant Name',
-                paymentIntentClientSecret: 'pi_3OrygsSEL02qr6me0gYKhQ79_secret_XvAecIR65Y3u0R19mzEDtn9hg',
-                style: 'automatic',
-                googlePay: { merchantCountryCode: 'US', testEnv: true },
-                returnURL: 'stripe-example://stripe-redirect',
-                defaultBillingDetails: billingDetails,
-            });
-
-            // If no errors occur during initialization, you can proceed with opening the payment sheet
-            console.log('Payment sheet initialized successfully:', dataaaa);
-        } catch (error) {
-            // Handle any errors that occur during initialization
-            console.error('Error initializing payment sheet:', error);
-        }
-    }
-
-
-    const createSubscription = async (customerId, priceId) => {
-        console.log(customerId, "customer iddd")
-        console.log(priceId, "price iddd")
-        const config = {
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                Authorization: 'Bearer sk_test_51OmCVYSEL02qr6meHFYch0kudum5OKF73YC3YcR14IMDKFa22xFJolqFlLn4DzlNEnznGgtFkj78NlTbE3yvxB6e00Izgz8l7l', // Add 'Bearer' prefix before token
-            },
-        };
-        try {
-            const response = await axios.post('https://api.stripe.com/v1/subscriptions', {
-                customer: customerId,
-                items: [
-                    {
-                        price: 'price_1OrfqJSEL02qr6meyZ2HrQtE',
-                    },
-                ],
-                payment_behavior: "default_incomplete",
-                payment_settings: { save_default_payment_method: "on_subscription" },
-                expand: ["latest_invoice.payment_intent"],
-                collection_method: "charge_automatically"
-            }, config);
-
-            console.log('Subscription created:', response);
-            if (response) {
-                openPaymentSheet()
-            }
-
-        } catch (error) {
-            console.error('Error:', error.response ? error.response.data : error.message);
-        }
-    };
-
-    const payInvoiceFinal = (idInvoice, data) => {
-        console.log(idInvoice, data, "dataaa invoiceee")
-        return new Promise((resolve, reject) => {
-            const config = {
-                headers: {
-                    // 'Accept': 'multipart/form-data',
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'Authorization': 'Bearer sk_test_51OmCVYSEL02qr6meHFYch0kudum5OKF73YC3YcR14IMDKFa22xFJolqFlLn4DzlNEnznGgtFkj78NlTbE3yvxB6e00Izgz8l7l', // Add 'Bearer' prefix before token
-                },
-            };
-
-            axios.post(`https://api.stripe.com/v1/invoices/${idInvoice}/pay`, data, config)
-                .then(function (res) {
-                    console.log(res, "invoiceee")
-                    resolve(res);
-                })
-                .catch(function (error) {
-                    console.log(error?.response, "invoicee in erroror")
-                    reject(error);
-                });
-        });
-    }
-
-
-
-    const attachDefaultPaymentMethod = (customerId, paymentMethodId) => {
-        console.log(customerId, paymentMethodId, "doneeeee")
-        return new Promise((resolve, reject) => {
-            const config = {
-                headers: {
-                    // 'Accept': 'multipart/form-data',
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'Authorization': 'Bearer sk_test_51OmCVYSEL02qr6meHFYch0kudum5OKF73YC3YcR14IMDKFa22xFJolqFlLn4DzlNEnznGgtFkj78NlTbE3yvxB6e00Izgz8l7l', // Add 'Bearer' prefix before token
-                },
-            };
-
-            const data = new FormData();
-            data.append('customer', customerId);
-            axios.post(`https://api.stripe.com/v1/payment_methods/${paymentMethodId}/attach`, data, config)
-                .then(function (res) {
-                    resolve(res);
-                })
-                .catch(function (error) {
-                    console.log(error, "eroorrr here")
-                    reject(error);
-                });
-        });
-    };
-
-
-    const handleLogin = async () => {
+    const handleCheckout = async () => {
         const newErrorMessages = {};
-
-        if (!userData.name) {
+        if (!userData.name.trim()) {
             newErrorMessages.name = 'Name is required';
         }
-        if (!userData.email) {
+        if (!userData.email.trim()) {
             newErrorMessages.email = 'Email is required';
         }
-        if (!userData.address) {
-            newErrorMessages.address = 'Address is required';
+        if (!userData.line1.trim()) {
+            newErrorMessages.line1 = 'Line 1 is required';
         }
-
+        if (!userData.line2.trim()) {
+            newErrorMessages.line2 = 'Line 2 is required';
+        }
+        if (!userData.postalCode.trim()) {
+            newErrorMessages.postalCode = 'Postal code is required';
+        }
         if (!cardDetails) {
             setCardDetailsErrMsg(true)
-        }
-        if (selectedOption === null) {
-            setCountryErrorMsg(true)
         }
         if (selectedState === null) {
             setStateErrorMsg(true)
@@ -362,12 +123,8 @@ function CheckoutScreen({ route }) {
         if (selectedCity === null) {
             setCityErrorMsg(true)
         }
-
         if (Object.keys(newErrorMessages).length > 0) {
             setErrorMessages(newErrorMessages);
-            if (selectedOption !== null && selectedOption.length > 0) {
-                setCountryErrorMsg(false)
-            }
             if (selectedState !== null) {
                 setStateErrorMsg(false)
             }
@@ -380,180 +137,104 @@ function CheckoutScreen({ route }) {
                 showAlert('Please enter valid card details');
                 return;
             } else {
+                setCardDetailsErrMsg(false)
+                setStateErrorMsg(false)
+                setCityErrorMsg(false)
                 try {
                     setIsLoading(true)
+                    showAlert('Subscribing..please wait!!')
+                    const config = {
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            Authorization: `Bearer ${STRIPE_CLIENT_SECRET_KEY}`,
+                        },
+                    };
                     const resToken = await createToken({ ...cardDetails, type: 'Card' })
-                    console.log(resToken, "tokennn")
-                    let amount;
-                    if (grandTotalAmount) {
-                        amount = grandTotalAmount;
-                    } else if (route?.params?.amount === 'N4999') {
-                        amount = 20000;
-                    } else {
-                        amount = 20000;
-                    }
-                    if (resToken && amount) {
-                        const requestData =
+                    if (resToken && resToken?.token && resToken?.token?.id) {
+                        const data =
                         {
-                            name: userData?.name,
-                            email: userData?.email,
-                            currency: 'INR', // Set currency to NGN for Nigerian Naira
-                            amount: amount,
-                            address: userData?.address,
-                            country: selectedOption,
-                            state: selectedState,
-                            city: selectedCity,
-                            // userId: '', //will update it later
-                            zip: '123', // make it dynamic later
-                            token: resToken?.token?.id   // stripe token
+                            type: 'card',
+                            card: { token: resToken?.token?.id },
                         }
-                        try {
-                            const res = await creatPaymentIntent(requestData)
-                            console.log(res, "resss here from backedn on basis of token")
-                            if (res?.data?.clientSecret) {
-                                let confirmPaymentIntent = await confirmPayment(res?.data?.clientSecret, { paymentMethodType: 'Card' })
-                                console.log(confirmPaymentIntent, "confirmPaymentIntent")
-                                setIsLoading(false)
-                                const config = {
-                                    headers: {
-                                        'Content-Type': 'application/x-www-form-urlencoded',
-                                        Authorization: 'Bearer sk_test_51OmCVYSEL02qr6meHFYch0kudum5OKF73YC3YcR14IMDKFa22xFJolqFlLn4DzlNEnznGgtFkj78NlTbE3yvxB6e00Izgz8l7l', // Add 'Bearer' prefix before token
-                                    },
-                                };
-                                if (confirmPaymentIntent) {
-                                    const responsePaymentLink = await axios.post('https://api.stripe.com/v1/payment_links', {
-                                        line_items: [
-                                            {
-                                                price: 'price_1Orfn8SEL02qr6mepdDLMpTx',
-                                                quantity: 1,
-                                            },
-                                        ],
-                                    }, config);                                 
-                                    const paymentURL = responsePaymentLink?.data?.url // Your Stripe payment URL
-
-                                    // const paymentURL = responsePaymentLink?.data?.url + "?prefilled_email=" + email + "?prefilled_last4=" + numberCard + "?prefilled_expirymonth=" + expiryMonth + "?prefilled_expiryyear=" + expiryYear; // Your Stripe payment URL
-                                    if (await Linking.canOpenURL(paymentURL)) {
-                                        await Linking.openURL(paymentURL);
-                                    } else {
-                                        console.error('Cannot open URL:', paymentURL);
-                                        // Handle error
+                        axios.post(STRIPE_PAYMENT_METHOD_API, data, config)
+                            .then(async function (resPaymentMethod) {
+                                if (resPaymentMethod && resPaymentMethod?.data && resPaymentMethod?.data?.id) {
+                                    const configSubscription = {
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                        },
+                                    };
+                                    const subscriptionData = {
+                                        name: userData?.name,
+                                        email: userData?.email,
+                                        address: {
+                                            city: selectedCity,
+                                            country: 'Nigeria',
+                                            line1: userData?.line1,
+                                            line2: userData?.line2,
+                                            postal_code: userData?.postalCode,
+                                            state: selectedState
+                                        },
+                                        price_id: route?.params?.amount == 'N14999' ? PRICE_BASIC_PLAN : PRICE_PREMIUM_PLAN,
+                                        paymentMethod: resPaymentMethod?.data?.id
                                     }
+                                    const api_url = `${API_URL}/stripesubscription`
+                                    await axios.post(api_url, JSON.stringify(subscriptionData), configSubscription)
+                                        .then(async function (resSubscription) {
+                                            const clientSecret = resSubscription?.data?.clientSecret?.payment_intent?.client_secret;
+                                            if (clientSecret) {
+                                                resSubscription?.data?.clientSecret?.lines?.data?.map(async item => {
+                                                    const responseSubs = {
+                                                        subscriptionId: resSubscription?.data?.clientSecret?.subscription,
+                                                        customerId: resSubscription?.data?.clientSecret?.customer,
+                                                        paymentIntentId: resSubscription?.data?.clientSecret?.payment_intent?.id,
+                                                        planStatus: item?.plan?.active, // this should be in the api
+                                                        amount: resSubscription?.data?.clientSecret?.payment_intent?.amount,
+                                                        currency: resSubscription?.data?.clientSecret?.currency,
+                                                        planInterval: item?.plan?.interval,
+                                                        planDescription: item?.plan?.nickname,
+                                                        quantity: item?.quantity,
+                                                        city: resSubscription?.data?.clientSecret?.customer_address?.city,
+                                                        country: resSubscription?.data?.clientSecret?.customer_address?.country,
+                                                        address: resSubscription?.data?.clientSecret?.customer_address?.line1,
+                                                        zip: resSubscription?.data?.clientSecret?.customer_address?.postal_code,
+                                                        state: resSubscription?.data?.clientSecret?.customer_address?.state,
+                                                        email: resSubscription?.data?.clientSecret?.customer_email,
+                                                        name: resSubscription?.data?.clientSecret?.customer_name
+                                                    }
+                                                    const api_url = `${API_URL}/orgcheckout`
+                                                    await axios.post(api_url, JSON.stringify(responseSubs), configSubscription)
+                                                        .then(async function (subsResData) {
+                                                            if (subsResData?.status === 201) {
+                                                                setIsLoading(false)
+                                                                setTimeout(async () => {
+                                                                    setIsLoading(false)
+                                                                    showAlert('Password has been sent on your email.')
+                                                                    navigation.navigate('SuccessScreen')
+                                                                }, 500);
+                                                            } else {
+                                                                setIsLoading(false)
+                                                                showAlert('Please try again later.')
+                                                            }
+                                                        })
+                                                        .catch(function (error) {
+                                                            console.log(error, "error")
+                                                        });
+                                                })
+                                            } else {
+                                                setIsLoading(false)
+                                                showAlert('Apologies for the inconvenience,\nplease try again later.')
+                                            }
+                                        })
+                                        .catch(function (error) {
+                                            console.log(error, "error")
+                                        });
                                 }
-                                // if (confirmPaymentIntent) {
-                                //     const requestDataCustomer =
-                                //     {
-                                //         name: userData?.name,
-                                //         email: userData?.email,
-                                //         currency: 'NGN', // Set currency to NGN for Nigerian Naira
-                                //         amount: amount,
-                                //         address: userData?.address,
-                                //         country: selectedOption,
-                                //         state: selectedState,
-                                //         city: selectedCity,
-                                //         // userId: '', //will update it later
-                                //         zip: '123', // make it dynamic later
-                                //         payment_method: res?.data?.clientSecret?.payment_method,
-                                //     }
-                                //     const resCustomer = await createCustomer(requestDataCustomer)
-                                //     console.log(resCustomer, "response create customer to get customer id")  // cus_12334 customer id here
-
-                                //     if (resCustomer?.data?.id) {
-                                //         const requestDataa = {
-                                //             customer: resCustomer?.data?.id,
-                                //             items: [
-                                //                 {
-                                //                     price: 'price_1OrfqJSEL02qr6meyZ2HrQtE',
-                                //                 },
-                                //             ],
-                                //             payment_behavior: "default_incomplete",
-                                //             // payment_settings: { payment_method: paymentMethod.id },
-                                //             payment_settings: { payment_method: confirmPaymentIntent?.paymentIntent?.paymentMethod?.id },
-                                //             expand: ["latest_invoice.payment_intent"],
-                                //             collection_method: "charge_automatically"
-                                //         }
-                                //         console.log(requestDataa?.customer, requestDataa?.items[0]?.price, 'idsssssss')
-                                //         const config = {
-                                //             headers: {
-                                //                 'Content-Type': 'application/x-www-form-urlencoded',
-                                //                 Authorization: 'Bearer sk_test_51OmCVYSEL02qr6meHFYch0kudum5OKF73YC3YcR14IMDKFa22xFJolqFlLn4DzlNEnznGgtFkj78NlTbE3yvxB6e00Izgz8l7l', // Add 'Bearer' prefix before token
-                                //             },
-                                //         };
-                                //         try {
-                                //             const response = await axios.post('https://api.stripe.com/v1/subscriptions', {
-                                //                 customer: resCustomer?.data?.id,
-                                //                 items: [
-                                //                     {
-                                //                         price: 'price_1OrfqJSEL02qr6meyZ2HrQtE',
-                                //                     },
-                                //                 ],
-                                //                 payment_behavior: "default_incomplete",
-                                //                 payment_settings: { save_default_payment_method: "on_subscription" },
-                                //                 expand: ["latest_invoice.payment_intent"],
-                                //                 collection_method: "charge_automatically"
-                                //             }, config);
-
-                                //             console.log('Subscription created:', response);
-                                //             if (response) {
-                                //                 const responsePaymentLink = await axios.post('https://api.stripe.com/v1/payment_links', {
-                                //                     line_items: [
-                                //                         {
-                                //                             price: 'price_1OrfqJSEL02qr6meyZ2HrQtE',
-                                //                             quantity: 1,
-                                //                         },
-                                //                     ],
-                                //                 }, config);
-
-                                //                 console.log(responsePaymentLink?.data?.url, "payment linkkk")
-
-                                //                 const paymentURL = responsePaymentLink?.data?.url; // Your Stripe payment URL
-                                //                 if (await Linking.canOpenURL(paymentURL)) {
-                                //                     await Linking.openURL(paymentURL);
-                                //                 } else {
-                                //                     console.error('Cannot open URL:', paymentURL);
-                                //                     // Handle error
-                                //                 }
-                                //             }
-
-                                //         } catch (error) {
-                                //             console.error('Error:', error.response ? error.response.data : error.message);
-                                //         }
-                                //         // if (subscription?.data?.data?.id) {
-                                //         //     console.log(subscription?.data?.data?.id, "callingggg")
-                                //         //     setIsLoading(false)
-
-                                //         //     const dataaaa = await initPaymentSheet({
-
-                                //         //         appearance: customAppearance,
-                                //         //     });
-
-                                //         //     // if (subscription?.data?.status === "incomplete") {
-                                //         //     //     setIsLoading(false)
-                                //         //     //     showAlert("Subscription setup incomplete. Additional action may be required.");
-                                //         //     // } else if (subscription?.data?.status === "active") {
-                                //         //     //     setIsLoading(false)
-                                //         //     //     navigation.navigate('SuccessScreen', { purchasedPlanAmount: confirmPaymentIntent?.paymentIntent?.amount });
-                                //         //     // }
-
-                                //         // }
-
-                                //     }
-
-                                // } else {
-                                //     setIsLoading(false)
-                                //     showAlert('Payment failed, please try again!!')
-                                // }
-                            }
-                        } catch (error) {
-                            setIsLoading(false)
-                            console.log("Error rasied during payment intent", error)
-                        }
-                    } else {
-                        showAlert('Something went wrong. Please try again later.');
+                            })
                     }
                 } catch (error) {
                     setIsLoading(false)
-                    console.error('Error generating token:', error);
-                    showAlert('Error', 'Something went wrong. Please try again later.');
+                    showAlert('Error', 'Something went wrong.\nPlease try again later.');
                 }
             }
         }
@@ -562,7 +243,7 @@ function CheckoutScreen({ route }) {
     const onPressStateItem = (item) => {
         return (
             <TouchableOpacity onPress={() => handleStatePress(item)}>
-                <Text style={{ fontSize: 18, paddingVertical: 10 }}>{item?.name}</Text>
+                <Text style={styles.itemm}>{item?.name}</Text>
             </TouchableOpacity>
         )
     }
@@ -570,251 +251,79 @@ function CheckoutScreen({ route }) {
     const onPressCityItem = (item) => {
         return (
             <TouchableOpacity onPress={() => handleCityPress(item)}>
-                <Text style={{ fontSize: 18, paddingVertical: 10 }}>{item?.name}</Text>
+                <Text style={styles.itemm}>{item?.name}</Text>
             </TouchableOpacity>
         )
     }
 
-    const removeCoupanCode = useCallback(() => {
-        const resetedAmount = route?.params?.amount === 'N4999' ? 4999 : 4499
-        setCoupanCode('');
-        setShowSummary(false)
-        setResetAmount(true)
-        setTotalAmount(resetedAmount)
-    }, [coupanCode, resetAmount, grandTotalAmount])
-
-    const handleCoupan = useCallback((text) => {
-        if (text) {
-            console.log(text)
-            setCoupanCode(text);
-        } else {
-            const resetedAmount = route?.params?.amount === 'N4999' ? 4999 : 4499
-            setCoupanCode('');
-            setShowSummary(false)
-            setResetAmount(true)
-            setTotalAmount(resetedAmount)
-        }
-    }, [coupanCode, resetAmount, grandTotalAmount]);
-
     const buttonContent = useCallback(() => {
         if (isLoading) {
             return <Loader />;
-        } else if (grandTotalAmount) {
-            return `PAY N${grandTotalAmount}`;
-        } else if (!showSummary && resetAmount && route?.params?.amount) {
-            return route?.params?.amount === 'N4999' ? ' PAY N4999' : 'PAY N4499';
         } else {
-            return route?.params?.amount === 'N4999' ? ' PAY N4999' : 'PAY N4499';
+            return route?.params?.amount === 'N13499' ? ' PAY N13,499' : 'PAY N14,999';
         }
-    }, [resetAmount, grandTotalAmount, isLoading, route?.params?.amount]);
+    }, [isLoading, route?.params?.amount]);
 
-    const handleCoupanCode = useCallback(() => {
-        setLoad(true); // Show loader
-
-        setTimeout(() => {
-            const previousAmount = route?.params?.amount === 'N4999' ? 4999 : 4499; // Parse to number
-
-            if (!coupanCode.trim()) {
-                showAlert('Please enter a valid coupon code.');
-                setLoad(false); // Hide loader
-                return;
-            }
-
-            setShowSummary(true);
-
-            const discountPercentage = 10; // static 10% discount for now, change it later
-            const discountedAmount = previousAmount * (1 - discountPercentage / 100);
-            const discountAmount = previousAmount * (discountPercentage / 100);
-
-            if (discountedAmount > 0) {
-                setLoad(false); // Hide loader
-                setDiscountedVal(discountAmount.toFixed(0));
-                setTotalAmount(discountedAmount.toFixed(0));
-                showAlert('Coupon Code Applied successfully!');
-            } else {
-                setLoad(false); // Hide loader
-                showAlert('Coupon amount exceeds total amount.');
-            }
-        }, 1000); // Delay execution of the main code by 1000 milliseconds
-    }, [route?.params?.amount, coupanCode]);
+    console.log(PUBLISH_KEY, STRIPE_CLIENT_SECRET_KEY, API_URL, PRICE_BASIC_PLAN, PRICE_PREMIUM_PLAN, STRIPE_PAYMENT_METHOD_API, "from env")
 
     return (
         <SafeAreaView style={styles.safeArea}>
-            <StripeProvider
-                publishableKey={PUBLISH_KEY}
-            >
-                <Status isLight />
-                <ScrollView keyboardShouldPersistTaps='handled'>
-                    <View style={{ margin: 20 }}>
-                        <View style={styles.containerHeader}>
-                            <View style={styles.header}>
-                                <TouchableOpacity onPress={() => navigation.goBack()}>
-                                    <Image source={back} style={styles.backArrow} />
-                                </TouchableOpacity>
-                                <Text style={styles.title}>Checkout</Text>
-                            </View>
-                        </View>
-                        <View style={{ marginTop: 30 }}>
-                            <Text style={styles.titleText}>Name</Text>
-                            <TextInput
-                                value={userData?.name}
-                                style={styles.input}
-                                placeholder="Enter name here"
-                                placeholderTextColor={colors.light_grey}
-                                onChangeText={(text) => handleInputChange('name', text)}
-                                keyboardType="email-address"
-                            />
+            <StripeProvider publishableKey={PUBLISH_KEY}>
+                <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} keyboardVerticalOffset={keyboardVerticalOffset}>
+                    <ScrollView keyboardShouldPersistTaps='handled'>
+                        <Status isLight />
+                        <Header title={'Checkout'} />
+                        <View style={{ margin: 20 }}>
+                            <CheckoutForm value={userData?.name} placeholder="Enter name here" onChangeText={(text) => handleInputChange('name', text)} title={'Name'} />
                             <ErrorMessageCheckout errorMessageText={errorMessages.name} />
-                            <Text style={styles.titleText}>Email</Text>
-                            <TextInput
-                                value={userData?.email}
-                                style={styles.input}
-                                placeholder="Enter email here"
-                                placeholderTextColor={colors.light_grey}
-                                onChangeText={(text) => handleInputChange('email', text)}
-                                keyboardType="email-address"
-                            />
+                            <CheckoutForm value={userData?.email} placeholder="Enter email here" onChangeText={(text) => handleInputChange('email', text)} keyboardType="email-address" title={'Email'} />
                             <ErrorMessageCheckout errorMessageText={errorMessages.email} />
-                            <View style={{ marginBottom: 10 }}>
-                                <Text style={styles.titleText}>Country</Text>
+                            <CheckoutForm value={'Nigeria'} title={'Country'} editable={false} />
+                            <View style={{ marginTop: 20 }}>
+                                <Text style={styles.titleText}>State</Text>
                                 <View style={styles.addressField}>
-                                    <TextInput
-                                        value={selectedOption}
-                                        editable={false}
-                                        style={styles.inputCount}
-                                        placeholder="Select country"
-                                        placeholderTextColor={colors.light_grey}
-                                    // onChangeText={(text) => handleInputChange('address', text)}
-                                    />
-                                    <TouchableOpacity onPress={() => setShowOptions(!showOptions)} style={{ marginRight: 20 }}>
-                                        <Image
-                                            source={down} // Change the path to your dropdown icon
-                                            style={{ width: 20, height: 20 }}
-                                        />
+                                    <TextInput value={selectedState} editable={false} style={styles.inputCount} placeholder="Select State" placeholderTextColor={colors.light_grey} />
+                                    <TouchableOpacity onPress={() => setShowState(!showState)} style={{ marginRight: 20 }}>
+                                        <Image source={down} style={styles.dropdownStyle} />
                                     </TouchableOpacity>
                                 </View>
-                                {countryErrMsg && <Text style={styles.errorMessageStyle}>{'Country is required'}</Text>}
-                                {showOptions && (
-                                    <View style={{
-                                        backgroundColor: colors.white,
-                                        borderRadius: 5,
-                                        color: '#fff',
-                                        shadowColor: '#000',
-                                        shadowOffset: { width: 0, height: 1 },
-                                        shadowOpacity: 0.8,
-                                        shadowRadius: 2,
-                                        elevation: 5
-                                    }}>
-                                        {countryData?.map(item => {
-                                            return (
-                                                <TouchableOpacity onPress={() => handleOptionPress(item)}>
-                                                    <Text style={{ fontSize: 18, padding: 15 }}>{item?.name}</Text>
-                                                </TouchableOpacity>
-                                            )
-                                        })}
+                                {stateErrMsg && <Text style={styles.errorMessageStyle}>{'State is required'}</Text>}
+                                {showState && (
+                                    <View style={styles.flatlistStyle}>
+                                        <FlatList nestedScrollEnabled contentContainerStyle={{ flexGrow: 1 }} style={{ padding: 10 }} data={statesData && statesData} renderItem={({ item }) => onPressStateItem(item)} keyExtractor={(item) => item.code} />
                                     </View>
                                 )}
                             </View>
-                            {selectedOption && (
-                                <View>
-                                    <Text style={styles.titleText}>State</Text>
-                                    <View style={styles.addressField}>
-                                        <TextInput
-                                            value={selectedState}
-                                            editable={false}
-                                            style={styles.inputCount}
-                                            placeholder="Select State"
-                                            placeholderTextColor={colors.light_grey}
-                                        // onChangeText={(text) => handleInputChange('address', text)}
-                                        />
-                                        <TouchableOpacity onPress={() => setShowState(!showState)} style={{ marginRight: 20 }}>
-                                            <Image
-                                                source={down} // Change the path to your dropdown icon
-                                                style={{ width: 20, height: 20 }}
-                                            />
-                                        </TouchableOpacity>
-                                    </View>
-                                    {stateErrMsg && <Text style={styles.errorMessageStyle}>{'State is required'}</Text>}
-                                    {showState && (
-                                        <View style={{
-                                            backgroundColor: colors.white,
-                                            borderRadius: 5,
-                                            shadowColor: '#000',
-                                            shadowOffset: { width: 0, height: 1 },
-                                            shadowOpacity: 0.8,
-                                            shadowRadius: 2,
-                                            elevation: 5,
-                                            height: 200,
-                                            flex: 1 // Allow the container to expand
-                                        }}>
-                                            <FlatList
-                                                nestedScrollEnabled
-                                                contentContainerStyle={{ flexGrow: 1 }}
-                                                style={{ padding: 10 }}
-                                                data={statesData && statesData}
-                                                renderItem={({ item }) => onPressStateItem(item)}
-                                                keyExtractor={(item) => item.code}
-                                            />
-                                        </View>
-                                    )}
-                                </View>
-                            )}
-                            {selectedOption && selectedState && (
-                                <View>
+                            {selectedState && (
+                                <View style={{ marginTop: 18 }}>
                                     <Text style={styles.titleText}>City</Text>
                                     <View style={styles.addressField}>
-                                        <TextInput
-                                            value={selectedCity}
-                                            editable={false}
-                                            style={styles.inputCount}
-                                            placeholder="Select City"
-                                            placeholderTextColor={colors.light_grey}
-                                        // onChangeText={(text) => handleInputChange('address', text)}
-                                        />
+                                        <TextInput value={selectedCity} editable={false} style={styles.inputCount} placeholder="Select City" placeholderTextColor={colors.light_grey} />
                                         <TouchableOpacity onPress={() => setShowCity(!showCity)} style={{ marginRight: 20 }}>
-                                            <Image
-                                                source={down} // Change the path to your dropdown icon
-                                                style={{ width: 20, height: 20 }}
-                                            />
+                                            <Image source={down} style={{ width: 20, height: 20 }} />
                                         </TouchableOpacity>
                                     </View>
                                     {cityErrMsg && <Text style={styles.errorMessageStyle}>{'City is required'}</Text>}
                                     {showCity && (
-                                        <View style={{
-                                            backgroundColor: colors.white,
-                                            borderRadius: 5,
-                                            shadowColor: '#000',
-                                            shadowOffset: { width: 0, height: 1 },
-                                            shadowOpacity: 0.8,
-                                            shadowRadius: 2,
-                                            elevation: 5,
-                                            height: 200,
-                                            flex: 1 // Allow the container to expand
-                                        }}>
-                                            <FlatList
-                                                nestedScrollEnabled
-                                                contentContainerStyle={{ flexGrow: 1 }}
-                                                style={{ padding: 10 }}
-                                                data={cityData && cityData}
-                                                renderItem={({ item }) => onPressCityItem(item)}
-                                                keyExtractor={(item) => item.code}
-                                            />
+                                        <View style={styles.flatlistStyle}>
+                                            <FlatList nestedScrollEnabled contentContainerStyle={{ flexGrow: 1 }} style={{ padding: 10 }} data={cityData && cityData} renderItem={({ item }) => onPressCityItem(item)} keyExtractor={(item) => item.code} />
                                         </View>
                                     )}
                                 </View>
                             )}
-                            <Text style={styles.titleText}>Address</Text>
-                            <TextInput
-                                value={userData?.address}
-                                style={styles.input}
-                                placeholder="Enter address here"
-                                placeholderTextColor={colors.light_grey}
-                                onChangeText={(text) => handleInputChange('address', text)}
-                            />
-                            <ErrorMessageCheckout errorMessageText={errorMessages.address} />
+                            <View style={{ marginTop: 12 }}>
+                                <Text style={styles.titleText}>Line 1</Text>
+                                <TextInput value={userData?.line1} style={styles.input} placeholder="Enter line 1" placeholderTextColor={colors.light_grey} onChangeText={(text) => handleInputChange('line1', text)} />
+                            </View>
+                            <ErrorMessageCheckout errorMessageText={errorMessages.line1} />
+                            <Text style={styles.titleText}>Line 2</Text>
+                            <TextInput value={userData?.line2} style={styles.input} placeholder="Enter line 2" placeholderTextColor={colors.light_grey} onChangeText={(text) => handleInputChange('line2', text)} />
+                            <ErrorMessageCheckout errorMessageText={errorMessages.line2} />
+                            <Text style={styles.titleText}>Postal Code</Text>
+                            <TextInput value={userData?.postalCode} style={styles.input} placeholder="Enter postal code" placeholderTextColor={colors.light_grey} onChangeText={(text) => handleInputChange('postalCode', text)} />
+                            <ErrorMessageCheckout errorMessageText={errorMessages.postalCode} />
                             <Text style={styles.titleText}>Card details</Text>
                             <CardField
-                                postalCodeEnabled={false}
                                 placeholders={{
                                     number: 'Enter card number',
                                 }}
@@ -822,7 +331,6 @@ function CheckoutScreen({ route }) {
                                 cardStyle={styles.cardStyling}
                                 style={styles.cardStripe}
                                 onCardChange={(cardDetails) => {
-                                    console.log('cardDetails', cardDetails);
                                     fetchCardDetails(cardDetails)
                                 }}
                                 onFocus={(focusedField) => {
@@ -832,67 +340,15 @@ function CheckoutScreen({ route }) {
                             {cardDetailsErrMsg && <Text style={styles.errorText}>
                                 Card details are required
                             </Text>}
-                            <Text style={[styles.titleText, { marginTop: 30, marginBottom: 3 }]}>Have a coupan code?</Text>
-                            <View style={{ flexDirection: 'row' }}>
-                                <View style={styles.coupanCodeView}>
-                                    <Image source={coupan} style={{ resizeMode: 'contain', height: 20, width: 20, alignSelf: 'center', marginLeft: 10 }} />
-                                    <TextInput
-                                        value={coupanCode}
-                                        style={[styles.input, { borderRadius: 0, width: '70%' }]}
-                                        placeholder="Enter coupan code"
-                                        placeholderTextColor={colors.light_grey}
-                                        onChangeText={(text) => handleCoupan(text)}
-                                    />
-                                    {coupanCode?.length > 0 && (
-                                        <TouchableOpacity style={{ justifyContent: 'center', width: 30 }} onPress={() => removeCoupanCode()}>
-                                            <Image source={close} style={{ resizeMode: 'contain', height: 13, width: 13, alignSelf: 'center', }} />
-                                        </TouchableOpacity>
-                                    )}
-                                </View>
-                                <TouchableOpacity onPress={() => {
-                                    if (!coupanCode) {
-                                        showAlert('Please enter a valid coupon code.');
-                                    } else {
-                                        handleCoupanCode();
-                                    }
-                                }} style={[styles.input, { shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.8, shadowRadius: 2, elevation: 5, width: '28%', marginLeft: 10, borderWidth: 1, justifyContent: 'center', alignSelf: 'center' }]}>
-                                    <Text style={styles.applyText}>{'APPLY'}</Text>
-                                </TouchableOpacity>
-                            </View>
-                            {load ?
-                                <ActivityIndicator size="small" color={colors.app_red} style={{ marginTop: 20 }} /> :
-                                showSummary ?
-                                    <View style={styles.summaryView}>
-                                        <Text style={styles.ordersummaryText}>Order summary</Text>
-                                        <View style={styles.viewAll}>
-                                            <Text style={styles.subTotal}>Subtotal</Text>
-                                            <Text style={styles.subTotal}>{route?.params?.amount === 'N4999' ? 'N4999' : 'N4499'}</Text>
-                                        </View>
-                                        <View style={styles.viewAll}>
-                                            <View style={styles.coupanView}>
-                                                <Image source={coupan} style={styles.imgCoupan} />
-                                                <Text style={styles.subTotal}>{coupanCode}</Text>
-                                            </View>
-                                            <Text style={styles.subTotal}>{'-' + 'N' + discountedAmount}</Text>
-                                        </View>
-                                        <View style={styles.viewAll}>
-                                            <Text style={styles.subTotal}>Grand total</Text>
-                                            <Text style={styles.subTotal}>{'N' + grandTotalAmount}</Text>
-                                        </View>
-                                    </View>
-                                    :
-                                    null
-                            }
-
+                            <RedButton
+                                buttonContainerStyle={[styles.buttonContainer, { marginTop: isPotrait ? '8%' : '8%' }]}
+                                ButtonContent={buttonContent()}
+                                contentStyle={styles.buttonText}
+                                onPress={() => handleCheckout()}
+                            />
                         </View>
-                        <RedButton
-                            buttonContainerStyle={[styles.buttonContainer, { marginTop: isPotrait ? '20%' : '8%' }]}
-                            ButtonContent={buttonContent()}
-                            contentStyle={styles.buttonText}
-                            onPress={() => handleLogin()}
-                        />
-                    </View>
-                </ScrollView>
+                    </ScrollView>
+                </KeyboardAvoidingView>
             </StripeProvider>
         </SafeAreaView>
     );

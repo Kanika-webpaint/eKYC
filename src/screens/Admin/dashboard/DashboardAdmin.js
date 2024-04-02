@@ -1,54 +1,79 @@
-import { SafeAreaView, StyleSheet, View, Image, Text, ScrollView, TouchableOpacity, FlatList} from 'react-native';
+import { SafeAreaView, View, Image, Text, TouchableOpacity, FlatList, KeyboardAvoidingView, ScrollView } from 'react-native';
 import React, { useState, useEffect, useCallback } from 'react';
 import colors from '../../../common/colors';
-import { logout, plan_select, plus, team } from '../../../common/images';
+import { iconPlanGrey, iconPlanWhite, iconUsersGrey, iconUsersWhite, logoValidyfy, logout, planIcon, profileGrey, userRed, usersIcon, } from '../../../common/images';
 import { useNavigation } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
-import { getOrgDetailsAction } from '../../../redux/actions/user';
-import Loader from '../../../components/ActivityIndicator';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { fonts } from '../../../common/fonts';
 import Status from '../../../components/Status';
-import { loginAdminslice } from '../../../redux/slices/user';
 import showAlert from '../../../components/showAlert';
 import { styles } from './styles';
+import { getOrgDetailsAction, getUsersListAction } from '../../../redux/actions/Organization/organizationActions';
+import { loginAdminslice } from '../../../redux/slices/organization/organizationSlice';
 
 function DashboardAdmin() {
     const [isLoading, setIsLoading] = useState(false);
     const navigation = useNavigation();
     const dispatch = useDispatch();
-    const OrganizationHomeList = useSelector((state) => state?.login?.orgDetails);
-    
-    const DashboardItemsData = [
-        {
-            id: 0,
-            image: team,
-            title: 'Users'
-        },
-        {
-            id: 1,
-            image: plan_select,
-            title: 'Plans'
-        },
-    ];
+    const OrganizationHomeList = useSelector((state) => state?.org?.orgDetails);
+    const usersListing = useSelector((state) => state?.org?.getUsersList)
+    const [activeTab, setActiveTab] = useState(1);
+    const [activeBottomTab, setActiveBottomTab] = useState(1);
+    const [orgDetails, setOrgDetails] = useState(null);
+    const [currentDate, setCurrentDateAndDay] = useState(null);
+    const keyboardVerticalOffset = Platform.OS === 'ios' ? 40 : 0
+    const usersList = useSelector((state) => state?.org?.getUsersList)
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const orgDetailsData = await getOrgDetails();
+                setOrgDetails(orgDetailsData);
+
+                const currentDateAndDayData = await getCurrentDateAndDay();
+                setCurrentDateAndDay(currentDateAndDayData);
+
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+        fetchData();
+    }, []);
 
     useEffect(() => {
         AsyncStorage.getItem("token").then((value) => {
             if (value) {
-                dispatch(getOrgDetailsAction(value, setIsLoading));
+                dispatch(getUsersListAction(value, setIsLoading));
             }
         })
-        .then(res => {
-            // do something else
-        });
-    }, [dispatch]);
+            .then(res => {
+            });
+    }, [dispatch, setIsLoading]);
 
-    const onPressItem = (selectedItem) => {
-        if (selectedItem?.item?.id === 0) {
-            navigation.navigate('UsersList');
-        } else {
-            // navigation.navigate('UsersList') //navigate to plan detail
+
+    const getOrgDetails = useCallback(async () => {
+        try {
+            const storedToken = await AsyncStorage.getItem('token');
+            if (storedToken) {
+                dispatch(getOrgDetailsAction(storedToken, setIsLoading));
+            } else {
+                // Handle case where token is not found
+            }
+        } catch (error) {
+            console.error('Error retrieving token from AsyncStorage:', error);
         }
+    }, [dispatch, setIsLoading]);
+
+    const getCurrentDateAndDay = () => {
+        const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+        const currentDate = new Date();
+        const dayOfWeek = daysOfWeek[currentDate.getDay()];
+        const month = months[currentDate.getMonth()];
+        const dayOfMonth = currentDate.getDate();
+
+        return `${dayOfWeek}, ${month} ${dayOfMonth}`;
     };
 
     const logoutAccount = useCallback(async () => {
@@ -56,45 +81,144 @@ function DashboardAdmin() {
         dispatch(loginAdminslice(false));
         showAlert('Logout successfully!');
     }, [dispatch]);
-    
-    const renderItem = (item) => (
-        <TouchableOpacity style={styles.itemsView} onPress={() => onPressItem(item)}>
-            <Image style={styles.imgItem} source={item?.item?.image} />
-            <Text style={styles.titleItem}>{item.item.title}</Text>
-        </TouchableOpacity>
-    );
+
+
+    const navigateToViewProfile = (item) => {
+        navigation.navigate('UserProfile', { id: item?.id })
+    }
+
+    const renderItemmUnVerified = (item) => {
+        return (
+            <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 10, marginTop: 10 }} onPress={() => navigateToViewProfile(item)}>
+                <Image
+                    source={profileGrey}
+                    style={styles.image}
+                />
+                <Text style={{ color: colors.black, fontSize: 15, fontFamily: fonts.regular }}>{item?.username}</Text>
+            </TouchableOpacity>
+        );
+    };
+
+    const renderItemmVerified = (item) => {
+        return (
+            <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 10, marginTop: 10 }} onPress={() => navigateToViewProfile(item)}>
+                <Image
+                    source={profileGrey}
+                    style={styles.image}
+                />
+                <Text style={{ color: colors.black, fontSize: 15, fontFamily: fonts.regular }}>{item?.username}</Text>
+            </TouchableOpacity>
+        );
+    };
+
+    const currentDateAndDay = getCurrentDateAndDay();
+    const handleTabPressOnBottomTab = (tabNumber) => {
+        setActiveBottomTab(tabNumber);
+        if (tabNumber === 1) {
+            navigation.navigate('UsersList')
+        } else {
+            navigation.navigate('CurrentPlan')
+        }
+    };
+
+    const verifiedData = usersList.filter(item => item.isVerified == 1 ? true : false);
+    const unverifiedData = usersList.filter(item => item.isVerified !== true);
+
+    const renderItem = ({ item }) => {
+        if (item.isVerified) {
+            return renderItemmVerified(item);
+        } else {
+            return renderItemmUnVerified(item);
+        }
+    };
+
+    const navigateToProfile = () => {
+        navigation.navigate('Settings')
+    }
 
     return (
         <SafeAreaView style={styles.safeArea}>
-            <Status isLight />
-            <ScrollView keyboardShouldPersistTaps='handled'>
-                <View style={styles.mainView}>
-                    <View>
-                        <Text style={styles.org}>{OrganizationHomeList?.organization?.name.replace(/[""]/g, '') || 'Organization'}</Text>
-                        <Text style={styles.detailText}>Details</Text>
+            <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} keyboardVerticalOffset={keyboardVerticalOffset}>
+                <Status />
+                <ScrollView scrollEnabled>
+
+
+                    <View style={styles.insideView}>
+                        <Image source={logoValidyfy} style={styles.logo}></Image>
+                        <View style={{ marginTop: 20, flexDirection: 'row', justifyContent: 'space-between' }}>
+                            <View>
+                                <Text style={styles.org}>{"Hi," + " " + OrganizationHomeList?.organization?.name.replace(/[""]/g, '')}</Text>
+                                <Text style={styles.detailText}>Have A Nice Day</Text>
+                                <Text style={styles.dateStyle}>{currentDateAndDay}</Text>
+                            </View>
+                            <TouchableOpacity style={{ alignItems: 'center', justifyContent: 'center', backgroundColor: colors.white, height: 40, width: 40, borderRadius: 20 }} onPress={() => navigateToProfile()}>
+                                <Image source={userRed} style={{ height: 22, width: 22, alignSelf: 'center', resizeMode: 'contain' }}></Image>
+                            </TouchableOpacity>
+                        </View>
                     </View>
-                    <View style={styles.buttonContainer}>
-                        <TouchableOpacity onPress={() => navigation.navigate('CreateUser')} style={styles.addView}>
-                            <Image source={plus} style={styles.plusIcon} />
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={() => logoutAccount()} style={styles.addView}>
-                            <Image source={logout} style={styles.plusIcon} />
-                        </TouchableOpacity>
+                    <View style={styles.itemsUsersPlan}>
+                        <View style={styles.insideUserPlan}>
+                            <View style={styles.UserTabTop}>
+                                <Image source={usersIcon} style={styles.itemImageUserPlan} />
+                                <Text style={styles.count}>{usersListing?.length || 0}</Text>
+                                <Text style={styles.textItemUserPlan}>Total users</Text>
+                            </View>
+                            <View style={styles.UserTabTop}>
+                                <Image source={planIcon} style={styles.itemImageUserPlan} />
+                                <Text style={styles.count}>{OrganizationHomeList?.organization?.amount === 1499900 ? 'Basic' : 'Premium'} </Text>
+                                <Text style={styles.textItemUserPlan}>Current Plan</Text>
+                            </View>
+                        </View>
+                        <View style={styles.middleView}>
+                            <TouchableOpacity
+                                style={{ flex: 0.5, alignSelf: 'center', borderBottomWidth: 1, borderBottomColor: activeTab === 1 ? colors.app_red : colors.grey, borderRadius: 5, height: 40, justifyContent: 'space-evenly', alignItems: 'center', marginRight: 20 }}
+                                onPress={() => setActiveTab(1)}
+                            >
+                                <Text style={styles.verifyText}>Verified users ({verifiedData?.length > 0 ? verifiedData?.length : 0})</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={{ flex: 0.5, alignSelf: 'center', borderBottomWidth: 1, borderBottomColor: activeTab === 2 ? colors.app_red : colors.grey, borderRadius: 5, height: 40, justifyContent: 'space-evenly', alignItems: 'center' }}
+                                onPress={() => setActiveTab(2)}
+                            >
+                                <Text style={styles.verifyText}>Unverified users ({unverifiedData?.length > 0 ? unverifiedData?.length : 0})</Text>
+                            </TouchableOpacity>
+                        </View>
+                        <View style={{ flex: 1 }}>
+                            {((activeTab === 1 && (!verifiedData || verifiedData.length === 0)) ||
+                                (activeTab === 2 && (!unverifiedData || unverifiedData.length === 0))) && (
+                                    <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1 }}>
+                                        <Text style={{ alignSelf: 'center' }}>No users found</Text>
+                                    </View>
+                                )}
+                            <FlatList
+                                nestedScrollEnabled
+                                data={usersList.filter(item => (activeTab === 1 ? item?.isVerified : !item?.isVerified))}
+                                renderItem={renderItem}
+                                keyExtractor={(item) => item.id.toString()}
+                                getItemLayout={(data, index) => ({ length: 50, offset: 50 * index, index })}
+                            />
+                        </View>
                     </View>
+                </ScrollView>
+                <View style={styles.tabContainer}>
+                    <TouchableOpacity
+                        style={styles.tabButton}
+                        onPress={() => handleTabPressOnBottomTab(1)}
+                    >
+                        {activeBottomTab === 1 ? <Image source={iconUsersWhite} style={styles.bottomTabImg} /> : <Image source={iconUsersGrey} style={styles.bottomTabImg} />}
+                        <Text style={styles.bottomTabText}>Users</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={styles.tabButton}
+                        onPress={() => handleTabPressOnBottomTab(2)}
+                    >
+                        {activeBottomTab === 2 ? <Image source={iconPlanWhite} style={styles.bottomTabImg} /> : <Image source={iconPlanGrey} style={styles.bottomTabImg} />}
+                        <Text style={styles.bottomTabText}>My plan</Text>
+                    </TouchableOpacity>
                 </View>
-                {isLoading ? <Loader /> :
-                    <FlatList
-                        nestedScrollEnabled
-                        numColumns={2}
-                        data={DashboardItemsData}
-                        renderItem={renderItem}
-                        keyExtractor={(item) => item?.id}
-                    />
-                }
-            </ScrollView>
+            </KeyboardAvoidingView>
         </SafeAreaView>
     );
 }
-
 
 export default DashboardAdmin;
