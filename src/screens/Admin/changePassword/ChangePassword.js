@@ -44,16 +44,19 @@ function ChangePassword({ route }) {
     const handleUpdatePassword = () => {
         setIsLoading(true)
         if (!newPassword) {
+            setIsLoading(false)
             showAlert('Please enter new password.');
             return;
         }
 
         if (!confirmPassword) {
+            setIsLoading(false)
             showAlert('Please confirm the password.');
             return;
         }
 
         if (newPassword !== confirmPassword) {
+            setIsLoading(false)
             showAlert('New password and confirm password must match.');
             return;
         }

@@ -72,6 +72,8 @@ function MobileNumber() {
       <RedButton disabled={enable} buttonContainerStyle={styles.buttonContainer} ButtonContent={isLoading ? <Loader /> : 'SUBMIT'} contentStyle={styles.buttonText} onPress={() => submitOTP()} />
     );
   };
+  console.log(API_URL,"URL IN MOBILEE NUMBERRR")
+
 
   const checkUserRegister = async () => {
     try {
@@ -94,6 +96,7 @@ function MobileNumber() {
         phoneNumber: phoneNumber
       };
 
+      console.log(API_URL,"URL IN MOBILEE NUMBERRR")
       const api_url = `${API_URL}/validateuser`;
 
       const res = await axios.post(api_url, requestData);
@@ -192,6 +195,7 @@ function MobileNumber() {
     const requestData = {
       phoneNumber: numberWithCode
     };   
+    console.log("calll")
     dispatch(loginUserAction(requestData, navigation, setIsLoading))
   }
 

@@ -1,8 +1,8 @@
 import axios from 'axios'
 import { API_URL } from "@env"
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getUserVerfiedSlice, verifiedDataSlice, verifyCodeslice } from '../../slices/user/userSlice';
 import showAlert from '../../../components/showAlert';
+import { getUserVerfiedSlice, verifiedDataSlice, verifyCodeslice } from '../../slices/user/userSlice';
 
 
 export const verifedCustomerDataAction =
@@ -22,7 +22,7 @@ export const verifedCustomerDataAction =
             const res = await axios.post(api_url, data, config)
             if (res.status === 200) {
                 const requestBody = {
-                    isVerified: "true"
+                    isVerified: true
                 }
                 await dispatch(verificationStatusAction(requestBody, navigation, token, setIsLoading))
             } else {
@@ -59,6 +59,7 @@ export const verificationStatusAction =
                     showAlert("Verification complete.\nThank you for your cooperation.");
                 }, 500);
             } else {
+                setIsLoading(false)
                 showAlert(res?.data?.message)
             }
         } catch (e) {
@@ -67,6 +68,7 @@ export const verificationStatusAction =
         }
     }
 
+console.log(API_URL, "URLLLLLL")
 
 export const loginUserAction =
     (data,
@@ -77,7 +79,6 @@ export const loginUserAction =
             const api_url = `${API_URL}/loginuser`
             const res = await axios.post(api_url, data)
             if (res?.status == 200) {
-
                 await AsyncStorage.setItem('token_user', res?.data?.token);
                 await AsyncStorage.setItem('role_user', "user");
                 const storedToken = await AsyncStorage.getItem('token_user');
