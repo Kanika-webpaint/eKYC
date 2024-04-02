@@ -86,7 +86,6 @@ function MobileNumber() {
       let mobileNumberCode = countryCode ? countryCode : '+91';
       const phoneNumber = mobileNumberCode + mobileNumber;
 
-      console.log(phoneNumber, "mobileee");
 
       setNumberWithCode(phoneNumber);
 
@@ -248,7 +247,6 @@ function MobileNumber() {
                 value={value}
                 onChangeText={(text) => {
                   setValue(text);
-                  console.log(text.length, CELL_COUNT, "hellooo")
                   if (text.length === CELL_COUNT) {
                     handleVerifyCode(text)
                   }

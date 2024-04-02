@@ -264,7 +264,6 @@ function CheckoutScreen({ route }) {
         }
     }, [isLoading, route?.params?.amount]);
 
-    console.log(PUBLISH_KEY, STRIPE_CLIENT_SECRET_KEY, API_URL, PRICE_BASIC_PLAN, PRICE_PREMIUM_PLAN, STRIPE_PAYMENT_METHOD_API, "from env")
 
     return (
         <SafeAreaView style={styles.safeArea}>

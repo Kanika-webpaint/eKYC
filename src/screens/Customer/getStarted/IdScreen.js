@@ -18,8 +18,8 @@ import showAlert from '../../../components/showAlert';
 import { styles } from './styles';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useDispatch, useSelector } from 'react-redux';
-import { checkverifiedUser, verifedCustomerDataAction } from '../../../redux/actions/user/userAction';
 import { verifyCodeslice } from '../../../redux/slices/user/userSlice';
+import { checkverifiedUser, verifedCustomerDataAction } from '../../../redux/actions/user/userAction';
 
 function IdScreen() {
   const navigation = useNavigation();
