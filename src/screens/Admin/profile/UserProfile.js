@@ -6,7 +6,7 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { SafeAreaView, View, TextInput, Image, ScrollView, Text } from 'react-native';
+import { SafeAreaView, View, TextInput, Image, ScrollView, Text, ActivityIndicator } from 'react-native';
 import colors from '../../../common/colors';
 import { userRed, verifiedUser } from '../../../common/images';
 import { useDispatch, useSelector } from 'react-redux'
@@ -31,6 +31,7 @@ function UserProfile({ route }) {
             });
     }, [dispatch]);
     return (
+
         <SafeAreaView style={styles.safeArea}>
             <Status isLight />
             <ScrollView keyboardShouldPersistTaps='handled'>
@@ -41,28 +42,34 @@ function UserProfile({ route }) {
                         {userDetail?.isVerified && <Image source={verifiedUser} style={styles.verifyImg} />}
                     </View>
                 </View>
-                <View style={{ margin: 20 }}>
-                    <TextInput
-                        editable={false}
-                        value={userDetail?.username || ''}
-                        style={styles.input}
-                        placeholder="Email"
-                        placeholderTextColor={colors.grey}
-                        onChangeText={(text) => handleInputChange('email', text)}
-                        keyboardType="email-address"
-                    />
-                    <TextInput
-                        editable={false}
-                        value={userDetail?.phoneNumber}
-                        style={styles.input}
-                        placeholder="Phone number"
-                        placeholderTextColor={colors.grey}
-                        onChangeText={(text) => handleInputChange('phNo', text)}
-                    />
-                    <View style={styles.verifyView}>
-                        <Text style={styles.verifiedStatus}>{userDetail?.isVerified == 1 ? 'Verified' : 'Not Verified'}</Text>
+                {userDetail ?
+                    <View style={{ margin: 20 }}>
+                        <TextInput
+                            editable={false}
+                            value={userDetail?.username || ''}
+                            style={styles.input}
+                            placeholder="Email"
+                            placeholderTextColor={colors.grey}
+                            onChangeText={(text) => handleInputChange('email', text)}
+                            keyboardType="email-address"
+                        />
+                        <TextInput
+                            editable={false}
+                            value={userDetail?.phoneNumber}
+                            style={styles.input}
+                            placeholder="Phone number"
+                            placeholderTextColor={colors.grey}
+                            onChangeText={(text) => handleInputChange('phNo', text)}
+                        />
+                        <View style={styles.verifyView}>
+                            <Text style={styles.verifiedStatus}>{userDetail?.isVerified == 1 ? 'Verified' : 'Not Verified'}</Text>
+                        </View>
                     </View>
-                </View>
+                    :
+                    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', marginTop: '40%' }}>
+                        <ActivityIndicator color={colors.app_red} style={{ alignSelf: 'center' }} size={30} />
+                    </View>
+                }
             </ScrollView>
         </SafeAreaView>
     );
