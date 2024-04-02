@@ -68,7 +68,6 @@ export const verificationStatusAction =
         }
     }
 
-console.log(API_URL, "URLLLLLL")
 
 export const loginUserAction =
     (data,

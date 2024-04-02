@@ -4,7 +4,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import showAlert from '../../../components/showAlert';
 import { createUserSlice, getOrgDetailsslice, getUserListSlice, getUserSlice, loginAdminslice } from '../../slices/organization/organizationSlice';
 
-console.log(API_URL,"urll in actions>>>")
 export const LoginAdminAction = (data, setIsLoading, setLoggedIn) => async (dispatch) => {
     try {
         const api_url = `${API_URL}/loginorganization`;

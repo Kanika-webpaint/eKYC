@@ -64,7 +64,6 @@ function IdScreen() {
     setTimeout(() => onPressGo(), 1000);
   };
 
-  console.log(TEMPLATE_ID,"temp id>>>>>>>")
   const onPressGo = async () => {
     if (isCheckStatus?.isVerified == 1) {
       showAlert('You are already verified')
