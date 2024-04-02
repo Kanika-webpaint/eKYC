@@ -121,8 +121,9 @@ function DashboardAdmin() {
         }
     };
 
-    const verifiedData = usersList.filter(item => item.isVerified == 1 ? true : false);
-    const unverifiedData = usersList.filter(item => item.isVerified !== true);
+    const verifiedData = usersList.filter(item => item?.isVerified == 1);
+    const unverifiedData = usersList.filter(item => item?.isVerified === null || item?.isVerified == 0);
+
 
     const renderItem = ({ item }) => {
         if (item.isVerified) {
@@ -184,20 +185,45 @@ function DashboardAdmin() {
                             </TouchableOpacity>
                         </View>
                         <View style={{ flex: 1 }}>
-                            {((activeTab === 1 && (!verifiedData || verifiedData.length === 0)) ||
-                                (activeTab === 2 && (!unverifiedData || unverifiedData.length === 0))) && (
-                                    <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1 }}>
-                                        <Text style={{ alignSelf: 'center' }}>No users found</Text>
-                                    </View>
-                                )}
-                            <FlatList
-                                nestedScrollEnabled
-                                data={usersList.filter(item => (activeTab === 1 ? item?.isVerified : !item?.isVerified))}
-                                renderItem={renderItem}
-                                keyExtractor={(item) => item.id.toString()}
-                                getItemLayout={(data, index) => ({ length: 50, offset: 50 * index, index })}
-                            />
+                            {activeTab === 1 && (
+                                <>
+                                    {usersList && usersList?.length > 0 ? (
+                                        <FlatList
+                                            nestedScrollEnabled
+                                            data={usersList.filter(item => item?.isVerified == 1)}
+                                            renderItem={renderItem}
+                                            keyExtractor={(item) => item.id.toString()}
+                                            getItemLayout={(data, index) => ({ length: 50, offset: 50 * index, index })}
+                                        />
+                                    ) : (
+                                        <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1 }}>
+                                            <Text style={{ alignSelf: 'center' }}>No users found</Text>
+                                        </View>
+                                    )}
+                                </>
+                            )}
+
+                            {activeTab === 2 && (
+                                <>
+                                    {usersList && usersList.length > 0 ? (
+                                        <FlatList
+                                            nestedScrollEnabled
+                                            data={usersList.filter(item => item?.isVerified == null || item?.isVerified == 0)}
+                                            renderItem={renderItem}
+                                            keyExtractor={(item) => item.id.toString()}
+                                            getItemLayout={(data, index) => ({ length: 50, offset: 50 * index, index })}
+                                        />
+                                    ) : (
+                                        <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1 }}>
+                                            <Text style={{ alignSelf: 'center' }}>No users found</Text>
+                                        </View>
+                                    )}
+                                </>
+                            )}
                         </View>
+
+
+
                     </View>
                 </ScrollView>
                 <View style={styles.tabContainer}>
