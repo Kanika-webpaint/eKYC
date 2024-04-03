@@ -26,13 +26,13 @@ const App = () => {
     return () => clearTimeout(splashTimeout);
   }, []);
 
-  const handleToggleLogs = () => {
-    setOpenLogs(prevState => !prevState);
-  };
+  // const handleToggleLogs = () => {
+  //   setOpenLogs(prevState => !prevState);
+  // };
 
-  const handleCloseLogs = () => {
-    setOpenLogs(false);
-  };
+  // const handleCloseLogs = () => {
+  //   setOpenLogs(false);
+  // };
 
   const renderNavigation = useCallback(() => {
     return showSplash ? (
@@ -47,16 +47,16 @@ const App = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <TouchableWithoutFeedback onPress={handleCloseLogs}>
+      {/* <TouchableWithoutFeedback onPress={handleCloseLogs}> */}
         <View style={styles.container}>
           <StatusBar backgroundColor={colors.app_blue} />
           {renderNavigation()}
-          <TouchableOpacity style={styles.logButton} onPress={handleToggleLogs}>
+          {/* <TouchableOpacity style={styles.logButton} onPress={handleToggleLogs}>
             <Text style={styles.logButtonText}>Logs</Text>
-          </TouchableOpacity>
-          {openLogs && <NetworkLogger />}
+          </TouchableOpacity> */}
+          {/* {openLogs && <NetworkLogger />} */}
         </View>
-      </TouchableWithoutFeedback>
+      {/* </TouchableWithoutFeedback> */}
     </SafeAreaView>
   );
 };

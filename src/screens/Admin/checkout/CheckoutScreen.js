@@ -227,10 +227,16 @@ function CheckoutScreen({ route }) {
                                             }
                                         })
                                         .catch(function (error) {
-                                            console.log(error, "error")
+                                            console.log(error, "error::::")
+
                                         });
                                 }
                             })
+                    } else {
+                        if (resToken && resToken?.error && resToken?.error?.code == 'Failed') {
+                            showAlert(resToken?.error?.message)
+                            setIsLoading(false)
+                        }
                     }
                 } catch (error) {
                     setIsLoading(false)
@@ -268,7 +274,7 @@ function CheckoutScreen({ route }) {
     return (
         <SafeAreaView style={styles.safeArea}>
             <StripeProvider publishableKey={PUBLISH_KEY}>
-                <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} keyboardVerticalOffset={keyboardVerticalOffset}>
+                <KeyboardAvoidingView behavior={'padding'} keyboardVerticalOffset={keyboardVerticalOffset}>
                     <ScrollView keyboardShouldPersistTaps='handled'>
                         <Status isLight />
                         <Header title={'Checkout'} />
