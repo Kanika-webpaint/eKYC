@@ -65,9 +65,6 @@ export const styles = StyleSheet.create({
       flex: 1,
       padding: 20,
     },
-    codeFieldRoot: {
-      marginTop: '5%',
-    },
     cell: {
       width: 40,
       height: 40,
@@ -94,12 +91,4 @@ export const styles = StyleSheet.create({
       fontFamily: fonts.regular,
       textAlign: 'center',
     },
-    fingerPrintStyle: {
-      // Position 60 units to the left
-      top: 0, // Adjust the top position as needed
-      position: 'absolute', // Position the fingerprint image absolutely
-      height: 70,
-      width: 70,
-    }
-  
   });

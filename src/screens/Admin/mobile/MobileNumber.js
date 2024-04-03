@@ -22,7 +22,7 @@ import showAlert from '../../../components/showAlert';
 import { styles } from './styles';
 import axios from 'axios';
 import { API_URL } from "@env"
-import { loginUserAction } from '../../../redux/actions/user/userAction';
+import { loginUserAction } from '../../../redux/actions/user/UserAction';
 
 function MobileNumber() {
   const [value, setValue] = useState('');
@@ -83,7 +83,7 @@ function MobileNumber() {
         return;
       }
 
-      let mobileNumberCode = countryCode ? countryCode : '+91';
+      let mobileNumberCode = countryCode ? countryCode : '+234';
       const phoneNumber = mobileNumberCode + mobileNumber;
 
 

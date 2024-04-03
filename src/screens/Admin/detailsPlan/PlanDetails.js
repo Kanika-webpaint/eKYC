@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { SafeAreaView, View, Image, Text, ScrollView, FlatList, Dimensions, KeyboardAvoidingView } from 'react-native';
-import { check, plan_select } from '../../../common/images';
+import { check, planIcon } from '../../../common/images';
 import { useNavigation } from '@react-navigation/native';
 import { BasicPlanData, PreminumPlanData } from '../../../common/PlansList';
 import RedButton from '../../../components/RedButton';
@@ -46,7 +46,7 @@ function PlanDetails({ route }) {
         setTimeout(() => {
             navigation.navigate('Checkout', { amount: route?.params?.amount || '' })
             setIsLoading(false)
-        }, 500)
+        }, 100)
     }
 
     return (
@@ -56,7 +56,7 @@ function PlanDetails({ route }) {
                     <Status isLight />
                     <Header title={route?.params?.plan === 'Basic' ? 'Basic Plan Details' : 'Premium Plan Details'} />
                     <View style={styles.mainView}>
-                        <Image source={plan_select} style={styles.imagePlanSelect} />
+                        <Image source={planIcon} style={styles.imagePlanSelect} />
                         <Text style={styles.amount}>{route?.params?.amount === 'N14999' ? 'N14,999' : 'N13,499'}</Text>
                         <FlatList scrollEnabled={false} data={route?.params?.plan === 'Basic' ?
                             BasicPlanData :

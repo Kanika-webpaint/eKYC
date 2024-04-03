@@ -12,12 +12,14 @@ import {
     Text,
     TouchableOpacity
 } from 'react-native';
+import { whiteArrow } from '../common/images';
 
-function RedButton({ buttonContainerStyle, ButtonContent, contentStyle ,onPress, disabled}) {
+function RedButton({ buttonContainerStyle, ButtonContent, contentStyle, onPress, disabled, image }) {
     return (
         <>
             <TouchableOpacity style={buttonContainerStyle} onPress={onPress} disabled={disabled}>
                 <Text style={[styles.buttonText, contentStyle]}>{ButtonContent}</Text>
+                {image && <Image source={whiteArrow} style={{ height: 15, width: 15 }} />}
             </TouchableOpacity>
         </>
     );

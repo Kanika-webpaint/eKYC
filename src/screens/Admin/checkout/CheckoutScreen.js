@@ -227,11 +227,17 @@ function CheckoutScreen({ route }) {
                                             }
                                         })
                                         .catch(function (error) {
-                                            console.log(error, "error::::")
-
+                                            console.log(error?.response?.data?.error,"errorrr")
+                                            if (error?.response?.data?.error?.statusCode == 402 || error?.response?.data?.error?.code === 'card_declined') {
+                                                setIsLoading(false)
+                                                showAlert('Your card was declined.\nPlease enter valid card details.');
+                                            }
                                         });
                                 }
-                            })
+                            }).catch(function (error) {
+                                setIsLoading(false)
+                                showAlert('Something went wrong.\nPlease try again later.');
+                            });
                     } else {
                         if (resToken && resToken?.error && resToken?.error?.code == 'Failed') {
                             showAlert(resToken?.error?.message)
@@ -240,7 +246,7 @@ function CheckoutScreen({ route }) {
                     }
                 } catch (error) {
                     setIsLoading(false)
-                    showAlert('Error', 'Something went wrong.\nPlease try again later.');
+                    showAlert('Something went wrong.\nPlease try again later.');
                 }
             }
         }

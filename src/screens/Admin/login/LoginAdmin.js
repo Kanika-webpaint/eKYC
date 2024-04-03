@@ -77,7 +77,7 @@ const LoginAdmin = ({ route }) => {
 
     return (
         <SafeAreaView style={styles.safeArea}>
-            <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} keyboardVerticalOffset={keyboardVerticalOffset}>
+            <KeyboardAvoidingView behavior={'padding'} keyboardVerticalOffset={keyboardVerticalOffset}>
                 <ScrollView keyboardShouldPersistTaps='handled'>
                     <Status lightContent />
                     <View style={styles.container}>
