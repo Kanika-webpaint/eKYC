@@ -7,11 +7,6 @@ export const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: colors.app_blue
     },
-    mainView: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        padding: 20
-    },
     detailText: {
         fontSize: 28,
         color: colors.white,
@@ -21,51 +16,6 @@ export const styles = StyleSheet.create({
         fontSize: 22,
         color: colors.white,
         fontFamily: fonts.bold
-    },
-    buttonContainer: {
-        flexDirection: 'row',
-    },
-    addView: {
-        height: 42,
-        width: 42,
-        justifyContent: 'center',
-        alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.8,
-        shadowRadius: 2,
-        elevation: 3,
-        marginHorizontal: 5,
-    },
-    plusIcon: {
-        height: 30,
-        width: 30,
-        resizeMode: 'contain'
-    },
-    itemsView: {
-        flex: 1,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.8,
-        shadowRadius: 2,
-        elevation: 5,
-        backgroundColor: colors.white,
-        margin: 20,
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 5,
-        borderRadius: 5
-    },
-    imgItem: {
-        height: 60,
-        width: 60,
-        alignSelf: 'center',
-
-    },
-    titleItem: {
-        fontFamily: fonts.bold,
-        fontSize: 16,
-        color: colors.black
     },
     dateStyle: {
         fontSize: 16,
@@ -95,7 +45,6 @@ export const styles = StyleSheet.create({
     tabButton: {
         flex: 1,
         alignItems: 'center',
-
     },
     activeTab: {
         borderBottomWidth: 2,

@@ -142,8 +142,6 @@ function DashboardAdmin() {
             <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} keyboardVerticalOffset={keyboardVerticalOffset}>
                 <Status />
                 <ScrollView scrollEnabled>
-
-
                     <View style={styles.insideView}>
                         <Image source={logoValidyfy} style={styles.logo}></Image>
                         <View style={{ marginTop: 20, flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -221,9 +219,6 @@ function DashboardAdmin() {
                                 </>
                             )}
                         </View>
-
-
-
                     </View>
                 </ScrollView>
                 <View style={styles.tabContainer}>

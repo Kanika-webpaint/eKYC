@@ -6,10 +6,9 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { SafeAreaView, View, Text, ScrollView, Dimensions, KeyboardAvoidingView } from 'react-native';
+import { SafeAreaView, View, Text, ScrollView, Dimensions, KeyboardAvoidingView, Image } from 'react-native';
 import RedButton from '../../../components/RedButton';
 import { useNavigation } from '@react-navigation/native';
-import Logo from '../../../components/Logo';
 import Status from '../../../components/Status';
 import { Inquiry, Environment } from 'react-native-persona';
 import Loader from '../../../components/ActivityIndicator';
@@ -19,7 +18,8 @@ import { styles } from './styles';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useDispatch, useSelector } from 'react-redux';
 import { verifyCodeslice } from '../../../redux/slices/user/userSlice';
-import { checkverifiedUser, verifedCustomerDataAction } from '../../../redux/actions/user/userAction';
+import { checkverifiedUser, verifedCustomerDataAction } from '../../../redux/actions/user/UserAction';
+import { logoValidyfy } from '../../../common/images';
 
 function IdScreen() {
   const navigation = useNavigation();
@@ -126,7 +126,7 @@ function IdScreen() {
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} keyboardVerticalOffset={keyboardVerticalOffset}>
         <ScrollView style={{ marginBottom: '10%' }} keyboardShouldPersistTaps='handled'>
           <Status lightContent />
-          <Logo styleContainer={{ marginTop: isPotrait ? '30%' : '5%' }} fingerPrintStyle={[styles.fingerPrintStyle, { left: isPotrait ? 60 : 310 }]} />
+          <Image source={logoValidyfy} style={{ marginTop: isPotrait ? '20%' : '5%', alignSelf: 'center', resizeMode: 'contain', height: 80, width: '60%', }} />
           <View style={[styles.mainView, { height: screenHeight * 0.5 }]}>
             <Text style={styles.textVerify}>
               Simplify Identity Verification
@@ -137,7 +137,8 @@ function IdScreen() {
           </View>
           <RedButton
             buttonContainerStyle={[styles.buttonContainer, { marginBottom: isPotrait ? 0 : 20 }]}
-            ButtonContent={isLoading ? <Loader /> : "Let's get started ->"}
+            ButtonContent={isLoading ? <Loader /> : "Let's get started"}
+            image
             contentStyle={styles.buttonText}
             onPress={() => onPressStarted()}
           />

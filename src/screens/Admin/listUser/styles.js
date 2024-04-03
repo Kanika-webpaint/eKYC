@@ -40,23 +40,6 @@ export const styles = StyleSheet.create({
     marginLeft: 10,
     color: colors.black
   },
-  containerHeader: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  header: {
-    flexDirection: 'row',
-    backgroundColor: colors.white,
-    padding: 5,
-    alignItems: 'center', // Vertical alignment
-    width: '100%', // Take full width of the screen
-  },
-  backArrow: {
-    height: 25,
-    width: 25,
-    marginRight: 10, // Add some space between back arrow and text
-  },
   title: {
     flex: 1, // Allow text to take remaining space
     textAlign: 'center', // Center the text horizontally

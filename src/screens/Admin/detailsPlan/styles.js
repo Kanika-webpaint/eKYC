@@ -15,10 +15,6 @@ export const styles = StyleSheet.create({
         marginTop: '10%',
         marginBottom: '5%'
     },
-    containerHeader: {
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
     header: {
         flexDirection: 'row',
         backgroundColor: colors.white,
@@ -27,22 +23,9 @@ export const styles = StyleSheet.create({
         alignItems: 'center',
         width: '100%',
     },
-    backArrow: {
-        height: 25,
-        width: 25,
-        marginRight: 10,
-        marginLeft: 10
-    },
-    title: {
-        flex: 1,
-        textAlign: 'center',
-        fontSize: 20,
-        color: 'black',
-        fontFamily: fonts.bold
-    },
     imagePlanSelect: {
-        height: 200, // Adjusted height
-        width: 200, // Adjusted width
+        height: 100, // Adjusted height
+        width: 100, // Adjusted width
         alignSelf: 'center',
         resizeMode: 'contain'
     },
@@ -76,23 +59,9 @@ export const styles = StyleSheet.create({
         resizeMode:'contain'
     },
     mainView: {
-        marginTop: 20,
+        marginTop: '10%',
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: colors.white,
-    },
-    input: {
-        height: 50,
-        borderWidth: 1,
-        paddingLeft: 8,
-        borderRadius: 5,
-        color: colors.black,
-        borderColor: colors.white,
-        backgroundColor: colors.white,
-        fontFamily: fonts.regular,
-        marginBottom: 10,
-        marginTop:30,
-        fontSize: 16,
-        width:'80%'
     },
 });
