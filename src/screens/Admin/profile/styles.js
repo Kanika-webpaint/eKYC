@@ -37,9 +37,12 @@ export const styles = StyleSheet.create({
         paddingLeft: 10,
         paddingRight:10,
         fontFamily: fonts.regular,
-        backgroundColor: 'green',
-        maxWidth: '32%',
-        borderRadius: 5
+        backgroundColor: colors.green,
+        maxWidth: '35%',
+        textAlign:'center',
+        borderRadius:10,
+        padding:3,
+        overflow:"hidden"
     },
     verifyView: {
         backgroundColor: colors.purple_dim,
@@ -47,5 +50,6 @@ export const styles = StyleSheet.create({
         paddingLeft: 12,
         borderRadius: 5,
         justifyContent: 'center',
+      
     }
 });

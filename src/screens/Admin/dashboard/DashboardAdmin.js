@@ -24,6 +24,8 @@ function DashboardAdmin() {
     const [currentDate, setCurrentDateAndDay] = useState(null);
     const keyboardVerticalOffset = Platform.OS === 'ios' ? 40 : 0
     const usersList = useSelector((state) => state?.org?.getUsersList)
+    const [enableScrollViewScroll, setEnableScrollViewScroll] = useState(true);
+
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -137,11 +139,16 @@ function DashboardAdmin() {
         navigation.navigate('Settings')
     }
 
+    const onStartShouldSetResponderCapture = () => {
+        setEnableScrollViewScroll(false);
+        // Check conditions and update enableScrollViewScroll if needed
+    };
+
     return (
         <SafeAreaView style={styles.safeArea}>
             <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} keyboardVerticalOffset={keyboardVerticalOffset}>
                 <Status />
-                <ScrollView scrollEnabled>
+                <ScrollView scrollEnabled={enableScrollViewScroll}>
                     <View style={styles.insideView}>
                         <Image source={logoValidyfy} style={styles.logo}></Image>
                         <View style={{ marginTop: 20, flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -182,7 +189,7 @@ function DashboardAdmin() {
                                 <Text style={styles.verifyText}>Unverified users ({unverifiedData?.length > 0 ? unverifiedData?.length : 0})</Text>
                             </TouchableOpacity>
                         </View>
-                        <View style={{ flex: 1 }}>
+                        <View style={{ flex: 1 }} onStartShouldSetResponderCapture={onStartShouldSetResponderCapture}>
                             {activeTab === 1 && (
                                 <>
                                     {usersList && usersList?.length > 0 && verifiedData?.length > 0 ? (
@@ -205,6 +212,8 @@ function DashboardAdmin() {
                                 <>
                                     {usersList && usersList.length > 0 && unverifiedData?.length > 0 ? (
                                         <FlatList
+                                            maxHeight={250}
+                                            marginBottom={30}
                                             nestedScrollEnabled
                                             data={usersList.filter(item => item?.isVerified == null || item?.isVerified == 0)}
                                             renderItem={renderItem}
