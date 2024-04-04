@@ -20,6 +20,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { verifyCodeslice } from '../../../redux/slices/user/userSlice';
 import { checkverifiedUser, verifedCustomerDataAction } from '../../../redux/actions/user/UserAction';
 import { logoValidyfy } from '../../../common/images';
+import { check, PERMISSIONS, RESULTS } from 'react-native-permissions';
 
 function IdScreen() {
   const navigation = useNavigation();
@@ -71,53 +72,76 @@ function IdScreen() {
       await AsyncStorage.clear();
       dispatch(verifyCodeslice(false));
     } else {
-      setIsLoading(false);
-      Inquiry.fromTemplate(TEMPLATE_ID)
-        .environment(Environment.SANDBOX)
-        .onComplete((inquiryId, status, fields) => {
-          setTimeout(async () => {
-            try {
-              setIsLoading(true)
-              if (status === 'completed') {
-                const requestData =
-                {
-                  addressCity: fields?.addressCity?.value ? fields?.addressCity?.value : '',
-                  addressCountryCode: fields?.addressCountryCode?.value ? fields?.addressCountryCode?.value : '',
-                  addressPostalCode: fields?.addressPostalCode?.value ? fields?.addressPostalCode?.value : '',
-                  addressStreet1: fields?.addressStreet1?.value ? fields?.addressStreet1?.value : '',
-                  addressStreet2: fields?.addressStreet2?.value ? fields?.addressStreet2?.value : '',
-                  addressSubdivision: fields?.addressSubdivision?.value ? fields?.addressSubdivision?.value : '',
-                  birthdate: fields?.birthdate?.value ? fields?.birthdate?.value : '',
-                  currentGovernmentId: fields?.currentGovernmentId?.value ? fields?.currentGovernmentId?.value : '',
-                  currentSelfie: fields?.currentSelfie?.value ? fields?.currentSelfie?.value : '',
-                  emailAddress: fields?.emailAddress?.value ? fields?.emailAddress?.value : '',
-                  expirationDate: fields?.expirationDate?.value ? fields?.expirationDate?.value : '',
-                  identificationClass: fields?.identificationClass?.value ? fields?.identificationClass?.value : '',
-                  identificationNumber: fields?.identificationNumber?.value ? fields?.identificationNumber?.value : '',
-                  nameFirst: fields?.nameFirst?.value ? fields?.nameFirst?.value : '',
-                  nameLast: fields?.nameLast?.value ? fields?.nameLast?.value : '',
-                  nameMiddle: fields?.nameMiddle?.value ? fields?.nameMiddle?.value : '',
-                  phoneNumber: fields?.phoneNumber?.value ? fields?.phoneNumber?.value : '',
-                  selectedCountryCode: fields?.selectedCountryCode?.value ? fields?.selectedCountryCode?.value : '',
-                  selectedIdClass: fields?.selectedIdClass?.value ? fields?.selectedIdClass?.value : '',
-                  inquiryId: inquiryId,
-                  status: status
-                }
-                dispatch(verifedCustomerDataAction(requestData, navigation, userToken, setIsLoading));
-              }
-            } catch (e) {
-              console.log(e, 'catch error');
-            }
-          }, 500);
+      check(PERMISSIONS.IOS.CAMERA)
+        .then((result) => {
+          switch (result) {
+            case RESULTS.UNAVAILABLE:
+              console.log('This feature is not available (on this device / in this context)');
+              break;
+            case RESULTS.DENIED:
+              console.log('The permission has not been requested / is denied but requestable');
+              break;
+            case RESULTS.LIMITED:
+              console.log('The permission is limited: some actions are possible');
+              break;
+            case RESULTS.GRANTED:
+              setIsLoading(false);
+              Inquiry.fromTemplate(TEMPLATE_ID)
+                .environment(Environment.SANDBOX)
+                .onComplete((inquiryId, status, fields) => {
+                  setTimeout(async () => {
+                    try {
+                      setIsLoading(true)
+                      if (status === 'completed') {
+                        const requestData =
+                        {
+                          addressCity: fields?.addressCity?.value ? fields?.addressCity?.value : '',
+                          addressCountryCode: fields?.addressCountryCode?.value ? fields?.addressCountryCode?.value : '',
+                          addressPostalCode: fields?.addressPostalCode?.value ? fields?.addressPostalCode?.value : '',
+                          addressStreet1: fields?.addressStreet1?.value ? fields?.addressStreet1?.value : '',
+                          addressStreet2: fields?.addressStreet2?.value ? fields?.addressStreet2?.value : '',
+                          addressSubdivision: fields?.addressSubdivision?.value ? fields?.addressSubdivision?.value : '',
+                          birthdate: fields?.birthdate?.value ? fields?.birthdate?.value : '',
+                          currentGovernmentId: fields?.currentGovernmentId?.value ? fields?.currentGovernmentId?.value : '',
+                          currentSelfie: fields?.currentSelfie?.value ? fields?.currentSelfie?.value : '',
+                          emailAddress: fields?.emailAddress?.value ? fields?.emailAddress?.value : '',
+                          expirationDate: fields?.expirationDate?.value ? fields?.expirationDate?.value : '',
+                          identificationClass: fields?.identificationClass?.value ? fields?.identificationClass?.value : '',
+                          identificationNumber: fields?.identificationNumber?.value ? fields?.identificationNumber?.value : '',
+                          nameFirst: fields?.nameFirst?.value ? fields?.nameFirst?.value : '',
+                          nameLast: fields?.nameLast?.value ? fields?.nameLast?.value : '',
+                          nameMiddle: fields?.nameMiddle?.value ? fields?.nameMiddle?.value : '',
+                          phoneNumber: fields?.phoneNumber?.value ? fields?.phoneNumber?.value : '',
+                          selectedCountryCode: fields?.selectedCountryCode?.value ? fields?.selectedCountryCode?.value : '',
+                          selectedIdClass: fields?.selectedIdClass?.value ? fields?.selectedIdClass?.value : '',
+                          inquiryId: inquiryId,
+                          status: status
+                        }
+                        dispatch(verifedCustomerDataAction(requestData, navigation, userToken, setIsLoading));
+                      }
+                    } catch (e) {
+                      console.log(e, 'catch error');
+                    }
+                  }, 500);
+                })
+                .onCanceled(
+                  (inquiryId, sessionToken) =>
+                    showAlert('You have canceled verification,\nplease verify'),
+                  navigation.navigate('IdScreen'),
+                )
+                .onError(error => showAlert(error?.message))
+                .build()
+                .start();
+              break;
+            case RESULTS.BLOCKED:
+              console.log('The permission is denied and not requestable anymore');
+              break;
+          }
         })
-        .onCanceled(
-          (inquiryId, sessionToken) =>
-            showAlert('You have canceled verification,\nplease verify'),
-          navigation.navigate('IdScreen'),
-        )
-        .onError(error => showAlert(error?.message))
-        .build()
-        .start();
+        .catch((error) => {
+          // …
+        });
+
     }
   };
 

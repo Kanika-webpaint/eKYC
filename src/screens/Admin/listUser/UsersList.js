@@ -104,13 +104,15 @@ const UserList = () => {
             <View >
               <View style={{ flexDirection: 'row', margin: 20 }}>
                 <View style={{
-                  flex: 1, flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10,
+                  flex: 1, flexDirection: 'row', marginBottom: 10,
                   borderWidth: 1,
                   borderColor: '#ccc',
                   backgroundColor: colors.purple_dim,
                   borderRadius: 5,
                   width: '80%',
-                  elevation: 3
+                  elevation: 3,
+                  alignItems: 'center', // Align items vertically
+                  paddingHorizontal: 10 // Add padding horizontally
                 }}>
                   <Image source={filter} style={styles.filterIcon} />
                   <TextInput
@@ -119,8 +121,8 @@ const UserList = () => {
                     value={searchQuery}
                     style={styles.searchInput}
                   />
-                  {searchQuery && (
-                    <TouchableOpacity onPress={() => removeSearchText()} style={{ justifyContent: 'center' }}>
+                  {searchQuery && searchQuery.length > 0 && (
+                    <TouchableOpacity onPress={() => removeSearchText()} style={{ position: 'absolute', right: 10 }}>
                       <Image source={close} style={styles.close} />
                     </TouchableOpacity>
                   )}
@@ -129,6 +131,17 @@ const UserList = () => {
                   <Image source={plus} style={styles.plusIcon} />
                 </TouchableOpacity>
               </View>
+
+              {searchQuery && filteredUsers && filteredUsers.length === 0 &&
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                  <Text style={{ fontFamily: fonts.regular }}>No users found!</Text>
+                </View>
+              }
+              {!searchQuery && usersListing && usersListing.length === 0 &&
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                  <Text style={{ fontFamily: fonts.regular }}>No users found!</Text>
+                </View>
+              }
               {usersListing && usersListing?.length > 0 ?
                 <FlatList
                   nestedScrollEnabled
@@ -138,9 +151,7 @@ const UserList = () => {
                   keyExtractor={item => item?.id.toString()}
                 />
                 :
-                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                  <Text style={{ fontFamily: fonts.regular }}>No users found!</Text>
-                </View>
+                null
               }
             </View>
           }

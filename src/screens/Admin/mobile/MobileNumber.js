@@ -190,7 +190,7 @@ function MobileNumber() {
     Keyboard.dismiss();
     const requestData = {
       phoneNumber: numberWithCode
-    };   
+    };
     dispatch(loginUserAction(requestData, navigation, setIsLoading))
   }
 
@@ -255,12 +255,14 @@ function MobileNumber() {
                 keyboardType="number-pad"
                 textContentType="oneTimeCode"
                 renderCell={({ index, symbol, isFocused }) => (
-                  <Text
-                    key={index}
-                    style={[styles.cell, isFocused && styles.focusCell]}
-                    onLayout={getCellOnLayoutHandler(index)}>
-                    {symbol || (isFocused ? <Cursor /> : null)}
-                  </Text>
+                  <View style={{ borderBottomWidth: 1, borderBottomColor: colors.white }}>
+                    <Text
+                      key={index}
+                      style={[styles.cell, isFocused && styles.focusCell]}
+                      onLayout={getCellOnLayoutHandler(index)}>
+                      {symbol || (isFocused ? <Cursor /> : null)}
+                    </Text>
+                  </View>
                 )}
               />
             </View>

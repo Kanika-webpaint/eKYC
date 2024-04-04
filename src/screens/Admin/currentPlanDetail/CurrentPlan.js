@@ -30,7 +30,7 @@ function CurrentPlan() {
                         <Text style={{ fontSize: 20, fontFamily: fonts.bold, color: colors.black, padding: 10 }}>Plan Details</Text>
                         <PlanItem title={'Current Plan'} value={planDetailsList?.organization?.amount === 1499900 ? 'Basic' : 'Premium'} />
                         <PlanItem title={'Billing Email'} value={planDetailsList?.organization?.email} />
-                        <PlanItem title={'Plan Status'} value={planDetailsList?.organization?.planStatus == 1 ? 'Active' : 'Inactive'} styleText={{ backgroundColor: planDetailsList?.organization?.planStatus == 1 ? 'green' : 'red', borderRadius: 10, padding: 3, color: colors.white }} />
+                        <PlanItem title={'Plan Status'} value={planDetailsList?.organization?.planStatus == 1 ? 'Active' : 'Inactive'} styleText={{ backgroundColor: planDetailsList?.organization?.planStatus == 1 ? colors.green : 'red', borderRadius: 10, overflow: 'hidden',paddingLeft: 6,padding:4, color: colors.white }} />
                         <PlanItem title={'Currency'} value={planDetailsList?.organization?.currency} />
                         <PlanItem title={'Price'} value={planDetailsList?.organization?.amount.toString().slice(0, -2) + '.' + planDetailsList?.organization?.amount?.toString().slice(-2).padEnd(2, '0')} />
                         <PlanItem title={'Billing period'} value={planDetailsList?.organization?.planInterval} />

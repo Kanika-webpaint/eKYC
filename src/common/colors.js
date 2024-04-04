@@ -10,5 +10,5 @@ export default colors = {
     purple:"#6E1CF5",
     purple_dim:'#FAF9FF',
     grey_text:'#575C69',
-    green:"#7cd49f"
+    green:"#228B22"
 }
