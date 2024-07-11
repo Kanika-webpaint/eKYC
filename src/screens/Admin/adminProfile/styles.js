@@ -13,7 +13,6 @@ export const styles = StyleSheet.create({
         paddingLeft: 12,
         borderRadius: 5,
         color: colors.black,
-        borderWidth: 1,
         width: '100%',
         fontSize: 16,
         borderColor: colors.white,
@@ -21,6 +20,27 @@ export const styles = StyleSheet.create({
         fontFamily: fonts.regular,
         marginBottom: 20
     },
-    imageView: { backgroundColor: colors.purple_dim, borderWidth: 1, justifyContent: 'center', alignItems: 'center', marginLeft: '8%', height: 70, width: 70, alignSelf: 'center', borderRadius: 40, borderColor: colors.app_red, elevation: 2, marginTop: 20 },
-    img: { height: 30, width: 30, resizeMode: 'contain', alignSelf: 'center' },
+    imageView: {
+        backgroundColor: colors.purple_dim,
+        borderWidth: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginLeft: '8%',
+        height: 70,
+        width: 70,
+        alignSelf: 'center',
+        borderRadius: 40,
+        borderColor: colors.app_red,
+        elevation: 2,
+        marginTop: 20
+    },
+    img: {
+        height: 30,
+        width: 30,
+        resizeMode: 'contain',
+    },
+    middleView: {
+        borderWidth: 0.3,
+        borderColor: colors.light_grey
+    }
 });

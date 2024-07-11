@@ -1,4 +1,13 @@
 rootProject.name = 'eKYC'
-apply from: file("../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesSettingsGradle(settings)
+
+apply from: file("../node_modules/@react-native-community/cli-platform-android/native_modules.gradle")
+applyNativeModulesSettingsGradle(settings)
+
 include ':app'
 includeBuild('../node_modules/@react-native/gradle-plugin')
+
+include ':react-native-document-reader-api'
+project(':react-native-document-reader-api').projectDir = new File(rootProject.projectDir, '../node_modules/@regulaforensics/react-native-document-reader-api/android')
+
+include ':react-native-document-reader-core-fullrfid'
+project(':react-native-document-reader-core-fullrfid').projectDir = new File(rootProject.projectDir, '../node_modules/@regulaforensics/react-native-document-reader-core-fullrfid/android')

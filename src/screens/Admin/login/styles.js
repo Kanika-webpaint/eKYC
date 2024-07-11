@@ -22,12 +22,10 @@ export const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
-
     },
     content: {
         flex: 1,
         justifyContent: 'center',
-        // alignItems: 'center',
     },
     title: {
         fontSize: 17,
@@ -65,7 +63,6 @@ export const styles = StyleSheet.create({
         paddingVertical: 10,
         borderRadius: 8,
         alignItems: 'center',
-
     },
     buttonText: {
         color: colors.white,

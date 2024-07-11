@@ -3,8 +3,6 @@
     <uses-permission android:name="android.permission.INTERNET" />   
      <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE " />
          <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE " />
-
-
     <application
       android:name=".MainApplication"
       android:label="@string/app_name"
@@ -26,5 +24,6 @@
             <category android:name="android.intent.category.LAUNCHER" />
         </intent-filter>
       </activity>
+      <activity android:name="com.regula.docreader.ReaderActivity" />
     </application>
 </manifest>

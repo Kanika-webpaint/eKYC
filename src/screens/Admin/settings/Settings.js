@@ -1,10 +1,3 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
 import React, { useCallback } from 'react';
 import { SafeAreaView, View, Image, ScrollView, Text, TouchableOpacity, Alert } from 'react-native';
 import { lock, logout, rightArrow, userRed } from '../../../common/images';
@@ -39,7 +32,6 @@ function Settings({ route }) {
                 style: 'cancel',
             },
         ]);
-
   
     return (
         <SafeAreaView style={styles.safeArea}>

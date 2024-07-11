@@ -104,9 +104,6 @@ android {
         }
     }
 }
-
-
-
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
@@ -117,16 +114,18 @@ implementation 'com.google.firebase:firebase-analytics'
   implementation("com.google.firebase:firebase-appcheck-playintegrity:17.1.1")
   implementation "androidx.browser:browser:1.2.0"
 //   implementation("com.google.firebase:firebase-appcheck-safetynet:16.1.2")
-  implementation("com.withpersona.sdk2:nfc-impl:2.10.9")
-
+  implementation "com.regulaforensics:documentreader:7.2.0"
     // include this line if integrating with the webrtc module. note that the webrtc-impl
     // version MUST match the version of the main sdk module.
-    implementation("com.withpersona.sdk2:webrtc-impl:2.10.9")
+     implementation "com.regulaforensics:documentreader-fullrfid:7.2.0"
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")
     } else {
         implementation jscFlavor
     }
+    //  implementation project(':@react-native-community/cli-platform-android/native_modules.gradle')
+   implementation project(':react-native-document-reader-api')
+implementation project(':react-native-document-reader-core-fullrfid')
 }
 
 apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)

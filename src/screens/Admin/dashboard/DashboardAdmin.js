@@ -52,7 +52,6 @@ function DashboardAdmin() {
             });
     }, [dispatch, setIsLoading]);
 
-
     const getOrgDetails = useCallback(async () => {
         try {
             const storedToken = await AsyncStorage.getItem('token');
@@ -83,7 +82,6 @@ function DashboardAdmin() {
         dispatch(loginAdminslice(false));
         showAlert('Logout successfully!');
     }, [dispatch]);
-
 
     const navigateToViewProfile = (item) => {
         navigation.navigate('UserProfile', { id: item?.id })
@@ -125,7 +123,6 @@ function DashboardAdmin() {
 
     const verifiedData = usersList.filter(item => item?.isVerified == 1);
     const unverifiedData = usersList.filter(item => item?.isVerified === null || item?.isVerified == 0);
-
 
     const renderItem = ({ item }) => {
         if (item.isVerified) {

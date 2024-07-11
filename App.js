@@ -5,6 +5,7 @@ import {
   View,
   Image,
   StatusBar,
+  LogBox,
   TouchableOpacity,
   Text,
   TouchableWithoutFeedback,
@@ -13,18 +14,21 @@ import colors from './src/common/colors';
 import { splashLogo, x_logo } from './src/common/images';
 import NavigationStack from './src/navigation/NavigationStack';
 import NetworkLogger from 'react-native-network-logger';
+import { Platform } from 'react-native';
 
 const App = () => {
   const [showSplash, setShowSplash] = useState(true);
   const [openLogs, setOpenLogs] = useState(false);
-
+  LogBox.ignoreAllLogs();
+  
   useEffect(() => {
     const splashTimeout = setTimeout(() => {
       setShowSplash(false);
-    }, 3000);
+    }, 3000); 
 
     return () => clearTimeout(splashTimeout);
   }, []);
+
 
   // const handleToggleLogs = () => {
   //   setOpenLogs(prevState => !prevState);
@@ -42,7 +46,7 @@ const App = () => {
       </View>
     ) : (
       <NavigationStack />
-    );
+    ); 
   }, [showSplash]);
 
   return (

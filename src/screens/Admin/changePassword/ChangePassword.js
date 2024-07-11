@@ -1,10 +1,3 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
 import React, { useState, useEffect } from 'react';
 import { SafeAreaView, View, ScrollView, Text, TextInput, Image, TouchableOpacity } from 'react-native';
 import { useDispatch } from 'react-redux'
@@ -19,7 +12,6 @@ import { updatePassowrdAction } from '../../../redux/actions/Organization/organi
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { hide, view } from '../../../common/images';
 
-
 function ChangePassword({ route }) {
     const navigation = useNavigation();
     const dispatch = useDispatch();
@@ -29,7 +21,6 @@ function ChangePassword({ route }) {
     const [token, setToken] = useState('')
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
     const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] = useState(false)
-
 
     useEffect(() => {
         AsyncStorage.getItem("token").then((value) => {

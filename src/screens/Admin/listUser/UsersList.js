@@ -12,7 +12,6 @@ import colors from '../../../common/colors';
 import Header from '../../../components/Header';
 import { deleteUserAction, getUsersListAction } from '../../../redux/actions/Organization/organizationActions';
 import { Swipeable } from 'react-native-gesture-handler';
-import showAlert from '../../../components/showAlert';
 import Loader from '../../../components/ActivityIndicator';
 
 const UserList = () => {
@@ -63,7 +62,6 @@ const UserList = () => {
             />
           }
         </TouchableOpacity>
-
       </View>
     );
   };
@@ -72,7 +70,6 @@ const UserList = () => {
     return (
       <Swipeable underlayColor="transparent" renderRightActions={() => renderRightActions(item.id)}>
         <View style={{ justifyContent: 'space-between' }}>
-
           <TouchableHighlight underlayColor='transparent' hitSlop={{ top: 100, bottom: 100, left: 200, right: 200 }} style={styles.itemContainer} onPress={() => navigateToUserProfile(item)}>
             <View style={styles.userInfoContainer}>
               <Image
@@ -111,8 +108,8 @@ const UserList = () => {
                   borderRadius: 5,
                   width: '80%',
                   elevation: 3,
-                  alignItems: 'center', // Align items vertically
-                  paddingHorizontal: 10 // Add padding horizontally
+                  alignItems: 'center', 
+                  paddingHorizontal: 10 
                 }}>
                   <Image source={filter} style={styles.filterIcon} />
                   <TextInput

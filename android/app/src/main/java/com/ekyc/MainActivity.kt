@@ -1,22 +1,49 @@
 package com.ekyc
 
+import android.os.Bundle
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
-import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.fabricEnabled
-import com.facebook.react.defaults.DefaultReactActivityDelegate
+import com.facebook.react.ReactRootView
+import com.facebook.react.modules.core.PermissionListener
+import com.regula.documentreader.full.DocumentReaderFull
+import com.swmansion.gesturehandler.react.RNGestureHandlerEnabledRootView
+import android.content.pm.PackageManager
 
-class MainActivity : ReactActivity() {
+class MainActivity : ReactActivity(), PermissionAwareActivity {
+    
+    private var mPermissionListener: PermissionListener? = null
+    
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
-  /**
-   * Returns the name of the main component registered from JavaScript. This is used to schedule
-   * rendering of the component.
-   */
-  override fun getMainComponentName(): String = "eKYC"
+        val licensePath = "..android/app/assets/regula.license" 
+        try {
+            DocumentReaderFull.getInstance().initialize(this, licensePath)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
 
-  /**
-   * Returns the instance of the [ReactActivityDelegate]. We use [DefaultReactActivityDelegate]
-   * which allows you to enable New Architecture with a single boolean flags [fabricEnabled]
-   */
-  override fun createReactActivityDelegate(): ReactActivityDelegate =
-      DefaultReactActivityDelegate(this, mainComponentName, fabricEnabled)
+    override fun getMainComponentName(): String {
+        return "eKYC"
+    }
+
+    override fun createReactActivityDelegate(): ReactActivityDelegate {
+        return object : ReactActivityDelegate(this, mainComponentName) {
+            override fun createRootView(): ReactRootView {
+                return RNGestureHandlerEnabledRootView(this@MainActivity)
+            }
+
+            override fun requestPermissions(permissions: Array<String>, requestCode: Int, listener: PermissionListener) {
+                mPermissionListener = listener
+                requestPermissions(permissions, requestCode)
+            }
+
+            override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+                if (mPermissionListener != null && mPermissionListener!!.onRequestPermissionsResult(requestCode, permissions, grantResults)) {
+                    mPermissionListener = null
+                }
+            }
+        }
+    }
 }
