@@ -1,6 +1,6 @@
-import { StyleSheet } from "react-native";
-import colors from "../../../common/colors";
-import { fonts } from "../../../common/fonts";
+import {StyleSheet} from 'react-native';
+import colors from '../../../common/colors';
+import {fonts} from '../../../common/fonts';
 
 export const styles = StyleSheet.create({
   safeArea: {
@@ -38,7 +38,7 @@ export const styles = StyleSheet.create({
     marginHorizontal: 30,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
   buttonText: {
     color: colors.white,
@@ -47,5 +47,31 @@ export const styles = StyleSheet.create({
     fontFamily: fonts.medium,
     marginRight: 5,
   },
-
+  modalContainer: {
+    flex: 1,
+    // justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    width: '100%',
+    height: '100%',
+    padding: 20,
+    backgroundColor: 'white',
+    // borderRadius: 10,
+    // alignItems: 'center',
+  },
+  modalText: {
+    fontSize: 18,
+    marginBottom: 20,
+  },
+  closeButton: {
+    position: 'absolute',
+    // top: 10,
+    right: 10,
+  },
+  closeButtonText: {
+    fontSize: 50,
+    color: 'black',
+  },
 });

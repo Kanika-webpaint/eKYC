@@ -76,6 +76,13 @@ android {
     compileSdk rootProject.ext.compileSdkVersion
 
     namespace "com.ekyc"
+    packagingOptions {
+        pickFirst '**/regula.license'
+        // Ensure that aaptOptions is within the android block
+        aaptOptions {
+            noCompress "Regula/faceSdkResource.dat"
+        }
+    }
     defaultConfig {
         applicationId "com.ekyc"
         minSdkVersion rootProject.ext.minSdkVersion
@@ -105,23 +112,23 @@ android {
     }
 }
 
-
-
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
     implementation("com.facebook.react:flipper-integration")
-implementation platform('com.google.firebase:firebase-bom:32.7.1')
-implementation 'com.google.firebase:firebase-analytics'
- implementation "com.google.firebase:firebase-auth:22.0.0"
-  implementation("com.google.firebase:firebase-appcheck-playintegrity:17.1.1")
-  implementation "androidx.browser:browser:1.2.0"
-//   implementation("com.google.firebase:firebase-appcheck-safetynet:16.1.2")
-  implementation("com.withpersona.sdk2:nfc-impl:2.10.9")
+    implementation platform('com.google.firebase:firebase-bom:33.1.2')
+    implementation 'com.google.firebase:firebase-analytics'
+    implementation "com.google.firebase:firebase-auth:22.0.0"
+    implementation("com.google.firebase:firebase-appcheck-playintegrity:17.1.1")
+    implementation "androidx.browser:browser:1.2.0"
+    implementation("com.google.firebase:firebase-appcheck-safetynet:16.1.2")
+   
+    //   implementation("com.withpersona.sdk2:nfc-impl:2.10.9")
+    // implementation project(':@regulaforensics_react-native-document-reader-api')
 
     // include this line if integrating with the webrtc module. note that the webrtc-impl
     // version MUST match the version of the main sdk module.
-    implementation("com.withpersona.sdk2:webrtc-impl:2.10.9")
+    // implementation("com.withpersona.sdk2:webrtc-impl:2.10.9")
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")
     } else {

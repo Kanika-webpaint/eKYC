@@ -1,10 +1,3 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { SafeAreaView, View, Text, TouchableOpacity, Image, ScrollView, TextInput, FlatList, Dimensions, KeyboardAvoidingView } from 'react-native';
 import colors from '../../../common/colors';
@@ -179,9 +172,10 @@ function CheckoutScreen({ route }) {
                                         paymentMethod: resPaymentMethod?.data?.id
                                     }
                                     const api_url = `${API_URL}/stripesubscription`
-                                    await axios.post(api_url, JSON.stringify(subscriptionData), configSubscription)
+                                    const res = await axios.post(api_url, JSON.stringify(subscriptionData), configSubscription)
                                         .then(async function (resSubscription) {
                                             const clientSecret = resSubscription?.data?.clientSecret?.payment_intent?.client_secret;
+                                            console.log("clientsecret",clientSecret)
                                             if (clientSecret) {
                                                 resSubscription?.data?.clientSecret?.lines?.data?.map(async item => {
                                                     const responseSubs = {
@@ -227,14 +221,16 @@ function CheckoutScreen({ route }) {
                                             }
                                         })
                                         .catch(function (error) {
-                                            console.log(error?.response?.data?.error,"errorrr")
+                                            console.log(error,"errorrr")
                                             if (error?.response?.data?.error?.statusCode == 402 || error?.response?.data?.error?.code === 'card_declined') {
                                                 setIsLoading(false)
                                                 showAlert('Your card was declined.\nPlease enter valid card details.');
                                             }
                                         });
+                                        console.log("res",res)
                                 }
                             }).catch(function (error) {
+                                console.log("err1",error)
                                 setIsLoading(false)
                                 showAlert('Something went wrong.\nPlease try again later.');
                             });
@@ -245,6 +241,7 @@ function CheckoutScreen({ route }) {
                         }
                     }
                 } catch (error) {
+                    console.log("err2",error)
                     setIsLoading(false)
                     showAlert('Something went wrong.\nPlease try again later.');
                 }

@@ -13,7 +13,6 @@ export const styles = StyleSheet.create({
         flexDirection: 'row',
         borderRadius: 5,
         color: colors.black,
-        borderWidth: 1,
         width: '100%',
         fontSize: 16,
         borderColor: colors.white,
@@ -24,7 +23,6 @@ export const styles = StyleSheet.create({
     usernameinput: {
         elevation: 2,
         height: 50,
-        borderWidth: 1,
         flexDirection: 'row',
         borderRadius: 5,
         color: colors.black,
@@ -55,8 +53,8 @@ export const styles = StyleSheet.create({
     header: {
         flexDirection: 'row',
         padding: 5,
-        alignItems: 'center', // Vertical alignment
-        width: '100%', // Take full width of the screen
+        alignItems: 'center', 
+        width: '100%',
     },
     userNameText: {
         margin: 5,

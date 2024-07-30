@@ -25,5 +25,4 @@ export const styles = StyleSheet.create({
         alignSelf:'center',
         marginLeft:10
     },
-
 });

@@ -1,10 +1,3 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
 import React from 'react';
 import { SafeAreaView, View, Text, ScrollView, KeyboardAvoidingView } from 'react-native';
 import colors from '../../../common/colors';

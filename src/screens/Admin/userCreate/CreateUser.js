@@ -1,10 +1,3 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
 import React, { useState, useEffect } from 'react';
 import { SafeAreaView, View, Text, ScrollView, TextInput, TouchableOpacity, Image, Dimensions, KeyboardAvoidingView } from 'react-native';
 import colors from '../../../common/colors';
@@ -36,15 +29,23 @@ function CreateUser() {
     const getUsersList = useSelector(state => state?.org?.getUsersList);
     const planDetailsList = useSelector((state) => state?.org?.orgDetails)
     useEffect(() => {
-        AsyncStorage.getItem("token").then((value) => {
-            if (value) {
-                setAuthToken(value)
-                dispatch(getUsersListAction(value, setIsLoading))
+        const fetchData = async () => {
+            try {
+                const value = await AsyncStorage.getItem("token");
+                if (value) {
+                    setAuthToken(value);
+                    dispatch(getUsersListAction(value, setIsLoading));
+                }
+            } catch (error) {
+                // Handle errors, e.g., logging or notifying the user
+                console.error("Error fetching token:", error);
             }
-        })
-            .then(res => {
-            });
+        };
+
+        fetchData();
+
     }, [token]);
+
 
     useEffect(() => {
         const updateOrientation = () => {
@@ -67,7 +68,6 @@ function CreateUser() {
         setFormData({ ...userData, [field]: value });
         setErrorMessages({ ...errorMessages, [field]: '' });
     };
-
 
     const handleCreateUser = () => {
         const newErrorMessages = {};
@@ -113,8 +113,6 @@ function CreateUser() {
             }
         }
     };
-
-
 
     const onChangeCountryCode = () => {
         setShow(true)
