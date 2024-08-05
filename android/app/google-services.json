@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "906176847453",
+    "project_id": "validifyx-ed3cc",
+    "storage_bucket": "validifyx-ed3cc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:906176847453:android:d3235a119ac0e26c0af7b4",
+        "android_client_info": {
+          "package_name": "com.ekyc"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "906176847453-fhfqcqmvqc4tu06n1ol87p9jtfke9ao3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCqi5GymPJlyRRbv1tgoxOL0AJEZ8WrrHo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "906176847453-fhfqcqmvqc4tu06n1ol87p9jtfke9ao3.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "906176847453-mtmk67s6jlo67pg157sf4htf07ethqrt.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "org.reactjs.native.validifyx"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

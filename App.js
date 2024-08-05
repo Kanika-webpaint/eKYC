@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
   SafeAreaView,
   StyleSheet,
@@ -11,16 +11,16 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 import colors from './src/common/colors';
-import { splashLogo, x_logo } from './src/common/images';
+import {splashLogo, x_logo} from './src/common/images';
 import NavigationStack from './src/navigation/NavigationStack';
 import NetworkLogger from 'react-native-network-logger';
-import { Platform } from 'react-native';
+import {Platform} from 'react-native';
 
 const App = () => {
   const [showSplash, setShowSplash] = useState(true);
   const [openLogs, setOpenLogs] = useState(false);
   LogBox.ignoreAllLogs();
-  
+
   useEffect(() => {
     const splashTimeout = setTimeout(() => {
       setShowSplash(false);
@@ -28,7 +28,6 @@ const App = () => {
 
     return () => clearTimeout(splashTimeout);
   }, []);
-
 
   // const handleToggleLogs = () => {
   //   setOpenLogs(prevState => !prevState);
@@ -52,14 +51,14 @@ const App = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       {/* <TouchableWithoutFeedback onPress={handleCloseLogs}> */}
-        <View style={styles.container}>
-          <StatusBar backgroundColor={colors.app_blue} />
-          {renderNavigation()}
-          {/* <TouchableOpacity style={styles.logButton} onPress={handleToggleLogs}>
+      <View style={styles.container}>
+        <StatusBar backgroundColor={colors.app_blue} />
+        {renderNavigation()}
+        {/* <TouchableOpacity style={styles.logButton} onPress={handleToggleLogs}>
             <Text style={styles.logButtonText}>Logs</Text>
           </TouchableOpacity> */}
-          {/* {openLogs && <NetworkLogger />} */}
-        </View>
+        {/* {openLogs && <NetworkLogger />} */}
+      </View>
       {/* </TouchableWithoutFeedback> */}
     </SafeAreaView>
   );
@@ -83,7 +82,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     resizeMode: 'contain',
     height: 80,
-    width: '80%'
+    width: '80%',
   },
   backgroundImage: {
     position: 'absolute',

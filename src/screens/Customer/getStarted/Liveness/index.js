@@ -30,7 +30,16 @@ import FaceSDK, {
 } from '@regulaforensics/react-native-face-api';
 import {TabView, SceneMap, TabBar} from 'react-native-tab-view';
 import Svg, {Polygon} from 'react-native-svg';
-
+import RedButton from '../../../../components/RedButton';
+import {useDispatch, useSelector} from 'react-redux';
+import {verifyCodeslice} from '../../../../redux/slices/user/userSlice';
+import {
+  checkverifiedUser,
+  verifedCustomerDataAction,
+} from '../../../../redux/actions/user/UserAction';
+import {useNavigation} from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Loader from '../../../../components/ActivityIndicator';
 const DropdownContent = ({label, value, isMatch}) => (
   <View style={{flexDirection: 'row', backgroundColor: 'lightgrey'}}>
     <View style={{width: '20%', backgroundColor: 'transparent'}}></View>
@@ -66,12 +75,6 @@ const DropdownContent = ({label, value, isMatch}) => (
       ) : (
         <Text style={{color: 'grey', fontSize: 40}}>-</Text>
       )}
-
-      {/* {label === 'Barcode <=>' && (
-        <Text style={{color: isMatch ? 'green' : 'grey', fontSize: 20}}>
-          {isMatch ? '✓' : '-'}
-        </Text>
-      )} */}
     </View>
   </View>
 );
@@ -92,12 +95,12 @@ const FirstRoute = ({data}) => {
     documentNumberField?.values.find(item => item.sourceType === 17)
       ?.originalValue || '';
   const country = fields.find(item => item.fieldName === 'Issuing state');
-  console.log(country, 'bjjjjjj');
+  // console.log(country, 'bjjjjjj');
   const countryBarcode =
     country?.values.find(item => item.sourceType === 18)?.value || '';
   const countryVisual =
     country?.values.find(item => item.sourceType === 17)?.value || '';
-  console.log(countryBarcode, countryVisual, 'pppppppp');
+  // console.log(countryBarcode, countryVisual, 'pppppppp');
   const imageFront =
     data?.graphicResult?.fields.find(
       item => item.fieldName === 'Document image',
@@ -124,7 +127,7 @@ const FirstRoute = ({data}) => {
     </View>
   );
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <FieldRow label="Date of birth" value={dob?.value} color={dobColor} />
       <FieldRow
         label="Document Number"
@@ -161,7 +164,7 @@ const FirstRoute = ({data}) => {
           resizeMode="cover"
         />
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -176,16 +179,17 @@ const SecondRoute = ({data}) => {
   };
 
   const renderRow = ({item}) => {
-    const {fieldName, value, key, values} = item;
+    const {fieldName, value, key, values, status} = item;
+    // console.log(status, '999999999');
     const barcodeValues = values.filter(val => val.sourceType === 18);
     const visualValues = values.filter(val => val.sourceType === 17);
 
     const barcodeSet = new Set(barcodeValues.map(val => val.value));
     const visualSet = new Set(visualValues.map(val => val.value));
 
-    const valuesMatch =
-      [...barcodeSet].every(val => visualSet.has(val)) &&
-      [...visualSet].every(val => barcodeSet.has(val));
+    // const valuesMatch =
+    //   [...barcodeSet].every(val => visualSet.has(val)) &&
+    //   [...visualSet].every(val => barcodeSet.has(val));
 
     return (
       <View>
@@ -220,7 +224,13 @@ const SecondRoute = ({data}) => {
               backgroundColor: 'white',
               justifyContent: 'center',
             }}>
-            <Text style={[{color: valuesMatch ? 'green' : 'black'}]}>
+            <Text
+              style={[
+                {
+                  color:
+                    status === 1 ? 'green' : status === 2 ? 'black' : 'red',
+                },
+              ]}>
               {value}
             </Text>
           </View>
@@ -231,14 +241,12 @@ const SecondRoute = ({data}) => {
               justifyContent: 'center',
               alignItems: 'center',
             }}>
-            {barcodeValues.length > 0 && visualValues.length > 0 ? (
-              valuesMatch ? (
-                <Text style={{color: 'green', fontSize: 20}}>✓</Text>
-              ) : (
-                <Text style={{color: 'grey', fontSize: 40}}>-</Text>
-              )
-            ) : (
+            {status === 1 ? (
+              <Text style={{color: 'green', fontSize: 20}}>✓</Text>
+            ) : status === 2 ? (
               <Text style={{color: 'grey', fontSize: 40}}>-</Text>
+            ) : (
+              <Text style={{color: 'red', fontSize: 20}}>x</Text>
             )}
           </View>
         </View>
@@ -249,7 +257,7 @@ const SecondRoute = ({data}) => {
                 key={`barcode-${index}`}
                 label="Barcode"
                 value={subValue.value}
-                isMatch={false} // No need to check match here
+                // isMatch={false} // No need to check match here
               />
             ))}
             {visualValues.map((subValue, index) => (
@@ -257,14 +265,14 @@ const SecondRoute = ({data}) => {
                 key={`visual-${index}`}
                 label="Visual Zone"
                 value={subValue.value}
-                isMatch={false} // No need to check match here
+                // isMatch={false} // No need to check match here
               />
             ))}
-            {barcodeValues.length > 0 && visualValues.length > 0 && (
+            {status === 1 && (
               <DropdownContent
                 label="Barcode <=>"
                 value="Visual Zone"
-                isMatch={valuesMatch}
+                isMatch={status}
               />
             )}
           </>
@@ -278,13 +286,15 @@ const SecondRoute = ({data}) => {
     key: `field-${index}`,
   }));
   return (
-    <View style={{flex: 1, backgroundColor: 'white'}}>
+    <ScrollView
+      showsVerticalScrollIndicator={false}
+      style={{flex: 1, backgroundColor: 'white'}}>
       <FlatList
         data={rows}
         renderItem={renderRow}
         keyExtractor={item => item.key}
       />
-    </View>
+    </ScrollView>
   );
 };
 
@@ -417,19 +427,29 @@ const ThirdRoute = ({data}) => {
   );
 };
 
-const FourthRoute = ({data}) => {
-  const [dropdownVisible, setDropdownVisible] = useState(false);
+const FourthRoute = ({data, img1, img2, similarity}) => {
+  const [dropdownsVisible, setDropdownsVisible] = useState({
+    barcode: false,
+    portrait: false,
+  });
+
   const imageFront =
     data?.graphicResult?.fields.find(
       item => item.fieldName === 'Document image',
     )?.value || '';
-  const {leftTop, rightTop, rightBottom, leftBottom} =
-    data?.barcodePosition[0] || {};
-  const toggleDropdown = () => {
-    setDropdownVisible(!dropdownVisible);
+
+  const imagePortrait = data?.graphicResult?.fields.find(
+    item => item.fieldName === 'Portrait',
+  );
+
+  const toggleDropdown = key => {
+    setDropdownsVisible(prevState => ({
+      ...prevState,
+      [key]: !prevState[key],
+    }));
   };
 
-  const renderDropdownItem = ({item, index}) => (
+  const renderDropdownItem = ({item}) => (
     <View
       style={{
         padding: 10,
@@ -439,15 +459,15 @@ const FourthRoute = ({data}) => {
       }}>
       <View style={{width: '80%'}}>
         <Text>{item?.elementTypeName}</Text>
-        <Text>{item?.elementDiagnoseName}</Text>
-      </View>
-
-      <View style={{marginLeft: 'auto'}}>
-        {item.status === 1 ? (
-          <Text style={{color: 'green', fontSize: 20}}>✓</Text>
-        ) : (
-          <Text style={{color: 'grey', fontSize: 40}}>—</Text>
+        {item?.elementDiagnoseName !== 'No errors' && (
+          <Text>{item?.elementDiagnoseName}</Text>
         )}
+      </View>
+      <View style={{marginLeft: 'auto'}}>
+        <Text
+          style={{color: item.status === 1 ? 'green' : 'grey', fontSize: 20}}>
+          {item.status === 1 ? '✓' : '—'}
+        </Text>
       </View>
     </View>
   );
@@ -475,50 +495,113 @@ const FourthRoute = ({data}) => {
     return null;
   };
 
+  const renderSectionHeader = (title, dropdownKey, status) => (
+    <View
+      style={{
+        backgroundColor: 'lightgrey',
+        flexDirection: 'row',
+        paddingVertical: 10,
+        alignItems: 'center',
+      }}>
+      <TouchableOpacity
+        style={{width: '20%', alignItems: 'center'}}
+        onPress={() => toggleDropdown(dropdownKey)}>
+        <Text style={{fontSize: 30}}>
+          {dropdownsVisible[dropdownKey] ? 'v' : '>'}
+        </Text>
+      </TouchableOpacity>
+      <View style={{width: '60%'}}>
+        <Text>{title}</Text>
+      </View>
+      <View style={{width: '20%', alignItems: 'center'}}>
+        <Text style={{color: status === 1 ? 'green' : 'grey', fontSize: 20}}>
+          {status === 1 ? '✓' : '-'}
+        </Text>
+      </View>
+    </View>
+  );
+
   const dataWithImage = data?.authenticityResult?.checks[0]?.elements || [];
-  const lastIndex = dataWithImage.length - 1;
 
   return (
-    <View style={{flex: 1, backgroundColor: 'white'}}>
-      <View
-        style={{
-          backgroundColor: 'lightgrey',
-          flexDirection: 'row',
-          paddingVertical: 10,
-          alignItems: 'center',
-        }}>
-        <TouchableOpacity
-          style={{width: '20%', alignItems: 'center'}}
-          onPress={toggleDropdown}>
-          {dropdownVisible ? (
-            <Text style={{fontSize: 30}}>v</Text>
-          ) : (
-            <Text style={{fontSize: 30}}>{`>`}</Text>
-          )}
-        </TouchableOpacity>
-        <View style={{width: '60%'}}>
-          <Text>Barcode format Check</Text>
-        </View>
-        <View style={{width: '20%', alignItems: 'center'}}>
-          {data?.authenticityResult?.checks[0]?.status === 1 ? (
-            <Text style={{color: 'green', fontSize: 20}}>✓</Text>
-          ) : (
-            <Text style={{color: 'grey', fontSize: 40}}>-</Text>
-          )}
-
-          {/* <Icon name="check" size={24} /> */}
-        </View>
-      </View>
-      {dropdownVisible && (
+    <ScrollView showsVerticalScrollIndicator={false} style={{flex: 1}}>
+      {renderSectionHeader(
+        'Barcode format Check',
+        'barcode',
+        data?.authenticityResult?.checks[0]?.status,
+      )}
+      {dropdownsVisible.barcode && (
         <FlatList
-          data={data?.authenticityResult?.checks[0]?.elements}
+          data={dataWithImage}
           keyExtractor={(item, index) => index.toString()}
           renderItem={renderDropdownItem}
           ListFooterComponent={renderImage}
           style={{backgroundColor: 'white', padding: 10}}
         />
       )}
-    </View>
+
+      <View style={{borderColor: 'lightgrey', borderWidth: 1}} />
+
+      {img1 &&
+        renderSectionHeader(
+          'Comparison of the Portraits',
+          'portrait',
+          similarity && parseFloat(similarity) >= 75 ? 1 : 0,
+        )}
+      {dropdownsVisible.portrait && (
+        <View style={{flex: 1, backgroundColor: 'white'}}>
+          <Text style={{textAlign: 'center', marginVertical: 10}}>
+            Portrait vs Camera image
+          </Text>
+          <View
+            style={{
+              flexDirection: 'row',
+              height: 200,
+              marginHorizontal: 10,
+            }}>
+            <View
+              style={{
+                width: '30%',
+                alignItems: 'center',
+                backgroundColor: 'white',
+              }}>
+              <Image
+                source={{
+                  uri: `data:image/png;base64,${imagePortrait?.value}`,
+                }}
+                style={{width: '80%', height: '80%'}}
+                resizeMode="contain"
+              />
+            </View>
+            <View
+              style={{
+                width: '50%',
+                alignItems: 'center',
+                backgroundColor: 'white',
+              }}>
+              <Image
+                source={{
+                  uri: img1?.uri,
+                }}
+                style={{width: '80%', height: '80%'}}
+                resizeMode="contain"
+              />
+            </View>
+            <View
+              style={{
+                width: '20%',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}>
+              <Text style={{textAlign: 'center', marginTop: 10}}>
+                {similarity}%
+              </Text>
+              <Text style={{textAlign: 'center', marginTop: 1}}>match</Text>
+            </View>
+          </View>
+        </View>
+      )}
+    </ScrollView>
   );
 };
 
@@ -536,7 +619,9 @@ const FifthRoute = ({liveness, similarity, data}) => {
   // );
 
   return (
-    <View style={{flex: 1, backgroundColor: 'white'}}>
+    <ScrollView
+      showsVerticalScrollIndicator={false}
+      style={{flex: 1, backgroundColor: 'white'}}>
       <View
         style={{
           marginLeft: '5%',
@@ -566,7 +651,7 @@ const FifthRoute = ({liveness, similarity, data}) => {
           alignItems: 'center',
         }}>
         <Text>Face matching</Text>
-        {similarity && similarity != 'nil' && similarity >= '75' ? (
+        {similarity && similarity !== 'nil' && parseFloat(similarity) >= 75 ? (
           <Text style={{color: 'green', fontSize: 20}}>✓</Text>
         ) : (
           <Text style={{color: 'grey', fontSize: 40}}>-</Text>
@@ -636,10 +721,10 @@ const FifthRoute = ({liveness, similarity, data}) => {
           flexDirection: 'row',
         }}>
         <Text>Text Fields</Text>
-        {data && data?.textResult?.status == '1' ? (
-          <Text style={{color: 'green', fontSize: 20}}>✓</Text>
-        ) : (
+        {data && data?.textResult?.status == '0' ? (
           <Text style={{color: 'grey', fontSize: 40}}>-</Text>
+        ) : (
+          <Text style={{color: 'green', fontSize: 20}}>✓</Text>
         )}
       </View>
       <View
@@ -661,30 +746,41 @@ const FifthRoute = ({liveness, similarity, data}) => {
           flexDirection: 'row',
         }}>
         <Text>Authenticity</Text>
-        {data && data?.authenticityResult?.status == '1' ? (
-          <Text style={{color: 'green', fontSize: 20}}>✓</Text>
-        ) : (
+        {data && data?.authenticityResult?.status == '0' ? (
           <Text style={{color: 'grey', fontSize: 40}}>-</Text>
+        ) : (
+          <Text style={{color: 'green', fontSize: 20}}>✓</Text>
         )}
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
 const Liveness = ({route}) => {
   const data = route?.params?.data?.testData;
-  console.log(data, 'hhhhhhhhhhhhhhhhh');
+  console.log(data?.textResult?.fields, 'hhhhhhhhhhhhhhhhh');
+  const navigation = useNavigation();
+  const {height: screenHeight} = Dimensions.get('window');
+  const dispatch = useDispatch();
+  const [userToken, setTokenUser] = useState('');
+  const a = data?.textResult;
+  // a.fields.forEach(field => {
+  //   console.log(
+  //     `Field Name: ${field.fieldName}, Status: ${field.status}, Validity Status: ${field.validityStatus}`,
+  //   );
+  // });
   const [similarity, setSimilarity] = useState('nil');
   const [liveness, setLiveness] = useState('nil');
   const [img1, setImg1] = useState('');
   const [img2, setImg2] = useState('');
   const image1 = useRef(new MatchFacesImage());
   const image2 = useRef(new MatchFacesImage());
-
+  const [isPortrait, setIsPortrait] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const name = data?.textResult?.fields.find(
     item => item.fieldName === 'Surname and given names',
   );
-  const age = data?.textResult?.fields.find(item => item.fieldName === 'Age');
+
   const imagePortrait = data?.graphicResult?.fields.find(
     item => item.fieldName === 'Portrait',
   );
@@ -692,9 +788,176 @@ const Liveness = ({route}) => {
   const gender = data?.textResult?.fields.find(
     item => item.fieldName === 'Sex',
   );
+
+  const documentClassCode =
+    data?.textResult?.fields.find(
+      item => item.fieldName === 'Document class code',
+    )?.value || '';
+
+  console.log(documentClassCode);
+
+  const issuingStateCode =
+    data?.textResult?.fields.find(
+      item => item.fieldName === 'Issuing state code',
+    )?.value || '';
+  console.log(issuingStateCode);
+
+  const documentNumber =
+    data?.textResult?.fields.find(item => item.fieldName === 'Document number')
+      ?.value || '';
+  console.log(documentNumber);
+
+  const dateofExpiry =
+    data?.textResult?.fields.find(item => item.fieldName === 'Date of expiry')
+      ?.value || '';
+  console.log(dateofExpiry);
+
+  const dateofIssue =
+    data?.textResult?.fields.find(item => item.fieldName === 'Date of issue')
+      ?.value || '';
+  console.log(dateofIssue);
+
+  const dateofBirth =
+    data?.textResult?.fields.find(item => item.fieldName === 'Date of birth')
+      ?.value || '';
+  console.log(dateofBirth);
+
+  const placeofBirth =
+    data?.textResult?.fields.find(item => item.fieldName === 'Place of birth')
+      ?.value || '';
+  console.log(placeofBirth);
+
+  const surname =
+    data?.textResult?.fields.find(item => item.fieldName === 'Surname')
+      ?.value || '';
+  console.log(surname);
+
+  const givenName =
+    data?.textResult?.fields.find(item => item.fieldName === 'Given name')
+      ?.value || '';
+  console.log(givenName);
+
+  const nationality =
+    data?.textResult?.fields.find(item => item.fieldName === 'Nationality')
+      ?.value || '';
+  console.log(nationality);
+
+  const sex =
+    data?.textResult?.fields.find(item => item.fieldName === 'Sex')?.value ||
+    '';
+  console.log(sex);
+
+  const issuingAuthority =
+    data?.textResult?.fields.find(
+      item => item.fieldName === 'Issuing authority',
+    )?.value || '';
+  console.log(issuingAuthority);
+
+  const surnameandGivenNames =
+    data?.textResult?.fields.find(
+      item => item.fieldName === 'Surname and given names',
+    )?.value || '';
+  console.log(surnameandGivenNames);
+
+  const nationalityCode =
+    data?.textResult?.fields.find(item => item.fieldName === 'Nationality code')
+      ?.value || '';
+  console.log(nationalityCode);
+
+  const issuingState =
+    data?.textResult?.fields.find(item => item.fieldName === 'Issuing state')
+      ?.value || '';
+  console.log(issuingState);
+
+  const middleName =
+    data?.textResult?.fields.find(item => item.fieldName === 'Middle name')
+      ?.value || '';
+  console.log(middleName);
+
+  const age =
+    data?.textResult?.fields.find(item => item.fieldName === 'Age')?.value ||
+    '';
+  console.log(age);
+
+  const monthsToExpire =
+    data?.textResult?.fields.find(item => item.fieldName === 'Months to expire')
+      ?.value || '';
+  console.log(monthsToExpire);
+
+  const ageAtIssue =
+    data?.textResult?.fields.find(item => item.fieldName === 'Age at issue')
+      ?.value || '';
+  console.log(ageAtIssue);
+
+  const yearsSinceIssue =
+    data?.textResult?.fields.find(
+      item => item.fieldName === 'Years since issue',
+    )?.value || '';
+  console.log(yearsSinceIssue);
+
+  const passportNumber =
+    data?.textResult?.fields.find(item => item.fieldName === 'Passport number')
+      ?.value || '';
+  console.log(passportNumber);
+
+  const companyName =
+    data?.textResult?.fields.find(item => item.fieldName === 'Company name')
+      ?.value || '';
+  console.log(companyName);
+
+  const address =
+    data?.textResult?.fields.find(item => item.fieldName === 'Address')
+      ?.value || '';
+  console.log(address);
+
+  // const middleName = data?.textResult?.fields.find(
+  //   item => item.fieldName === 'Middle name',
+  // );
+
+  // const middleName = data?.textResult?.fields.find(
+  //   item => item.fieldName === 'Middle name',
+  // );
+
+  // const middleName = data?.textResult?.fields.find(
+  //   item => item.fieldName === 'Middle name',
+  // );
+
+  // const middleName = data?.textResult?.fields.find(
+  //   item => item.fieldName === 'Middle name',
+  // );
+
+  // const middleName = data?.textResult?.fields.find(
+  //   item => item.fieldName === 'Middle name',
+  // );
+
+  const requestData = {
+    issuingStateCode: issuingStateCode,
+    documentNumber: documentNumber,
+    dateofExpiry: dateofExpiry,
+    dateofIssue: dateofIssue,
+    dateofBirth: dateofBirth,
+    placeofBirth: placeofBirth,
+    surname: surname,
+    givenName: givenName,
+    nationality: nationality,
+    sex: sex,
+    issuingAuthority: issuingAuthority,
+    surnameandGivenNames: surnameandGivenNames,
+    nationalityCode: nationalityCode,
+    issuingState: issuingState,
+    middleName: middleName,
+    age: age,
+    monthsToExpire: monthsToExpire,
+    ageAtIssue: ageAtIssue,
+    yearsSinceIssue: yearsSinceIssue,
+    passportNumber: passportNumber,
+    companyName: companyName,
+    documentClassCode: documentClassCode,
+    address: address,
+  };
+
   const layout = useWindowDimensions();
   const [index, setIndex] = useState(0);
-  // console.log(Enum, 'IIIIIIIIIIIIIIIIIIIII');
   const [routes] = React.useState([
     {key: 'first', title: 'OVERALL RESULT'},
     {key: 'second', title: 'TEXT DATA'},
@@ -707,7 +970,14 @@ const Liveness = ({route}) => {
     first: () => <FirstRoute data={data} />,
     second: () => <SecondRoute data={data?.textResult} />,
     third: () => <ThirdRoute data={data?.graphicResult} />,
-    fourth: () => <FourthRoute data={data} />,
+    fourth: () => (
+      <FourthRoute
+        data={data}
+        img1={img1}
+        similarity={similarity}
+        img2={img2}
+      />
+    ),
     fifth: () => (
       <FifthRoute liveness={liveness} similarity={similarity} data={data} />
     ),
@@ -757,6 +1027,17 @@ const Liveness = ({route}) => {
   }, []);
 
   useEffect(() => {
+    AsyncStorage.getItem('token_user')
+      .then(value => {
+        if (value) {
+          setTokenUser(value);
+          dispatch(checkverifiedUser(navigation, userToken, setIsLoading));
+        }
+      })
+      .then(res => {});
+  }, [dispatch, userToken]);
+
+  useEffect(() => {
     if (route?.params?.detail === 'cancel') {
       console.log('result page');
     } else {
@@ -773,7 +1054,6 @@ const Liveness = ({route}) => {
       image1.current.image = base64;
       image1.current.imageType = type;
       setImg1({uri: 'data:image/png;base64,' + base64});
-      // setLiveness('null');
     } else {
       image2.current = new MatchFacesImage();
       image2.current.image = base64;
@@ -791,7 +1071,7 @@ const Liveness = ({route}) => {
       console.log('Init Error Message:', response.error?.message);
     } else {
       console.log('Init complete');
-      // livenessCheck();
+      livenessCheck();
     }
   };
 
@@ -854,7 +1134,6 @@ const Liveness = ({route}) => {
   };
 
   const livenessCheck = () => {
-    console.log('aaaaaaaaa');
     FaceSDK.startLiveness(
       {skipStep: [LivenessSkipStep.ONBOARDING_STEP]},
       json => {
@@ -867,6 +1146,11 @@ const Liveness = ({route}) => {
                 ? 'passed'
                 : 'unknown',
             );
+
+            if (imagePortrait) {
+              setImage(false, imagePortrait?.value, Enum.ImageType.PRINTED);
+              matchFaces();
+            }
           }
         } catch (error) {
           console.error('Error parsing liveness response:', error);
@@ -876,60 +1160,87 @@ const Liveness = ({route}) => {
         console.error('Liveness check error:', error);
       },
     );
+  };
 
-    // FaceSDK.startLiveness(
-    //   // {skipStep: LivenessSkipStep.ONBOARDING_STEP},
-    //   json => {
-    //     try {
-    //       console.log('Liveness response JSON:');
-    //       const parsedJson = JSON.parse(json);
-    //       const response = LivenessResponse.fromJson(parsedJson);
-    //       console.log(response, 'Parsed response:');
-
-    //       if (response?.image) {
-    //         setLiveness(
-    //           response.liveness === Enum.LivenessStatus.PASSED
-    //             ? 'passed'
-    //             : 'unknown',
-    //         );
-
-    //         if (imagePortrait) {
-    //           setImage(true, imagePortrait?.value, Enum.ImageType.PRINTED);
-    //         }
-
-    //         setImage(false, response?.image, Enum.ImageType.LIVE);
-    //         matchFaces();
-    //       }
-
-    //       FaceSDK.stopLiveness(
-    //         _ => {},
-    //         _ => {},
-    //       );
-    //     } catch (error) {
-    //       console.error('Error parsing liveness response:', error);
-    //     }
-    //   },
-    //   error => {
-    //     console.error('Liveness check error:', error);
-    //   },
-    // );
+  const handleSubmission = () => {
+    setIsLoading(true);
+    console.log('111111');
+    dispatch(
+      verifedCustomerDataAction(
+        requestData,
+        navigation,
+        userToken,
+        setIsLoading,
+      ),
+    );
   };
 
   return (
     <SafeAreaView style={styles.container}>
+      <View
+        style={{
+          height: 60,
+          backgroundColor: 'white',
+          justifyContent: 'center',
+        }}>
+        <TouchableOpacity
+          style={{width: '15%', backgroundColor: 'white', marginLeft: '2%'}}
+          onPress={() => {
+            navigation.navigate('IdScreen');
+          }}>
+          <Image
+            source={require('../../../../common/assets/back.png')}
+            style={{height: 30, width: 30, marginLeft: '5%'}}
+          />
+        </TouchableOpacity>
+      </View>
+      <View
+        style={{
+          borderWidth: 0.7,
+          width: '100%',
+          borderColor: 'lightgrey',
+        }}></View>
       <View style={styles.headerContainer}>
         <View style={styles.headerLeft}>
-          {name && (
-            <Text style={styles.nameText}>{name?.getValue?.originalValue}</Text>
+          {surnameandGivenNames && (
+            <Text style={styles.nameText}>{surnameandGivenNames}</Text>
           )}
-          {gender && (
-            <Text style={styles.sexText}>
-              {gender?.getValue?.originalValue}
-            </Text>
-          )}
-          {age && (
-            <Text style={styles.ageText}>Age {age?.getValue?.value}</Text>
-          )}
+          {sex && <Text style={styles.sexText}>{sex}</Text>}
+          {age && <Text style={styles.ageText}>Age {age}</Text>}
+          <View style={{marginTop: 10, flexDirection: 'row'}}>
+            {data && data?.textResult?.status == '0' ? (
+              <Image
+                source={require('../../../../common/assets/alert.png')}
+                style={{width: 30, height: 30}}
+                resizeMode="contain"
+              />
+            ) : (
+              <View
+                style={{
+                  height: 30,
+                  width: 30,
+                  borderRadius: 15,
+                  backgroundColor: 'green',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <Text style={{color: 'white', fontSize: 15}}>✓</Text>
+              </View>
+            )}
+
+            {
+              liveness && liveness == 'passed' ? (
+                <Image
+                  source={require('../../../../common/assets/live.png')}
+                  style={{width: 30, height: 30, marginLeft: 10}}
+                  resizeMode="contain"
+                />
+              ) : null
+              // <Text style={{color: 'grey', fontSize: 40, marginLeft: 10}}>
+              //   -
+              // </Text>
+            }
+          </View>
         </View>
         <View style={styles.headerRight}>
           <Image
@@ -949,6 +1260,39 @@ const Liveness = ({route}) => {
           onIndexChange={setIndex}
           // initialLayout={{width: layout.width}}
           renderTabBar={renderTabBar}
+        />
+      </View>
+      <View
+        style={{
+          backgroundColor: 'white',
+          paddingVertical: 1,
+        }}>
+        {similarity && parseFloat(similarity) >= 75 ? null : (
+          <RedButton
+            buttonContainerStyle={[
+              styles.buttonContainer,
+              {marginBottom: isPortrait ? 0 : 20},
+            ]}
+            ButtonContent={isLoading ? <Loader /> : 'Verify Face '}
+            image
+            contentStyle={styles.buttonText}
+            onPress={() => {
+              initializeSDK();
+            }}
+          />
+        )}
+
+        <RedButton
+          buttonContainerStyle={[
+            styles.buttonContainer,
+            {marginBottom: isPortrait ? 0 : 20},
+          ]}
+          ButtonContent={isLoading ? <Loader /> : 'Submit Verification '}
+          image
+          contentStyle={styles.buttonText}
+          onPress={() => {
+            handleSubmission();
+          }}
         />
       </View>
     </SafeAreaView>
@@ -982,6 +1326,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: 'black',
     marginVertical: 2,
+    fontWeight: '800',
   },
   sexText: {
     marginVertical: 2,
@@ -1005,13 +1350,17 @@ const styles = StyleSheet.create({
   },
   tabBar: {
     backgroundColor: 'white',
+    // paddingHorizontal: 10,
   },
   tabLabel: {
     color: 'gray',
     fontSize: 14,
+    fontWeight: '700',
   },
   selectedTabLabel: {
     color: 'black',
+    fontSize: 14,
+    fontWeight: '700',
   },
   scene: {
     flex: 1,
@@ -1027,992 +1376,20 @@ const styles = StyleSheet.create({
     height: '100%',
     width: '100%',
   },
+  buttonContainer: {
+    marginTop: '5%',
+    backgroundColor: colors.app_red,
+    paddingVertical: 10,
+    borderRadius: 20,
+    alignItems: 'center',
+    marginHorizontal: 30,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   // tabStyle: {
   //   width: 100,
   // },
 });
 
 export default Liveness;
-
-// import React from 'react'
-// import { SafeAreaView, StyleSheet, View, Button, Text, Image, Alert, TouchableOpacity, Platform, NativeEventEmitter } from 'react-native'
-// import { launchImageLibrary } from 'react-native-image-picker'
-// import * as RNFS from 'react-native-fs'
-// import FaceSDK, { Enum, FaceCaptureResponse, LivenessResponse, MatchFacesResponse, MatchFacesRequest, MatchFacesImage, ComparedFacesSplit, InitConfig, InitResponse, LivenessSkipStep, SearchPerson, RNFaceApi, LivenessNotification } from '@regulaforensics/react-native-face-api'
-
-// interface IProps {
-// }
-
-// interface IState {
-//   img1: any
-//   img2: any
-//   similarity: string
-//   liveness: string
-// }
-
-// var image1 = new MatchFacesImage()
-// var image2 = new MatchFacesImage()
-
-// export default class App extends React.Component<IProps, IState> {
-//   constructor(props: {} | Readonly<{}>) {
-//     super(props)
-
-//     var eventManager = new NativeEventEmitter(RNFaceApi)
-//     eventManager.addListener('livenessNotificationEvent', data => {
-//       var notification = LivenessNotification.fromJson(JSON.parse(data))!
-//       console.log("LivenessStatus: " + notification.status)
-//     })
-
-//     var onInit = (json: string) => {
-//       var response = InitResponse.fromJson(JSON.parse(json))
-//       console.log(response,'-------')
-//       if (!response!.success) {
-//         console.log(response!.error!.code);
-//         console.log(response!.error!.message);
-//       } else {
-//         console.log("Init complete")
-//       }
-//     };
-
-//     var licPath = Platform.OS === 'ios' ? (RNFS.MainBundlePath + "/license/regula.license") : "regula.license"
-//     var readFile = Platform.OS === 'ios' ? RNFS.readFile : RNFS.readFileAssets
-//     console.log(licPath,readFile,'oooooooo')
-//     readFile(licPath, 'base64').then((license) => {
-//       var config = new InitConfig();
-//       config.license = license
-//       FaceSDK.initialize(config, onInit, (_e: any) => { })
-//     }).catch(_ => {
-//       FaceSDK.initialize(null, onInit, (_e: any) => { })
-//     })
-
-//     this.state = {
-//       img1: require('../../../../common/assets/back.png'),
-//       img2: require('../../../../common/assets/back.png'),
-//       similarity: "nil",
-//       liveness: "nil"
-//     }
-//   }
-
-//   pickImage(first: boolean) {
-//     Alert.alert("Select option", "", [
-//       {
-//         text: "Use gallery",
-//         onPress: () => launchImageLibrary({
-//           mediaType: 'photo',
-//           selectionLimit: 1,
-//           includeBase64: true
-//         }, (response: any) => {
-//           if (response.assets == undefined) return
-//           this.setImage(first, response.assets[0].base64!, Enum.ImageType.PRINTED)
-//         })
-//       },
-//       {
-//         text: "Use camera",
-//         onPress: () => FaceSDK.startFaceCapture(null, (json: string) => {
-//           var response = FaceCaptureResponse.fromJson(JSON.parse(json))!
-//           if (response.image != null && response.image.image != null)
-//             this.setImage(first, response.image.image, Enum.ImageType.LIVE)
-//         }, _e => { })
-//       }], { cancelable: true })
-//   }
-
-//   setImage(first: boolean, base64: string, type: number) {
-//     if (base64 == null) return
-//     this.setState({ similarity: "null" })
-//     if (first) {
-//       image1 = new MatchFacesImage()
-//       image1.image = base64
-//       image1.imageType = type
-//       this.setState({ img1: { uri: "data:image/png;base64," + base64 } })
-//       this.setState({ liveness: "null" })
-//     } else {
-//       image2 = new MatchFacesImage()
-//       image2.image = base64
-//       image2.imageType = type
-//       this.setState({ img2: { uri: "data:image/png;base64," + base64 } })
-//     }
-//   }
-
-//   clearResults() {
-//     this.setState({ img1: require('../../../../common/assets/back.png'), })
-//     this.setState({ img2: require('../../../../common/assets/back.png'), })
-//     this.setState({ similarity: "null" })
-//     this.setState({ liveness: "null" })
-//     image1 = new MatchFacesImage()
-//     image2 = new MatchFacesImage()
-//   }
-
-//   matchFaces() {
-//     if (image1 == null || image1.image == null || image1.image == "" || image2 == null || image2.image == null || image2.image == "")
-//       return
-//     this.setState({ similarity: "Processing..." })
-//     var request = new MatchFacesRequest()
-//     request.images = [image1, image2]
-//     FaceSDK.matchFaces(request, null, (json: string) => {
-//       var response = MatchFacesResponse.fromJson(JSON.parse(json))
-//       FaceSDK.splitComparedFaces(response!.results!, 0.75, str => {
-//         var split = ComparedFacesSplit.fromJson(JSON.parse(str))!
-//         this.setState({ similarity: split.matchedFaces!.length > 0 ? ((split.matchedFaces![0].similarity! * 100).toFixed(2) + "%") : "error" })
-//       }, e => { this.setState({ similarity: e }) })
-//     }, e => { this.setState({ similarity: e }) })
-//   }
-
-//   liveness() {
-//     console.log('aaaaa')
-//     FaceSDK.startLiveness({ skipStep: [LivenessSkipStep.ONBOARDING_STEP] }, (json: string) => {
-//       var response = LivenessResponse.fromJson(JSON.parse(json))!
-//       console.log(response,'bbbbbbb')
-//       if (response.image != null) {
-//         this.setImage(true, response.image, Enum.ImageType.LIVE)
-//         this.setState({ liveness: response.liveness == Enum.LivenessStatus.PASSED ? "passed" : "unknown" })
-//       }
-//     }, _e => { })
-//   }
-
-//   render() {
-//     return (
-//       <SafeAreaView style={styles.container}>
-
-//         <View style={{ padding: 15 }}>
-//           <TouchableOpacity onPress={() => this.pickImage(true)} style={{ alignItems: "center" }}>
-//             <Image source={this.state.img1} resizeMode="contain" style={{ height: 150, width: 150 }} />
-//           </TouchableOpacity>
-//           <TouchableOpacity onPress={() => this.pickImage(false)} style={{ alignItems: "center" }}>
-//             <Image source={this.state.img2} resizeMode="contain" style={{ height: 150, width: 200 }} />
-//           </TouchableOpacity>
-//         </View>
-
-//         <View style={{ width: "100%", alignItems: "center" }}>
-//           <View style={{ padding: 3, width: "60%" }}>
-//             <Button title="Match" color="#4285F4" onPress={() => { this.matchFaces() }} />
-//           </View>
-//           <View style={{ padding: 3, width: "60%" }}>
-//             <Button title="Liveness" color="#4285F4" onPress={() => { this.liveness() }} />
-//           </View>
-//           <View style={{ padding: 3, width: "60%" }}>
-//             <Button title="Clear" color="#4285F4" onPress={() => { this.clearResults() }} />
-//           </View>
-//         </View>
-
-//         <View style={{ flexDirection: 'row', padding: 10 }}>
-//           <Text>Similarity: {this.state.similarity}</Text>
-//           <View style={{ padding: 10 }} />
-//           <Text>Liveness: {this.state.liveness}</Text>
-//         </View>
-//       </SafeAreaView>
-//     )
-//   };
-// }
-
-// const styles = StyleSheet.create({
-//   container: {
-//     width: '100%',
-//     height: '100%',
-//     flex: 1,
-//     justifyContent: 'center',
-//     alignItems: 'center',
-//     backgroundColor: '#F5FCFF',
-//     marginBottom: 12,
-//   },
-// });
-
-// import React, {useEffect, useState, useCallback} from 'react';
-// import {
-//   SafeAreaView,
-//   View,
-//   Text,
-//   ScrollView,
-//   Dimensions,
-//   KeyboardAvoidingView,
-//   Image,
-//   Platform,
-//   Alert,
-//   NativeEventEmitter,
-//   Button,
-// } from 'react-native';
-// import RedButton from '../../../components/RedButton';
-// import {useNavigation} from '@react-navigation/native';
-// import Status from '../../../components/Status';
-// import Loader from '../../../components/ActivityIndicator';
-// import {TEMPLATE_ID} from '@env';
-// import showAlert from '../../../components/showAlert';
-// import {styles} from './styles';
-// import AsyncStorage from '@react-native-async-storage/async-storage';
-// import {useDispatch, useSelector} from 'react-redux';
-// import {verifyCodeslice} from '../../../redux/slices/user/userSlice';
-// import {
-//   checkverifiedUser,
-//   verifedCustomerDataAction,
-// } from '../../../redux/actions/user/UserAction';
-// import {logoValidyfy} from '../../../common/images';
-// import {check, PERMISSIONS, RESULTS, request} from 'react-native-permissions';
-// import RNFS from 'react-native-fs';
-// import DocumentReader, {
-//   Enum,
-//   DocumentReaderCompletion,
-//   DocumentReaderScenario,
-//   RNRegulaDocumentReader,
-//   DocumentReaderResults,
-//   DocumentReaderNotification,
-//   ScannerConfig,
-//   ScenarioIdentifier,
-//   RecognizeConfig,
-//   DocReaderConfig,
-//   Functionality,
-//   getProcessParams,
-//   setProcessParams,
-// } from '@regulaforensics/react-native-document-reader-api';
-// import DocumentPicker from 'react-native-document-picker';
-// import {launchImageLibrary} from 'react-native-image-picker';
-// import Progress from 'react-native-progress';
-// import CheckBox from '@react-native-community/checkbox';
-// import RadioGroup, {RadioButtonProps} from 'react-native-radio-buttons-group';
-// import {TouchableOpacity} from 'react-native-gesture-handler';
-
-// function IdScreen() {
-//   const navigation = useNavigation();
-//   const [isLoading, setIsLoading] = useState(false);
-//   const {height: screenHeight} = Dimensions.get('window');
-//   const [isPotrait, setIsPortrait] = useState(true);
-//   const dispatch = useDispatch();
-//   const [userToken, setTokenUser] = useState('');
-//   const keyboardVerticalOffset = Platform.OS === 'ios' ? 40 : 0;
-//   const isCheckStatus = useSelector(state => state.user.verified);
-//   const [selectedScenario, setSelectedScenario] = useState('');
-//   const [isReadingRfidCustomUi, setIsReadingRfidCustomUi] = useState(false);
-//   const [rfidUIHeader, setRfidUIHeader] = useState('Reading RFID');
-//   const [rfidUIHeaderColor, setRfidUIHeaderColor] = useState('black');
-//   const [rfidDescription, setRfidDescription] = useState('');
-//   const [rfidProgress, setRfidProgress] = useState(-1);
-//   const [doRfid, setDoRfid] = useState(false);
-//   const [isReadingRfid, setIsReadingRfid] = useState(false);
-//   const [fullName, setFullName] = useState('');
-//   const [docFront, setDocFront] = useState(null);
-//   const [portrait, setPortrait] = useState(null);
-//   const [radioButtons, setRadioButtons] = useState([]);
-//   const [canRfid, setCanRfid] = useState(false); // Assuming you have a state for canRfid
-//   const [canRfidTitle, setCanRfidTitle] = useState(''); // Assuming you have a state for canRfidTitle
-//   const [documentType, setDocumentType] = useState([]);
-//   const [isInitialized, setIsInitialized] = useState(false);
-//   const [fields, setFields] = useState({
-//     documentNumberField: '',
-//     dob: '',
-//     name: '',
-//     country: '',
-//     state: '',
-//     fatherName: '',
-//     bloodgroup: '',
-//     age: '',
-//     issuedate: '',
-//     validto: '',
-//     sex: '',
-//     imageFront: '',
-//     imagePortrait: '',
-//     signature: '',
-//     barCode: '',
-//   });
-
-//   // console.log(DocumentReader, 'documenttype--------');
-
-//   // useEffect(() => {
-//   //   // Check and set screen orientation
-//   //   const handleOrientationChange = () => {
-//   //     const {height, width} = Dimensions.get('window');
-//   //     setIsPortrait(height > width);
-//   //   };
-
-//   //   Dimensions.addEventListener('change', handleOrientationChange);
-//   //   return () => {
-//   //     Dimensions.removeEventListener('change', handleOrientationChange);
-//   //   };
-//   // }, []);
-
-//   // useEffect(() => {
-//   //   prepareDatabase();
-//   // }, []);
-
-//   const actionSuccess = action => {
-//     return (
-//       action === Enum.DocReaderAction.COMPLETE ||
-//       action === Enum.DocReaderAction.TIMEOUT
-//     );
-//   };
-
-//   const actionError = action => {
-//     return (
-//       action === Enum.DocReaderAction.CANCEL ||
-//       action === Enum.DocReaderAction.ERROR
-//     );
-//   };
-
-//   const prepareDatabase = async () => {
-//     await DocumentReader.prepareDatabase(
-//       'Full',
-//       respond => {
-//         console.log(respond, 'Database preparation complete');
-
-//         initialize();
-//       },
-//       error => {
-//         console.log(error, 'Database preparation error');
-//       },
-//     );
-//   };
-
-//   const initialize = async () => {
-//     console.log('Initializing...');
-//     const licPath =
-//       Platform.OS === 'ios'
-//         ? `${RNFS.MainBundlePath}/regula.license`
-//         : 'regula.license';
-//     const readFile =
-//       Platform.OS === 'ios' ? RNFS.readFile : RNFS.readFileAssets;
-//     const res = await readFile(licPath, 'base64');
-//     await DocumentReader.initializeReader(
-//       {
-//         license: res,
-//       },
-//       respond => {
-//         console.log(respond, 'Initialization successful');
-//         setIsInitialized(true);
-//         process();
-//       },
-//       error => {
-//         console.log(error, 'Initialization error');
-//         setIsInitialized(false);
-//         Alert.alert('Initialization error');
-//       },
-//     );
-//   };
-
-//   const process = async () => {
-//     if (!isInitialized) {
-//       Alert.alert('Initialization Error', 'Checking again.');
-//       initialize();
-//     }
-//     const eventManager = new NativeEventEmitter(RNRegulaDocumentReader);
-
-//     const config = new ScannerConfig();
-//     config.scenario = ScenarioIdentifier.SCENARIO_FULL_PROCESS;
-//     DocumentReader.scan(
-//       config,
-//       _ => {},
-//       e => console.log(e),
-//     );
-//     eventManager.addListener('completion', e =>
-//       handleCompletion(DocumentReaderCompletion.fromJson(JSON.parse(e['msg']))),
-//     );
-//   };
-
-//   const handleCompletion = completion => {
-//     console.log(completion, 'handleCompletion');
-//     DocumentReader.deinitializeReader(
-//       s => {},
-//       e => {},
-//     );
-//     if (isReadingRfidCustomUi) {
-//       // console.log('zzzzzzzzzz');
-//       if (completion.action == Enum.DocReaderAction.ERROR)
-//         console.log('xxxxxxxxxxxx');
-//       restartRfidUI();
-//       if (actionSuccess(completion.action) || actionError(completion.action)) {
-//         // console.log('a');
-//         hideRfidUI();
-//         displayResults(completion.results);
-//       }
-//     } else if (
-//       actionSuccess(completion.action) ||
-//       actionError(completion.action)
-//     ) {
-//       // console.log('b');
-
-//       handleResults(completion.results);
-//     }
-//   };
-
-//   const showRfidUI = () => {
-//     // show animation
-//     setIsReadingRfidCustomUi(true);
-//   };
-
-//   const hideRfidUI = () => {
-//     // show animation
-//     DocumentReader.stopRFIDReader(
-//       () => {},
-//       () => {},
-//     );
-//     restartRfidUI();
-//     setIsReadingRfidCustomUi(false);
-//     setRfidUIHeader('Reading RFID');
-//     setRfidUIHeaderColor('black');
-//   };
-
-//   const restartRfidUI = () => {
-//     setRfidUIHeaderColor('red');
-//     setRfidUIHeader('Failed!');
-//     setRfidDescription('Place your phone on top of the NFC tag');
-//     setRfidProgress(-1);
-//   };
-
-//   const updateRfidUI = notification => {
-//     if (
-//       notification.notificationCode ===
-//       Enum.eRFID_NotificationCodes.RFID_NOTIFICATION_PCSC_READING_DATAGROUP
-//     ) {
-//       setRfidDescription('ERFIDDataFileType: ' + notification.dataFileType);
-//     }
-//     setRfidUIHeader('Reading RFID');
-//     setRfidUIHeaderColor('black');
-//     if (notification.progress != null) {
-//       setRfidProgress(notification.progress / 100);
-//     }
-//     if (Platform.OS === 'ios') {
-//       DocumentReader.setRfidSessionStatus(
-//         `${rfidDescription}\n${notification.progress}%`,
-//         () => {},
-//         () => {},
-//       );
-//     }
-//   };
-
-//   const handleResults = results => {
-//     // console.log('handleresults-------------', results);
-//     if (!isReadingRfid && results?.chipPage !== 0) {
-//       usualRFID();
-//     } else {
-//       setIsReadingRfid(false);
-//       displayResults(results);
-//     }
-//   };
-
-//   const usualRFID = () => {
-//     // console.log('usualrfid-------------');
-
-//     setIsReadingRfid(true);
-//     initialize();
-//     // DocumentReader.startRFIDReader(
-//     //   false,
-//     //   false,
-//     //   false,
-//     //   _ => {},
-//     //   _ => {},
-//     // );
-//   };
-
-//   const displayResults = results => {
-//     // console.log(
-//     //   results?.textResult?.fields?.values,
-//     //   '------------------------------------------------------',
-//     // );
-//     // console.log(
-//     //   results?.graphicResult?.fields,
-//     //   '9999999999999999999999999999999999999999999',
-//     // );
-//     console.log(results?.graphicResult, 'displayresults-------------');
-
-//     if (results?.textResult?.fields == null || undefined) {
-//       Alert.alert('Error Please check again');
-//     }
-
-//     // if (results?.documentType.length > 0) {
-//     //   console.log(
-//     //     results?.documentType[0],
-//     //     '---------------------------------------------------------------',
-//     //   );
-//     // }
-
-//     const imageFront = results?.graphicResult?.fields.find(
-//       item => item.fieldName === 'Document image',
-//     );
-
-//     const imagePortrait = results?.graphicResult?.fields.find(
-//       item => item.fieldName === 'Portrait',
-//     );
-
-//     const signature = results?.graphicResult?.fields.find(
-//       item => item.fieldName === 'Signature',
-//     );
-
-//     const barCode = results?.graphicResult?.fields.find(
-//       item => item.fieldName === 'Barcode',
-//     );
-
-//     if (results?.textResult?.fields) {
-//       setDocumentType(results?.textResult?.fields);
-
-//       const documentNumberField = results?.textResult?.fields.find(
-//         item => item.fieldName === 'Document number',
-//       );
-
-//       if (documentNumberField) {
-//         console.log(
-//           'document number',
-//           documentNumberField.getValue.originalValue,
-//         );
-//       } else {
-//         console.log('Document number field not found.');
-//       }
-
-//       const dob = results?.textResult?.fields.find(
-//         item => item.fieldName === 'Date of birth',
-//       );
-
-//       if (dob) {
-//         console.log('dob', dob.getValue.originalValue);
-//       } else {
-//         console.log('dob not found.');
-//       }
-
-//       const name = results?.textResult?.fields.find(
-//         item => item.fieldName === 'Surname and given names',
-//       );
-
-//       if (name) {
-//         console.log('name', name.getValue.originalValue);
-//       } else {
-//         console.log('name not found.');
-//       }
-
-//       const country = results?.textResult?.fields.find(
-//         item => item.fieldName === 'Issuing state',
-//       );
-
-//       if (country) {
-//         console.log('country', country.getValue.value);
-//       } else {
-//         console.log('country not found.');
-//       }
-
-//       const state = results?.textResult?.fields.find(
-//         item => item.fieldName === 'State',
-//       );
-
-//       if (state) {
-//         console.log('state', state.getValue.value);
-//       } else {
-//         console.log('state not found.');
-//       }
-
-//       const fathername = results?.textResult?.fields.find(
-//         item => item.fieldName === "Father's name",
-//       );
-
-//       if (fathername) {
-//         console.log('fathername', fathername.getValue.value);
-//       } else {
-//         console.log('father name not found.');
-//       }
-
-//       const bloodgroup = results?.textResult?.fields.find(
-//         item => item.fieldName === 'Blood group',
-//       );
-
-//       if (bloodgroup) {
-//         console.log('bloodgroup', bloodgroup.getValue.originalValue);
-//       } else {
-//         console.log('blood group not found.');
-//       }
-//       const age = results?.textResult?.fields.find(
-//         item => item.fieldName === 'Age',
-//       );
-
-//       if (age) {
-//         console.log('age', age.getValue.value);
-//       } else {
-//         console.log('age not found.');
-//       }
-//       const issuedate = results?.textResult?.fields.find(
-//         item => item.fieldName === 'First issue date',
-//       );
-
-//       if (issuedate) {
-//         console.log('issuedate', issuedate.getValue.originalValue);
-//       } else {
-//         console.log('issue date not found.');
-//       }
-
-//       const validto = results?.textResult?.fields.find(
-//         item => item.fieldName === 'DL category NT valid to',
-//       );
-
-//       if (validto) {
-//         console.log('validto', validto.getValue.originalValue);
-//       } else {
-//         console.log('valid to not found.');
-//       }
-
-//       const sex = results?.textResult?.fields.find(
-//         item => item.fieldName === 'Sex',
-//       );
-//       if (sex) {
-//         console.log('sex', sex.getValue.originalValue);
-//       } else {
-//         console.log('sex not found.');
-//       }
-
-//       const updatedFields = {
-//         documentNumberField: documentNumberField?.getValue?.originalValue || '',
-//         dob: dob?.getValue?.originalValue || '',
-//         name: name?.getValue?.originalValue || '',
-//         country: country?.getValue?.value || '',
-//         state: state?.getValue?.value || '',
-//         fatherName: fathername?.getValue?.value || '',
-//         bloodgroup: bloodgroup?.getValue?.originalValue || '',
-//         age: age?.getValue?.value || '',
-//         issuedate: issuedate?.getValue?.originalValue || '',
-//         validto: validto?.getValue?.originalValue || '',
-//         sex: sex?.getValue?.originalValue || '',
-//         imageFront: imageFront?.value || '',
-//         imagePortrait: imagePortrait?.value,
-//         signature: signature?.value,
-//         barCode: barCode?.value,
-//       };
-
-//       setFields(updatedFields); // Set the updated fields state
-//       DocumentReader.setProcessParams(
-//         {
-//           authenticityParams: {
-//             livenessParams: {
-//               checkED: true,
-//             },
-//           },
-//         },
-//         () => {
-//           console.log('Process parameters set successfully');
-//         },
-//         error => {
-//           console.error('Error setting process parameters:', error);
-//         },
-//       );
-
-//       // DocumentReader.deinitializeReader(
-//       //   s => {},
-//       //   e => {},
-//       // );
-//     } else {
-//       // If no fields are available, reset the fields to default values
-//       setFields({
-//         documentNumberField: '',
-//         dob: '',
-//         name: '',
-//         country: '',
-//         state: '',
-//         fatherName: '',
-//         bloodgroup: '',
-//         age: '',
-//         issuedate: '',
-//         validto: '',
-//         sex: '',
-//         imageFront: '',
-//         imagePortrait: '',
-//         signature: '',
-//         barCode: '',
-//       });
-//     }
-//   };
-
-//   const recognize = async () => {
-//     if (!isInitialized) {
-//       Alert.alert('Initialization Error', 'Checking again.');
-//       initialize();
-//     }
-//     await handlePermissions();
-//     launchImageLibrary(
-//       {
-//         mediaType: 'mixed',
-//         includeBase64: true,
-//         selectionLimit: 1,
-//       },
-//       response => {
-//         if (response.errorCode != null) {
-//           console.log('Error code: ' + response.errorCode);
-//           console.log('Error message: ' + response.errorMessage);
-//           return;
-//         }
-//         if (response.didCancel) return;
-
-//         const response1 = response.assets;
-//         // console.log(response1, 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbb');
-//         if (response1 && response1.length > 0) {
-//           const images = response1[0].base64;
-//           // console.log(images, 'zzzzzzzzzzzzzzzz');
-
-//           const eventManager = new NativeEventEmitter(RNRegulaDocumentReader);
-//           const config = new RecognizeConfig();
-//           config.scenario = ScenarioIdentifier.SCENARIO_FULL_PROCESS;
-//           config.images = [images];
-//           DocumentReader.recognize(
-//             config,
-//             _ => {},
-//             e => console.log(e, '3444444444555555'),
-//           );
-//           eventManager.addListener('completion', e =>
-//             handleCompletion(
-//               DocumentReaderCompletion.fromJson(JSON.parse(e['msg'])),
-//             ),
-//           );
-
-//           eventManager.addListener('rfidOnProgressCompletion', e =>
-//             updateRfidUI(
-//               DocumentReaderNotification.fromJson(JSON.parse(e['msg'])),
-//             ),
-//           );
-//         }
-//       },
-//     );
-//   };
-
-//   const handlePermissionCheck = async permission => {
-//     return await check(permission);
-//   };
-
-//   const handlePermissionRequest = async permission => {
-//     return await request(permission);
-//   };
-
-//   const handlePermissions = async () => {
-//     // console.log('1111111');
-//     const permission =
-//       Platform.OS === 'ios'
-//         ? PERMISSIONS.IOS.CAMERA
-//         : PERMISSIONS.ANDROID.CAMERA;
-//     const result = await handlePermissionCheck(permission);
-//     // console.log('2222222', result);
-
-//     switch (result) {
-//       case RESULTS.UNAVAILABLE:
-//         Alert.alert(
-//           'Permission Unavailable',
-//           'This feature is not available on this device.',
-//         );
-//         break;
-//       case RESULTS.DENIED:
-//         const requestResult = await handlePermissionRequest(permission);
-//         if (requestResult === RESULTS.GRANTED) {
-//           proceedWithDocumentReading();
-//         } else {
-//           Alert.alert(
-//             'Permission Denied',
-//             'Camera permissions are required for this feature.',
-//           );
-//         }
-//         break;
-//       case RESULTS.LIMITED:
-//         Alert.alert(
-//           'Permission Limited',
-//           'The permission is limited: some actions are possible.',
-//         );
-//         break;
-//       case RESULTS.GRANTED:
-//         proceedWithDocumentReading();
-//         break;
-//       case RESULTS.BLOCKED:
-//         Alert.alert(
-//           'Permission Blocked',
-//           'The permission is denied and not requestable anymore.',
-//         );
-//         break;
-//     }
-//   };
-
-//   const proceedWithDocumentReading = async () => {
-//     await DocumentReader.deinitializeReader(
-//       s => {},
-//       e => {},
-//     );
-//     setIsLoading(true);
-//     await prepareDatabase();
-//     setIsLoading(false);
-//   };
-
-//   return (
-//     <SafeAreaView style={styles.safeArea}>
-//       <KeyboardAvoidingView
-//         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-//         keyboardVerticalOffset={keyboardVerticalOffset}>
-//         <ScrollView
-//           style={{marginBottom: '10%'}}
-//           keyboardShouldPersistTaps="handled">
-//           <Status lightContent />
-//           <Image
-//             source={logoValidyfy}
-//             style={{
-//               marginTop: isPotrait ? '20%' : '5%',
-//               alignSelf: 'center',
-//               resizeMode: 'contain',
-//               height: 80,
-//               width: '60%',
-//             }}
-//           />
-//           <View style={[styles.mainView, {height: screenHeight * 0.5}]}>
-//             <Text style={styles.textVerify}>
-//               Simplify Identity Verification
-//             </Text>
-//             <Text style={styles.middleText}>
-//               Validifyx provides seamless digital verification solutions,
-//               empowering businesses to securely and conveniently interact with
-//               their customers.
-//             </Text>
-//           </View>
-//           <RedButton
-//             buttonContainerStyle={[
-//               styles.buttonContainer,
-//               {marginBottom: isPotrait ? 0 : 20},
-//             ]}
-//             ButtonContent={isLoading ? <Loader /> : "Let's get started"}
-//             image
-//             contentStyle={styles.buttonText}
-//             onPress={() => handlePermissions()}
-//           />
-//         </ScrollView>
-//       </KeyboardAvoidingView>
-//     </SafeAreaView>
-//   );
-// }
-
-// export default IdScreen;
-
-// //   return (
-// //     <SafeAreaView style={{flex: 1}}>
-// //       {!isReadingRfidCustomUi && (
-// //         <View style={styles.container}>
-// //           <ScrollView
-// //             style={{padding: 5, alignSelf: 'center'}}
-// //             showsVerticalScrollIndicator={false}>
-// //             <RadioGroup
-// //               containerStyle={{alignItems: 'flex-start'}}
-// //               radioButtons={radioButtons}
-// //               onPress={selectedID => setSelectedScenario(selectedID)}
-// //               selectedId={selectedScenario}
-// //             />
-// //           </ScrollView>
-
-// //           <View style={{flexDirection: 'row', padding: 5}}>
-// //             {/* <CheckBox
-// //               containerStyle={{backgroundColor: '#F5FCFF'}}
-// //               checked={doRfid}
-// //               title={'Process RFID reading' + canRfidTitle}
-// //               onPress={() => {
-// //                 if (canRfid) {
-// //                   setDoRfid(!doRfid);
-// //                 }
-// //               }}
-// //             /> */}
-// //           </View>
-
-// //           <View style={{flexDirection: 'row'}}>
-// //             <Button color="#4285F4" title="Scan document" onPress={process} />
-// //             <Text style={{padding: 5}}></Text>
-// //             <Button color="#4285F4" title="Scan image" onPress={recognize} />
-// //           </View>
-// //         </View>
-// //       )}
-
-// //       {isReadingRfidCustomUi && (
-// //         <View style={styles.container}>
-// //           <Text
-// //             style={{paddingBottom: 30, fontSize: 23, color: rfidUIHeaderColor}}>
-// //             {rfidUIHeader}
-// //           </Text>
-// //           <Text style={{paddingBottom: 50, fontSize: 20}}>
-// //             {rfidDescription}
-// //           </Text>
-// //           <Progress.Bar
-// //             style={{marginBottom: 30}}
-// //             width={200}
-// //             useNativeDriver={true}
-// //             color="#4285F4"
-// //             progress={rfidProgress}
-// //           />
-// //           <TouchableOpacity style={styles.cancelButton} onPress={hideRfidUI}>
-// //             <Text style={{fontSize: 20}}>X</Text>
-// //           </TouchableOpacity>
-// //         </View>
-// //       )}
-// //       {/* <KeyboardAvoidingView
-// //         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-// //         keyboardVerticalOffset={keyboardVerticalOffset}>
-// //         <ScrollView
-// //           style={{marginBottom: '10%'}}
-// //           keyboardShouldPersistTaps="handled">
-// //           <Status lightContent />
-// //           <Image
-// //             source={logoValidyfy}
-// //             style={{
-// //               marginTop: isPortrait ? '20%' : '5%',
-// //               alignSelf: 'center',
-// //               resizeMode: 'contain',
-// //               height: 80,
-// //               width: '60%',
-// //             }}
-// //           />
-// //           <View style={[styles.mainView, {height: screenHeight * 0.5}]}>
-// //             <Text style={styles.textVerify}>
-// //               Simplify Identity Verification
-// //             </Text>
-// //             <Text style={styles.middleText}>
-// //               Validifyx provides seamless digital verification solutions,
-// //               empowering businesses to securely and conveniently interact with
-// //               their customers.
-// //             </Text>
-// //           </View>
-// //           <RedButton
-// //             buttonContainerStyle={[
-// //               styles.buttonContainer,
-// //               {marginBottom: isPortrait ? 0 : 20},
-// //             ]}
-// //             ButtonContent={isLoading ? <Loader /> : "Let's get started"}
-// //             image
-// //             contentStyle={styles.buttonText}
-// //             onPress={handlePermissions}
-// //           />
-// //         </ScrollView>
-// //       </KeyboardAvoidingView> */}
-
-// //       {documentType.length > 0 ? (
-// //         <View>
-// //           {fields.imageFront && (
-// //             <Image
-// //               style={{height: 150, width: 200}}
-// //               source={{uri: `data:image/png;base64,${fields?.imageFront}`}}
-// //               resizeMode="contain"
-// //             />
-// //           )}
-// //           {fields.imagePortrait && (
-// //             <Image
-// //               style={{height: 150, width: 200}}
-// //               source={{uri: `data:image/png;base64,${fields?.imagePortrait}`}}
-// //               resizeMode="contain"
-// //             />
-// //           )}
-// //           {fields.name && <Text>Name: {fields.name}</Text>}
-// //           {fields.dob && <Text>Date of Birth: {fields.dob}</Text>}
-// //           {fields.documentNumberField && (
-// //             <Text>Document Number: {fields.documentNumberField}</Text>
-// //           )}
-// //           {fields.country && <Text>Country: {fields.country}</Text>}
-// //           {fields.state && <Text>State: {fields.state}</Text>}
-// //           {fields.fatherName && <Text>Father's Name: {fields.fatherName}</Text>}
-
-// //           {fields.bloodgroup && <Text>Blood Group: {fields.bloodgroup}</Text>}
-// //           {fields.age && <Text>Age: {fields.age}</Text>}
-// //           {fields.issuedate && <Text>Issued Date: {fields.issuedate}</Text>}
-// //           {fields.validto && <Text>Valid to: {fields.validto}</Text>}
-// //           {fields.sex && <Text>Sex: {fields.sex}</Text>}
-// //           <TouchableOpacity
-// //             onPress={() => {
-// //               navigation.navigate('Liveness');
-// //             }}>
-// //             <Text>Next</Text>
-// //           </TouchableOpacity>
-// //         </View>
-// //       ) : (
-// //         <View>
-// //           <Text>No document type information available.</Text>
-// //         </View>
-// //       )}
-// //     </SafeAreaView>
-// //   );
-// // }
-
-// // export default IdScreen;

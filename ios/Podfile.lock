@@ -1,10 +1,13 @@
 PODS:
   - BEMCheckBox (1.4.1)
   - boost (1.83.0)
-  - DocumentReader (7.2.3545):
-    - RegulaCommon (= 7.2.487)
-  - DocumentReaderFullRFID (7.2.9111)
+  - DocumentReader (7.3.3764):
+    - RegulaCommon (= 7.3.683)
+  - DocumentReaderFullRFID (7.3.9680)
   - DoubleConversion (1.1.6)
+  - FaceCoreBasic (6.2.783)
+  - FaceSDK (6.2.1999):
+    - RegulaCommon (= 7.3.683)
   - FBLazyVector (0.73.3)
   - FBReactNativeSpec (0.73.3):
     - RCT-Folly (= 2022.05.16.00)
@@ -1014,6 +1017,10 @@ PODS:
     - glog
     - RCT-Folly (= 2022.05.16.00)
     - React-Core
+  - react-native-pager-view (6.3.3):
+    - glog
+    - RCT-Folly (= 2022.05.16.00)
+    - React-Core
   - react-native-safe-area-context (4.10.8):
     - React-Core
   - React-nativeconfig (0.73.3)
@@ -1184,7 +1191,7 @@ PODS:
     - React-logger (= 0.73.3)
     - React-perflogger (= 0.73.3)
   - RecaptchaInterop (100.0.0)
-  - RegulaCommon (7.2.487)
+  - RegulaCommon (7.3.683)
   - RNCAsyncStorage (1.24.0):
     - React-Core
   - RNCCheckbox (0.5.17):
@@ -1192,11 +1199,17 @@ PODS:
     - React-Core
   - RNCMaskedView (0.1.11):
     - React
-  - RNDocumentReaderApi (7.2.2):
-    - DocumentReader (= 7.2.3545)
+  - RNDocumentReaderApi (7.3.676):
+    - DocumentReader (= 7.3.3764)
     - React
-  - RNDocumentReaderCore (7.2.0):
-    - DocumentReaderFullRFID (= 7.2.9111)
+  - RNDocumentReaderCore (7.3.602):
+    - DocumentReaderFullRFID (= 7.3.9680)
+    - React
+  - RNFaceApi (6.2.4):
+    - FaceSDK (= 6.2.1999)
+    - React
+  - RNFaceCore (6.2.1):
+    - FaceCoreBasic (= 6.2.783)
     - React
   - RNFBApp (18.9.0):
     - Firebase/CoreOnly (= 10.20.0)
@@ -1296,6 +1309,7 @@ DEPENDENCIES:
   - React-Mapbuffer (from `../node_modules/react-native/ReactCommon`)
   - react-native-document-picker (from `../node_modules/react-native-document-picker`)
   - react-native-image-picker (from `../node_modules/react-native-image-picker`)
+  - react-native-pager-view (from `../node_modules/react-native-pager-view`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - React-nativeconfig (from `../node_modules/react-native/ReactCommon`)
   - React-NativeModulesApple (from `../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios`)
@@ -1322,6 +1336,8 @@ DEPENDENCIES:
   - "RNCMaskedView (from `../node_modules/@react-native-community/masked-view`)"
   - "RNDocumentReaderApi (from `../node_modules/@regulaforensics/react-native-document-reader-api`)"
   - "RNDocumentReaderCore (from `../node_modules/@regulaforensics/react-native-document-reader-core-fullrfid`)"
+  - "RNFaceApi (from `../node_modules/@regulaforensics/react-native-face-api`)"
+  - "RNFaceCore (from `../node_modules/@regulaforensics/react-native-face-core-basic`)"
   - "RNFBApp (from `../node_modules/@react-native-firebase/app`)"
   - "RNFBAuth (from `../node_modules/@react-native-firebase/auth`)"
   - RNFS (from `../node_modules/react-native-fs`)
@@ -1337,6 +1353,8 @@ SPEC REPOS:
     - BEMCheckBox
     - DocumentReader
     - DocumentReaderFullRFID
+    - FaceCoreBasic
+    - FaceSDK
     - Firebase
     - FirebaseAnalytics
     - FirebaseAppCheckInterop
@@ -1423,6 +1441,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-document-picker"
   react-native-image-picker:
     :path: "../node_modules/react-native-image-picker"
+  react-native-pager-view:
+    :path: "../node_modules/react-native-pager-view"
   react-native-safe-area-context:
     :path: "../node_modules/react-native-safe-area-context"
   React-nativeconfig:
@@ -1475,6 +1495,10 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@regulaforensics/react-native-document-reader-api"
   RNDocumentReaderCore:
     :path: "../node_modules/@regulaforensics/react-native-document-reader-core-fullrfid"
+  RNFaceApi:
+    :path: "../node_modules/@regulaforensics/react-native-face-api"
+  RNFaceCore:
+    :path: "../node_modules/@regulaforensics/react-native-face-core-basic"
   RNFBApp:
     :path: "../node_modules/@react-native-firebase/app"
   RNFBAuth:
@@ -1497,9 +1521,11 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   BEMCheckBox: 5ba6e37ade3d3657b36caecc35c8b75c6c2b1a4e
   boost: d3f49c53809116a5d38da093a8aa78bf551aed09
-  DocumentReader: 5247041fe1a954bce0d744d1e65bdf680c024a4a
-  DocumentReaderFullRFID: 0386d8c61e0c76f92eb781d4d0ceaa61ee05a3d0
+  DocumentReader: d6ac12a93b5bcddcd128fd10198d0789ec8fc668
+  DocumentReaderFullRFID: 5c3e49f343d30c81426a30e3a9b829bb85d8d66e
   DoubleConversion: fea03f2699887d960129cc54bba7e52542b6f953
+  FaceCoreBasic: c4dd96c2f76134cbfb7c62eb35b35a9bbdcc63b2
+  FaceSDK: 9fb0973e244dcb38bc109629cff54528534427db
   FBLazyVector: 70590b4f9e8ae9b0ce076efacea3abd7bc585ace
   FBReactNativeSpec: e47ea8c8f044c25e41a4fa5e8b7ff3923d3e0a94
   Firebase: 10c8cb12fb7ad2ae0c09ffc86cd9c1ab392a0031
@@ -1541,6 +1567,7 @@ SPEC CHECKSUMS:
   React-Mapbuffer: d59258be3b0d2280c6ba8964ab6e36ec69211871
   react-native-document-picker: 5b97e24a7f1a1e4a50a72c540a043f32d29a70a2
   react-native-image-picker: 994a97b28e7f2c2197e21801569bb19f6e494e38
+  react-native-pager-view: 51b8a98ed400354aea0250186669db6c66a6231f
   react-native-safe-area-context: b7daa1a8df36095a032dff095a1ea8963cb48371
   React-nativeconfig: 4d3076dc3dc498ec49819e4e4225b55d3507f902
   React-NativeModulesApple: 46f14baf36010b22ffd84fd89d5586e4148edfb3
@@ -1563,12 +1590,14 @@ SPEC CHECKSUMS:
   React-utils: b22b4a51aa578b3aac1e7c19501c0b9ba358ed79
   ReactCommon: e708b8be8cb317b83e31c6ccfeda8bf6c0d1a2b3
   RecaptchaInterop: 7d1a4a01a6b2cb1610a47ef3f85f0c411434cb21
-  RegulaCommon: a3d0c906ae863942ebb28f60fe96a807cdeaaa71
+  RegulaCommon: 3ff38b3135a7fdc8962bd8738bf1ecfde36c320d
   RNCAsyncStorage: ec53e44dc3e75b44aa2a9f37618a49c3bc080a7a
   RNCCheckbox: a3ca9978cb0846b981d28da4e9914bd437403d77
   RNCMaskedView: 0e1bc4bfa8365eba5fbbb71e07fbdc0555249489
-  RNDocumentReaderApi: 6f1184db5854d79d7567a18238b670e49c36bceb
-  RNDocumentReaderCore: 495b2cd15d12ff38feca022c1afcdd2f7462c0d0
+  RNDocumentReaderApi: 2d03f188a64a64a663822d842d1d2483057579da
+  RNDocumentReaderCore: 8b867a1b937aba23e89032e9d90b338ff6125964
+  RNFaceApi: 04d3da45883cfddde4f9a14942454900910e9afa
+  RNFaceCore: b7229ac4a30168c1f01b2322a9e1209457a335f4
   RNFBApp: a3e139715386fe79a09c387f2dbeb6890eb05b39
   RNFBAuth: b967a31a2ce307557a4237564d8e5f7cd83a316f
   RNFS: 4ac0f0ea233904cb798630b3c077808c06931688
@@ -1588,6 +1617,6 @@ SPEC CHECKSUMS:
   StripeUICore: 879bbf5889265db13f52fac8aad7a176ba62481f
   Yoga: 08cd7601462818c4985bda7b205b9e6a92a7e66a
 
-PODFILE CHECKSUM: 97cf501639b3d8fb53d72a933a85440c23d85737
+PODFILE CHECKSUM: 51dbe567032b7895814d60c019c9006811fa3e9c
 
 COCOAPODS: 1.15.2

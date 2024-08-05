@@ -119,59 +119,79 @@ function MobileNumber() {
       const res = await axios.post(api_url, requestData);
 
       if (res.status === 200) {
+        console.log('1111111111111');
         handleSendCode(phoneNumber);
       } else {
-        showAlert(res.data.message);
+        showAlert(res.data.message, 'jjjjjj');
+        console.log(res.data.message, 'jjjjjj');
         setIsLoading(false);
       }
     } catch (error) {
       setIsLoading(false);
       showAlert(error.response?.data?.message || error.message);
+      console.log(
+        error.response?.data?.message || error.message,
+        'nnnnnnn',
+        error,
+      );
     } finally {
     }
   };
 
   const handleSendCode = async numberWithCode => {
-    console.log('aaaa', numberWithCode);
+    console.log('Phone number:', numberWithCode);
+
     if (numberWithCode) {
-      await auth()
-        .signInWithPhoneNumber(numberWithCode, true)
-        .then(confirmResult => {
-          console.log(confirmResult);
-          setIsLoading(false);
+      setIsLoading(true);
+      try {
+        const confirmResult = await auth().signInWithPhoneNumber(
+          numberWithCode,
+          true,
+        );
+        console.log('Confirm result:', confirmResult);
+
+        setIsLoading(false);
+
+        if (confirmResult && confirmResult.verificationId) {
           setConfirmResult(confirmResult);
-          if (confirmResult._verificationId) {
-            setIsLoading(false);
-            setShowOTP(true);
-          } else {
-            setIsLoading(false);
-            showAlert('Please try again later!');
-          }
-        })
-        .catch(error => {
-          console.log(error, '111111111111');
-          setIsLoading(false);
-          // switch (error.code) {
-          //   case 'auth/too-many-requests' || 'auth/app-not-authorized':
-          //     showAlert(
-          //       'Too many attempts with One-Time Passwords.\nPlease try again later.',
-          //     );
-          //     break;
-          //   case 'auth/invalid-phone-number':
-          //     showAlert('Please enter valid phone number');
-          //     break;
-          //   case 'auth/credential-already-in-use':
-          //     showAlert('This phone number is already in use.');
-          //     break;
-          //   case 'auth/missing-phone-number':
-          //     showAlert('Phone number is missing.');
-          //     break;
-          //   default:
-          //     break;
-          // }
-        });
+          setShowOTP(true);
+        } else {
+          showAlert('Verification failed. Please try again later.');
+        }
+      } catch (error) {
+        console.log('Error:', error);
+
+        setIsLoading(false);
+
+        switch (error.code) {
+          case 'auth/too-many-requests':
+          case 'auth/app-not-authorized':
+            showAlert(
+              'Too many attempts with One-Time Passwords.\nPlease try again later.',
+            );
+            break;
+          case 'auth/invalid-phone-number':
+            showAlert('Please enter a valid phone number.');
+            break;
+          case 'auth/credential-already-in-use':
+            showAlert('This phone number is already in use.');
+            break;
+          case 'auth/missing-phone-number':
+            showAlert('Phone number is missing.');
+            break;
+          case 'auth/missing-client-identifier':
+            showAlert(
+              'Client identifier is missing. Please check your configuration.',
+            );
+            break;
+          default:
+            showAlert('An unknown error occurred. Please try again later.');
+            break;
+        }
+      }
     } else {
       setIsLoading(false);
+      showAlert('Phone number cannot be empty.');
     }
   };
 
