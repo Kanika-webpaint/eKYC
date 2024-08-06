@@ -210,30 +210,83 @@ const IdScreen = ({navigation}) => {
 
   const initialize = async () => {
     console.log('Initializing...');
-    const licPath =
-      Platform.OS === 'ios'
-        ? `${RNFS.MainBundlePath}/regula.license`
-        : 'regula.license';
+    const licPath = `${RNFS.MainBundlePath}/regula.license`;
     const readFile =
       Platform.OS === 'ios' ? RNFS.readFile : RNFS.readFileAssets;
-    const res = await readFile(licPath, 'base64');
-    await DocumentReader.initializeReader(
-      {
-        license: res,
-      },
-      respond => {
-        console.log(respond, 'Initialization successful');
+
+    try {
+      // Verify file presence
+      const fileExists = await RNFS.exists(licPath);
+      if (!fileExists) {
+        console.error(`File not found at ${licPath}`);
+        Alert.alert('Error: License file not found');
         setIsLoading(false);
-        onInitialized();
-      },
-      error => {
-        console.log(error, 'Initialization error');
-        // setIsInitialized(false);
-        setIsLoading(false);
-        Alert.alert('Initialization error');
-      },
-    );
+        return;
+      }
+
+      // Read the file
+      const res = await readFile(licPath, 'base64');
+      console.log('File read successfully');
+
+      // Initialize the reader
+      await DocumentReader.initializeReader(
+        {license: res},
+        respond => {
+          console.log('Initialization successful', respond);
+          setIsLoading(false);
+          onInitialized();
+        },
+        error => {
+          console.log('Initialization error', error);
+          setIsLoading(false);
+          Alert.alert('Initialization error');
+        },
+      );
+    } catch (err) {
+      console.error('Error during initialization:', err);
+      Alert.alert('Error initializing reader');
+      setIsLoading(false);
+    }
   };
+
+  // Call this function to ensure initialization
+  initialize();
+
+  // const initialize = async () => {
+  //   console.log('Initializing...');
+  //   const licPath =
+  //     Platform.OS === 'ios'
+  //       ? `${RNFS.MainBundlePath}/regula.license`
+  //       : 'regula.license';
+  //   const readFile =
+  //     Platform.OS === 'ios' ? RNFS.readFile : RNFS.readFileAssets;
+  //   try {
+  //     const res = await readFile(licPath, 'base64');
+  //     // Proceed with initialization
+  //   } catch (err) {
+  //     console.error('Error reading file:', err);
+  //     Alert.alert('Error reading license file');
+  //     return;
+  //   }
+
+  //   // const res = await readFile(licPath, 'base64');
+  //   // await DocumentReader.initializeReader(
+  //   //   {
+  //   //     license: res,
+  //   //   },
+  //   //   respond => {
+  //   //     console.log(respond, 'Initialization successful');
+  //   //     setIsLoading(false);
+  //   //     onInitialized();
+  //   //   },
+  //   //   error => {
+  //   //     console.log(error, 'Initialization error');
+  //   //     // setIsInitialized(false);
+  //   //     setIsLoading(false);
+  //   //     Alert.alert('Initialization error');
+  //   //   },
+  //   // );
+  // };
 
   const onInitialized = () => {
     // setFullName('Ready');
