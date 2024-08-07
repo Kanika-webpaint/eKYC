@@ -81,7 +81,7 @@ const NavigationStack = () => {
               component={routeNames.ChangePassword}
             />
           </>
-        ) : !isLoggedUser ? (
+        ) : isLoggedUser ? (
           <>
             <Stack.Screen
               options={{headerShown: false}}

@@ -13,6 +13,7 @@ import {
   KeyboardAvoidingView,
   Dimensions,
   Modal,
+  Alert,
 } from 'react-native';
 import DocumentReader, {
   Enum,
@@ -198,7 +199,8 @@ const IdScreen = ({navigation}) => {
       'Full',
       respond => {
         console.log(respond, 'Database preparation complete');
-
+        // verifyFilePath();
+        // onInitialized();
         initialize();
       },
       error => {
@@ -210,34 +212,49 @@ const IdScreen = ({navigation}) => {
 
   const initialize = async () => {
     console.log('Initializing...');
-    const licPath = `${RNFS.MainBundlePath}/regula.license`;
+
+    var licPath =
+      Platform.OS === 'ios'
+        ? RNFS.MainBundlePath + '/regula.license'
+        : 'regula.license';
+
+    console.log(licPath, '1111111111');
     const readFile =
       Platform.OS === 'ios' ? RNFS.readFile : RNFS.readFileAssets;
 
     try {
-      // Verify file presence
-      const fileExists = await RNFS.exists(licPath);
+      // Log the path being used
+      console.log('Reading file from path:', licPath);
+
+      // Check if file exists (optional but useful for debugging)
+      const fileExists = RNFS.exists(licPath);
+      console.log(fileExists);
       if (!fileExists) {
         console.error(`File not found at ${licPath}`);
+        scan();
         Alert.alert('Error: License file not found');
         setIsLoading(false);
         return;
+      } else {
+        console.error(`File found at ${licPath}`);
+        scan();
+        setIsLoading(false);
       }
 
       // Read the file
       const res = await readFile(licPath, 'base64');
       console.log('File read successfully');
 
-      // Initialize the reader
+      // Initialize the document reader
       await DocumentReader.initializeReader(
         {license: res},
         respond => {
-          console.log('Initialization successful', respond);
+          console.log(respond, 'Initialization successful');
           setIsLoading(false);
           onInitialized();
         },
         error => {
-          console.log('Initialization error', error);
+          console.error(error, 'Initialization error');
           setIsLoading(false);
           Alert.alert('Initialization error');
         },
@@ -248,45 +265,6 @@ const IdScreen = ({navigation}) => {
       setIsLoading(false);
     }
   };
-
-  // Call this function to ensure initialization
-  initialize();
-
-  // const initialize = async () => {
-  //   console.log('Initializing...');
-  //   const licPath =
-  //     Platform.OS === 'ios'
-  //       ? `${RNFS.MainBundlePath}/regula.license`
-  //       : 'regula.license';
-  //   const readFile =
-  //     Platform.OS === 'ios' ? RNFS.readFile : RNFS.readFileAssets;
-  //   try {
-  //     const res = await readFile(licPath, 'base64');
-  //     // Proceed with initialization
-  //   } catch (err) {
-  //     console.error('Error reading file:', err);
-  //     Alert.alert('Error reading license file');
-  //     return;
-  //   }
-
-  //   // const res = await readFile(licPath, 'base64');
-  //   // await DocumentReader.initializeReader(
-  //   //   {
-  //   //     license: res,
-  //   //   },
-  //   //   respond => {
-  //   //     console.log(respond, 'Initialization successful');
-  //   //     setIsLoading(false);
-  //   //     onInitialized();
-  //   //   },
-  //   //   error => {
-  //   //     console.log(error, 'Initialization error');
-  //   //     // setIsInitialized(false);
-  //   //     setIsLoading(false);
-  //   //     Alert.alert('Initialization error');
-  //   //   },
-  //   // );
-  // };
 
   const onInitialized = () => {
     // setFullName('Ready');
@@ -385,6 +363,7 @@ const IdScreen = ({navigation}) => {
   };
 
   const scan = () => {
+    console.log('dddddddd');
     clearResults();
     const config = new ScannerConfig();
     config.scenario = ScenarioIdentifier.SCENARIO_FULL_PROCESS;

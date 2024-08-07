@@ -13,9 +13,9 @@
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		1827E5792C624CAA00D6987F /* regula.license in Resources */ = {isa = PBXBuildFile; fileRef = 1827E5782C624CAA00D6987F /* regula.license */; settings = {ASSET_TAGS = (New, ); }; };
+		18A7B6062C636D8300647A34 /* db.dat in Resources */ = {isa = PBXBuildFile; fileRef = 18A7B6052C636D8300647A34 /* db.dat */; settings = {ASSET_TAGS = (New, ); }; };
+		18A7B60C2C637CC900647A34 /* regula.license in Resources */ = {isa = PBXBuildFile; fileRef = 18A7B60B2C637CC900647A34 /* regula.license */; };
 		18B068D02BBE6BB60082B3F0 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 18B068CF2BBE6BB60082B3F0 /* GoogleService-Info.plist */; };
-		18E0D9FC2C60E4C100C2FB86 /* GoogleService-Info (3).plist in Resources */ = {isa = PBXBuildFile; fileRef = 18E0D9FB2C60E4C100C2FB86 /* GoogleService-Info (3).plist */; };
 		2FC78133EE334F329EF8E981 /* Roboto-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0887265B80424E0F9C0D6255 /* Roboto-Light.ttf */; };
 		3C8D0A5940DE4CE8916F3E8E /* Roboto-BoldCondensedItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 22E5A53E3DAB460C86D2843D /* Roboto-BoldCondensedItalic.ttf */; };
 		43C3F18B78EC42938D40B77D /* Roboto-MediumItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E2A9443072A14A2CBDD71D07 /* Roboto-MediumItalic.ttf */; };
@@ -56,8 +56,9 @@
 		13B07FB01A68108700A75B9A /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = eKYC/AppDelegate.mm; sourceTree = "<group>"; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = eKYC/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = eKYC/main.m; sourceTree = "<group>"; };
-		1827E5762C624A4000D6987F /* regula.license */ = {isa = PBXFileReference; lastKnownFileType = file; path = regula.license; sourceTree = "<group>"; };
-		1827E5782C624CAA00D6987F /* regula.license */ = {isa = PBXFileReference; lastKnownFileType = file; path = regula.license; sourceTree = "<group>"; };
+		18A7B6052C636D8300647A34 /* db.dat */ = {isa = PBXFileReference; lastKnownFileType = file; path = db.dat; sourceTree = "<group>"; };
+		18A7B6072C636F2900647A34 /* regula.license */ = {isa = PBXFileReference; lastKnownFileType = file; path = regula.license; sourceTree = "<group>"; };
+		18A7B60B2C637CC900647A34 /* regula.license */ = {isa = PBXFileReference; lastKnownFileType = file; path = regula.license; sourceTree = "<group>"; };
 		18B068CF2BBE6BB60082B3F0 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		18E0D9FB2C60E4C100C2FB86 /* GoogleService-Info (3).plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info (3).plist"; sourceTree = "<group>"; };
 		18F48E7754414F22BB6E29A6 /* Roboto-Medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-Medium.ttf"; path = "../assets/fonts/Roboto-Medium.ttf"; sourceTree = "<group>"; };
@@ -154,8 +155,9 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
-				1827E5762C624A4000D6987F /* regula.license */,
-				1827E5782C624CAA00D6987F /* regula.license */,
+				18A7B6072C636F2900647A34 /* regula.license */,
+				18A7B60B2C637CC900647A34 /* regula.license */,
+				18A7B6052C636D8300647A34 /* db.dat */,
 				18E0D9FB2C60E4C100C2FB86 /* GoogleService-Info (3).plist */,
 				13B07FAE1A68108700A75B9A /* eKYC */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
@@ -265,10 +267,11 @@
 		83CBB9F71A601CBA00E9B192 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				BuildIndependentTargetsInParallel = YES;
 				KnownAssetTags = (
 					New,
 				);
-				LastUpgradeCheck = 1210;
+				LastUpgradeCheck = 1540;
 				TargetAttributes = {
 					00E356ED1AD99517003FC87E = {
 						CreatedOnToolsVersion = 6.2;
@@ -285,6 +288,7 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				Base,
 			);
 			mainGroup = 83CBB9F61A601CBA00E9B192;
 			packageReferences = (
@@ -312,7 +316,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1827E5792C624CAA00D6987F /* regula.license in Resources */,
+				18A7B60C2C637CC900647A34 /* regula.license in Resources */,
+				18A7B6062C636D8300647A34 /* db.dat in Resources */,
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				EC40C19D41BF44F3981BF95D /* Roboto-Black.ttf in Resources */,
@@ -322,7 +327,6 @@
 				3C8D0A5940DE4CE8916F3E8E /* Roboto-BoldCondensedItalic.ttf in Resources */,
 				EBE18B20D25140DA8CFB2A6C /* Roboto-BoldItalic.ttf in Resources */,
 				A1975D5304B9476983540A6C /* Roboto-Condensed.ttf in Resources */,
-				18E0D9FC2C60E4C100C2FB86 /* GoogleService-Info (3).plist in Resources */,
 				A5287ECBC63B4D18A5CBD4B6 /* Roboto-CondensedItalic.ttf in Resources */,
 				B63FBD3BE1534DE9BDF27857 /* Roboto-Italic.ttf in Resources */,
 				18B068D02BBE6BB60082B3F0 /* GoogleService-Info.plist in Resources */,
@@ -515,6 +519,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 40DD7BCFB7813A32D2AEDFB2 /* Pods-eKYC-eKYCTests.debug.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -542,6 +547,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7A4A3D3E679102C6600F065F /* Pods-eKYC-eKYCTests.release.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
 				INFOPLIST_FILE = eKYCTests/Info.plist;
@@ -651,6 +657,7 @@
 				COPY_PHASE_STRIP = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = i386;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -738,6 +745,7 @@
 				COPY_PHASE_STRIP = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = i386;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_NO_COMMON_BLOCKS = YES;
