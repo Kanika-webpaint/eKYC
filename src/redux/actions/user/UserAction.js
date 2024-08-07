@@ -127,3 +127,19 @@ export const checkverifiedUser =
       // showAlert(e?.response?.data?.message)
     }
   };
+
+export const imageUpload = (image, setIsLoading) => async dispatch => {
+  try {
+    const api_url = `${API_URL}/upload`;
+    const res = await axios.post(api_url, config);
+    if (res.status === 200) {
+      setIsLoading(false);
+    } else {
+      showAlert(res?.data?.message);
+    }
+    await dispatch(getUserVerfiedSlice(res));
+  } catch (e) {
+    setIsLoading(false);
+    // showAlert(e?.response?.data?.message)
+  }
+};

@@ -40,6 +40,8 @@ import {
 import {useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Loader from '../../../../components/ActivityIndicator';
+import axios from 'axios';
+
 const DropdownContent = ({label, value, isMatch}) => (
   <View style={{flexDirection: 'row', backgroundColor: 'lightgrey'}}>
     <View style={{width: '20%', backgroundColor: 'transparent'}}></View>
@@ -1162,9 +1164,41 @@ const Liveness = ({route}) => {
     );
   };
 
-  const handleSubmission = () => {
+  const handleImageUpload = async () => {
+    const base64Image = `data:image/png;base64,${imagePortrait?.value}`;
+    const uploadUrl = 'https://validifyx.com/node/api/upload';
+
+    try {
+      // If your server expects just the Base64 string without the prefix, strip it off
+      const base64ImageStripped = base64Image.replace(
+        /^data:image\/[a-z]+;base64,/,
+        '',
+      );
+
+      // Create the payload object
+      const payload = {
+        image: base64ImageStripped,
+      };
+
+      // Make the POST request
+      const response = await axios.post(uploadUrl, payload, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      console.log('Image uploaded successfully:', response.data);
+    } catch (error) {
+      console.error('Error uploading image:', error);
+    }
+  };
+
+  const handleSubmission = async () => {
     setIsLoading(true);
     console.log('111111');
+
+    await handleImageUpload();
+
     dispatch(
       verifedCustomerDataAction(
         requestData,
