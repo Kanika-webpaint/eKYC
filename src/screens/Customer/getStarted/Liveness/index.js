@@ -760,7 +760,7 @@ const FifthRoute = ({liveness, similarity, data}) => {
 
 const Liveness = ({route}) => {
   const data = route?.params?.data?.testData;
-  console.log(data?.textResult?.fields, 'hhhhhhhhhhhhhhhhh');
+  // console.log(data?.graphicResult?.fields, 'hhhhhhhhhhhhhhhhh');
   const navigation = useNavigation();
   const {height: screenHeight} = Dimensions.get('window');
   const dispatch = useDispatch();
@@ -779,14 +779,28 @@ const Liveness = ({route}) => {
   const image2 = useRef(new MatchFacesImage());
   const [isPortrait, setIsPortrait] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const [isFaceLoading, setIsFaceLoading] = useState(false);
+  console.log(liveness, similarity, '8888888888');
   const name = data?.textResult?.fields.find(
     item => item.fieldName === 'Surname and given names',
   );
 
-  const imagePortrait = data?.graphicResult?.fields.find(
-    item => item.fieldName === 'Portrait',
-  );
+  const imagePortrait =
+    data?.graphicResult?.fields.find(item => item.fieldName === 'Portrait')
+      ?.value || '';
 
+  const signatureImage =
+    data?.graphicResult?.fields.find(item => item.fieldName === 'Signature')
+      ?.value || '';
+
+  const documentImage =
+    data?.graphicResult?.fields.find(
+      item => item.fieldName === 'Document image',
+    )?.value || '';
+
+  const barcodeimage =
+    data?.graphicResult?.fields.find(item => item.fieldName === 'Barcode')
+      ?.value || '';
   const gender = data?.textResult?.fields.find(
     item => item.fieldName === 'Sex',
   );
@@ -956,6 +970,12 @@ const Liveness = ({route}) => {
     companyName: companyName,
     documentClassCode: documentClassCode,
     address: address,
+    liveness: liveness,
+    similarity: similarity,
+    signatureImage: signatureImage,
+    portraitImage: imagePortrait,
+    barcodeimage: barcodeimage,
+    documentImage: documentImage,
   };
 
   const layout = useWindowDimensions();
@@ -1074,10 +1094,12 @@ const Liveness = ({route}) => {
     } else {
       console.log('Init complete');
       livenessCheck();
+      setIsFaceLoading(false);
     }
   };
 
   const initializeSDK = async () => {
+    setIsFaceLoading(true);
     console.log('Initializing SDK...');
     try {
       const licPath =
@@ -1096,16 +1118,18 @@ const Liveness = ({route}) => {
       // console.log((config.license = license), 'license');
       FaceSDK.initialize(null, onInit, error => {
         console.log('Initialization callback error:', error);
+        setIsFaceLoading(false);
       });
     } catch (error) {
       FaceSDK.initialize(null, onInit, _e => {});
       console.error('Error during SDK initialization:', error);
+      setIsFaceLoading(false);
     }
   };
 
   const matchFaces = () => {
     if (!image1.current.image || !image2.current.image) return;
-    setSimilarity('Processing...');
+    setSimilarity('Processing');
     const request = new MatchFacesRequest();
     request.images = [image1.current, image2.current];
     FaceSDK.matchFaces(
@@ -1197,7 +1221,7 @@ const Liveness = ({route}) => {
     setIsLoading(true);
     console.log('111111');
 
-    await handleImageUpload();
+    // await handleImageUpload();
 
     dispatch(
       verifedCustomerDataAction(
@@ -1262,24 +1286,39 @@ const Liveness = ({route}) => {
               </View>
             )}
 
-            {
-              liveness && liveness == 'passed' ? (
-                <Image
-                  source={require('../../../../common/assets/live.png')}
-                  style={{width: 30, height: 30, marginLeft: 10}}
-                  resizeMode="contain"
-                />
-              ) : null
-              // <Text style={{color: 'grey', fontSize: 40, marginLeft: 10}}>
-              //   -
-              // </Text>
-            }
+            {liveness && liveness == 'passed' ? (
+              <Image
+                source={require('../../../../common/assets/live.png')}
+                style={{width: 30, height: 30, marginLeft: 10}}
+                resizeMode="contain"
+              />
+            ) : liveness == 'unknown' ? (
+              <Image
+                source={require('../../../../common/assets/notliveness.png')}
+                style={{width: 30, height: 30, marginLeft: 10}}
+                resizeMode="contain"
+              />
+            ) : null}
+
+            {similarity && parseFloat(similarity) >= 75 ? (
+              <Image
+                source={require('../../../../common/assets/similarity.png')}
+                style={{width: 30, height: 30, marginLeft: 10}}
+                resizeMode="contain"
+              />
+            ) : parseFloat(similarity) < 75 && parseFloat(similarity) >= 0 ? (
+              <Image
+                source={require('../../../../common/assets/notsimilarity.png')}
+                style={{width: 30, height: 30, marginLeft: 10}}
+                resizeMode="contain"
+              />
+            ) : null}
           </View>
         </View>
         <View style={styles.headerRight}>
           <Image
             source={{
-              uri: `data:image/png;base64,${imagePortrait?.value}`,
+              uri: `data:image/png;base64,${imagePortrait}`,
             }}
             style={styles.portraitImage}
             resizeMode="contain"
@@ -1307,7 +1346,7 @@ const Liveness = ({route}) => {
               styles.buttonContainer,
               {marginBottom: isPortrait ? 0 : 20},
             ]}
-            ButtonContent={isLoading ? <Loader /> : 'Verify Face '}
+            ButtonContent={isFaceLoading ? <Loader /> : 'Verify Face '}
             image
             contentStyle={styles.buttonText}
             onPress={() => {

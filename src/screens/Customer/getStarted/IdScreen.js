@@ -148,12 +148,14 @@ const IdScreen = ({navigation}) => {
               'Permission Approved',
               'Camera permissions are approved.',
             );
+            // setIsLoading(false);
             proceedWithDocumentReading();
           } else {
             Alert.alert(
               'Permission Denied',
               'Camera permissions are required for this feature.',
             );
+            // setIsLoading(false);
           }
           break;
         case RESULTS.LIMITED:
