@@ -121,6 +121,7 @@ const IdScreen = ({navigation}) => {
   }, []);
 
   const handlePermissions = async () => {
+    setIsLoading(true);
     console.log('1111111');
     if (isCheckStatus?.isVerified == 2) {
       showAlert('You are already verified');
@@ -240,7 +241,7 @@ const IdScreen = ({navigation}) => {
       } else {
         console.error(`File found at ${licPath}`);
         scan();
-        setIsLoading(false);
+        // setIsLoading(false);
       }
 
       // Read the file
@@ -252,7 +253,7 @@ const IdScreen = ({navigation}) => {
         {license: res},
         respond => {
           console.log(respond, 'Initialization successful');
-          setIsLoading(false);
+          // setIsLoading(false);
           onInitialized();
         },
         error => {
@@ -366,6 +367,7 @@ const IdScreen = ({navigation}) => {
 
   const scan = () => {
     console.log('dddddddd');
+    // setIsLoading(false);
     clearResults();
     const config = new ScannerConfig();
     config.scenario = ScenarioIdentifier.SCENARIO_FULL_PROCESS;
@@ -380,6 +382,7 @@ const IdScreen = ({navigation}) => {
     if (!results) return;
     setTestData(results);
     setModalVisible(true);
+    setIsLoading(false);
   };
 
   const customRFID = () => {

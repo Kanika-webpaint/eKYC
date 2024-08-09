@@ -26,6 +26,8 @@
     "@rneui/themed": "^4.0.0-rc.8",
     "@stripe/stripe-react-native": "^0.37.0",
     "axios": "^1.6.7",
+    "base-64": "^1.0.0",
+    "base64-js": "^1.5.1",
     "country-state-city": "^3.2.1",
     "firebase": "^10.8.0",
     "react": "18.2.0",

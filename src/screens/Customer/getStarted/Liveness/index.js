@@ -41,6 +41,9 @@ import {useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Loader from '../../../../components/ActivityIndicator';
 import axios from 'axios';
+import {decode as base64Decode} from 'base64-js';
+import {Buffer} from 'buffer';
+global.Buffer = Buffer;
 
 const DropdownContent = ({label, value, isMatch}) => (
   <View style={{flexDirection: 'row', backgroundColor: 'lightgrey'}}>
@@ -946,37 +949,37 @@ const Liveness = ({route}) => {
   //   item => item.fieldName === 'Middle name',
   // );
 
-  const requestData = {
-    issuingStateCode: issuingStateCode,
-    documentNumber: documentNumber,
-    dateofExpiry: dateofExpiry,
-    dateofIssue: dateofIssue,
-    dateofBirth: dateofBirth,
-    placeofBirth: placeofBirth,
-    surname: surname,
-    givenName: givenName,
-    nationality: nationality,
-    sex: sex,
-    issuingAuthority: issuingAuthority,
-    surnameandGivenNames: surnameandGivenNames,
-    nationalityCode: nationalityCode,
-    issuingState: issuingState,
-    middleName: middleName,
-    age: age,
-    monthsToExpire: monthsToExpire,
-    ageAtIssue: ageAtIssue,
-    yearsSinceIssue: yearsSinceIssue,
-    passportNumber: passportNumber,
-    companyName: companyName,
-    documentClassCode: documentClassCode,
-    address: address,
-    liveness: liveness,
-    similarity: similarity,
-    signatureImage: signatureImage,
-    portraitImage: imagePortrait,
-    barcodeimage: barcodeimage,
-    documentImage: documentImage,
-  };
+  // const requestData = {
+  //   issuingStateCode: issuingStateCode,
+  //   documentNumber: documentNumber,
+  //   dateofExpiry: dateofExpiry,
+  //   dateofIssue: dateofIssue,
+  //   dateofBirth: dateofBirth,
+  //   placeofBirth: placeofBirth,
+  //   surname: surname,
+  //   givenName: givenName,
+  //   nationality: nationality,
+  //   sex: sex,
+  //   issuingAuthority: issuingAuthority,
+  //   surnameandGivenNames: surnameandGivenNames,
+  //   nationalityCode: nationalityCode,
+  //   issuingState: issuingState,
+  //   middleName: middleName,
+  //   age: age,
+  //   monthsToExpire: monthsToExpire,
+  //   ageAtIssue: ageAtIssue,
+  //   yearsSinceIssue: yearsSinceIssue,
+  //   passportNumber: passportNumber,
+  //   companyName: companyName,
+  //   documentClassCode: documentClassCode,
+  //   address: address,
+  //   liveness: liveness,
+  //   similarity: similarity,
+  //   signatureImage: signatureImage,
+  //   portraitImage: imagePortrait,
+  //   barcodeimage: barcodeimage,
+  //   documentImage: documentImage,
+  // };
 
   const layout = useWindowDimensions();
   const [index, setIndex] = useState(0);
@@ -1004,12 +1007,6 @@ const Liveness = ({route}) => {
       <FifthRoute liveness={liveness} similarity={similarity} data={data} />
     ),
   });
-
-  const calculateTabWidth = title => {
-    const baseWidth = 80;
-    const extraWidthPerChar = 8;
-    return baseWidth + title.length * extraWidthPerChar;
-  };
 
   const renderTabBar = props => {
     // console.log(props?.navigationState?.routes[1]?.key, 'kkkkkkkk');
@@ -1188,50 +1185,448 @@ const Liveness = ({route}) => {
     );
   };
 
-  const handleImageUpload = async () => {
-    const base64Image = `data:image/png;base64,${imagePortrait?.value}`;
-    const uploadUrl = 'https://validifyx.com/node/api/upload';
+  // function base64ToBlob(base64, type = 'image/jpeg') {
+  //   const byteCharacters = atob(base64);
+  //   const byteNumbers = new Array(byteCharacters.length);
+  //   for (let i = 0; i < byteCharacters.length; i++) {
+  //     byteNumbers[i] = byteCharacters.charCodeAt(i);
+  //   }
+  //   const byteArray = new Uint8Array(byteNumbers);
+  //   return new Blob([byteArray], {type});
+  // }
 
+  // const handleSubmission = () => {
+  //   const formData = new FormData();
+  //   console.log(imagePortrait, '44444');
+  //   // const imageBlob = base64ToBlob(
+  //   //   imagePortrait.replace(/^data:image\/(png|jpeg);base64,/, ''),
+  //   // );
+  //   // formData.append('image', imageBlob, 'portrait.jpg');
+  //   formData.append('image', {
+  //     imagePortrait,
+  //     type: 'image/jpeg',
+  //     name: 'portrait.jpg',
+  //   });
+
+  //   axios
+  //     .post('https://validifyx.com/node/api/upload', formData, {
+  //       headers: {
+  //         'Content-Type': 'multipart/form-data',
+  //       },
+  //     })
+  //     .then(response => {
+  //       console.log('Upload Success', response.data);
+  //     })
+  //     .catch(error => {
+  //       console.log('Upload Error', error.message);
+  //       if (error.response) {
+  //         console.log('Error Response:', error.response.data);
+  //       } else if (error.request) {
+  //         console.log('Error Request:', error.request);
+  //       } else {
+  //         console.log('General Error:', error.message);
+  //       }
+  //     });
+  // };
+  // const handleSubmission = async () => {
+  //   setIsLoading(true);
+  //   console.log('111111');
+
+  //   const base64Images = [
+  //     `data:image/jpeg;base64,${imagePortrait}`,
+  //     // `data:image/jpeg;base64,${signatureImage}`,
+  //     `data:image/jpeg;base64,${barcodeimage}`,
+  //     `data:image/jpeg;base64,${documentImage}`,
+  //   ];
+
+  //   console.log('Base64 Images:', base64Images);
+
+  //   try {
+  //     const blobs = await processImages(base64Images);
+  //     console.log('Blobs:', blobs);
+
+  //     if (blobs.length === 0) {
+  //       throw new Error('No blobs were created from base64 images.');
+  //     }
+
+  //     blobs.forEach(blob => {
+  //       console.log('Uploading blob:', blob);
+  //       uploadBlob(blob);
+  //     });
+  //   } catch (error) {
+  //     console.error('Error in handleSubmission:', error);
+  //   }
+
+  //   setIsLoading(false);
+  // };
+
+  // const processImages = async images => {
+  //   console.log('Processing images...');
+  //   try {
+  //     const blobs = await Promise.all(
+  //       images.map(async image => {
+  //         try {
+  //           const [header, base64Data] = image.split(',');
+  //           const contentType = header.split(':')[1].split(';')[0];
+  //           const blob = base64ToBlob(base64Data, contentType);
+  //           console.log('Processed blob:', blob);
+  //           return blob;
+  //         } catch (error) {
+  //           console.error('Error processing image:', error);
+  //           return null;
+  //         }
+  //       }),
+  //     );
+
+  //     // Ensure the result is an array and filter out null values
+  //     if (Array.isArray(blobs)) {
+  //       return blobs.filter(blob => blob !== null);
+  //     } else {
+  //       console.error('Result of Promise.all is not an array:', blobs);
+  //       return [];
+  //     }
+  //   } catch (error) {
+  //     console.error('Error in processImages:', error);
+  //     return [];
+  //   }
+  // };
+
+  // const base64ToBlob = (base64, contentType = '', sliceSize = 512) => {
+  //   try {
+  //     const byteCharacters = Buffer.from(base64, 'base64').toString('binary');
+  //     const byteArrays = [];
+
+  //     for (
+  //       let offset = 0;
+  //       offset < byteCharacters.length;
+  //       offset += sliceSize
+  //     ) {
+  //       const slice = byteCharacters.slice(offset, offset + sliceSize);
+  //       const byteNumbers = new Array(slice.length);
+
+  //       for (let i = 0; i < slice.length; i++) {
+  //         byteNumbers[i] = slice.charCodeAt(i);
+  //       }
+
+  //       const byteArray = new Uint8Array(byteNumbers);
+  //       byteArrays.push(byteArray);
+  //     }
+
+  //     return new Blob(byteArrays, {type: contentType});
+  //   } catch (error) {
+  //     console.error('Error converting base64 to blob:', error);
+  //     return null;
+  //   }
+  // };
+
+  // const uploadBlob = async blob => {
+  //   console.log('Blob ID:', blob?._data?.blobId);
+
+  //   if (!blob || blob.size === 0) {
+  //     console.error('Blob is empty or invalid');
+  //     return;
+  //   }
+
+  //   try {
+  //     // Fetch the actual binary data using the blobId if necessary
+  //     const actualBlob = await getActualBlobData(blob?._data?.blobId);
+
+  //     if (!actualBlob) {
+  //       console.error('Failed to retrieve actual blob data.');
+  //       return;
+  //     }
+
+  //     const formData = new FormData();
+  //     formData.append('file', actualBlob, 'image.jpg');
+
+  //     const response = await axios.post(
+  //       'https://validifyx.com/node/api/upload',
+  //       formData,
+  //       {
+  //         headers: {
+  //           'Content-Type': 'multipart/form-data',
+  //         },
+  //       },
+  //     );
+
+  //     console.log('Upload result:', response.data);
+  //   } catch (error) {
+  //     console.error(
+  //       'Error uploading blob:',
+  //       error.response ? error.response.data : error.message,
+  //     );
+  //   }
+  // };
+
+  // Dummy function to represent fetching actual blob data using blobId
+  // const getActualBlobData = async blobId => {
+  //   // Logic to retrieve actual Blob data from the blobId
+  //   // This might involve fetching from local storage, a server, or other sources
+  //   // For now, let's assume we have a function that retrieves this
+  //   const actualBlob = /* your logic to retrieve blob */ null;
+
+  //   return actualBlob;
+  // };
+
+  // const uploadBlob = async blob => {
+  //   const formData = new FormData();
+  //   formData.append('file', blob, 'image.jpg');
+
+  //   try {
+  //     const response = await fetch('https://validifyx.com/node/api/upload', {
+  //       method: 'POST',
+  //       body: formData,
+  //     });
+
+  //     if (!response.ok) {
+  //       throw new Error('Network response was not ok');
+  //     }
+
+  //     const result = await response.json();
+  //     console.log('Upload result:', result);
+  //   } catch (error) {
+  //     console.error('Error uploading blob:', error);
+  //   }
+  // };
+
+  // Call handleSubmission to start the process
+  // handleSubmission();
+
+  // const uploadImages = async base64Images => {
+  //   console.log(base64Images.length, '7777777');
+  //   const formData = new FormData();
+  //   console.log(base64Images.length, 'aaaaaaaa');
+
+  //   base64Images.forEach((base64Image, index) => {
+  //     const contentType = 'image/jpeg'; // Adjust the content type if needed
+  //     const base64Data = base64Image.startsWith('data:image/')
+  //       ? base64Image.split(',')[1]
+  //       : base64Image;
+
+  //     console.log(base64Data, 'bbbbbbb');
+
+  //     try {
+  //       const blob = base64ToBlob(base64Data, contentType);
+  //       formData.append('images', blob, `image${index}.jpg`);
+  //     } catch (error) {
+  //       console.error('Error creating Blob:', error);
+  //     }
+
+  //     formData.append('images', blob, `image${index}.jpg`);
+  //   });
+
+  //   try {
+  //     console.log(formData, '9999999');
+  //     const response = await axios.post(
+  //       'https://validifyx.com/node/api/upload',
+  //       formData,
+  //       {
+  //         headers: {
+  //           'Content-Type': 'multipart/form-data',
+  //         },
+  //       },
+  //     );
+
+  //     console.log('Upload successful', response);
+  //   } catch (error) {
+  //     console.error('Upload failed', error);
+  //   }
+  // };
+
+  const generateUniqueFileName = fileName => {
+    const timestamp = new Date().getTime();
+    const randomSuffix = Math.floor(Math.random() * 10000); // Add a random number to further ensure uniqueness
+    const fileExtension = fileName.split('.').pop();
+    const baseName = fileName.replace(`.${fileExtension}`, '');
+    return `${baseName}_${timestamp}_${randomSuffix}.${fileExtension}`;
+  };
+
+  // Function to save base64 data as a file
+  const saveBase64ToFile = async (base64String, fileName) => {
     try {
-      // If your server expects just the Base64 string without the prefix, strip it off
-      const base64ImageStripped = base64Image.replace(
-        /^data:image\/[a-z]+;base64,/,
-        '',
-      );
+      // Decode the base64 string and get the binary data
+      const base64Data = base64String.replace(/^data:image\/jpeg;base64,/, ''); // Adjust prefix if needed
 
-      // Create the payload object
-      const payload = {
-        image: base64ImageStripped,
-      };
+      // Define the path where the file will be saved
+      let filePath = `${RNFS.DocumentDirectoryPath}/${fileName}`;
 
-      // Make the POST request
-      const response = await axios.post(uploadUrl, payload, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      // Check if the file already exists and generate a new name if necessary
+      let fileExists = await RNFS.exists(filePath);
+      while (fileExists) {
+        const newFileName = generateUniqueFileName(fileName);
+        filePath = `${RNFS.DocumentDirectoryPath}/${newFileName}`;
+        fileExists = await RNFS.exists(filePath);
+      }
 
-      console.log('Image uploaded successfully:', response.data);
+      // Write the binary data to the file
+      await RNFS.writeFile(filePath, base64Data, 'base64');
+
+      console.log('File saved at:', filePath);
+      return filePath;
     } catch (error) {
-      console.error('Error uploading image:', error);
+      console.error('Error saving file:', error);
+      throw error;
     }
   };
 
-  const handleSubmission = async () => {
-    setIsLoading(true);
-    console.log('111111');
+  // Function to upload a file
+  const uploadFile = async filePath => {
+    try {
+      // Prepare the form data
+      const formData = new FormData();
+      formData.append('file', {
+        uri: `file://${filePath}`,
+        type: 'image/jpeg', // Adjust type based on the file type
+        name: filePath.split('/').pop(), // Extract the file name
+      });
 
-    // await handleImageUpload();
+      // Define your server upload URL
+      const uploadUrl = 'https://validifyx.com/node/api/upload';
 
-    dispatch(
-      verifedCustomerDataAction(
-        requestData,
-        navigation,
-        userToken,
-        setIsLoading,
-      ),
-    );
+      // Make the POST request to upload the file
+      const response = await axios.post(uploadUrl, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      console.log('Upload successful:', response.data);
+      return response.data.fileUrl[0];
+    } catch (error) {
+      console.error(
+        'Error uploading file:',
+        error.response ? error.response.data : error.message,
+      );
+      throw error;
+    }
   };
+
+  // Function to process images
+  const processImages = async images => {
+    try {
+      // Upload all images and gather filenames
+      const filePromises = images.map(async ({base64String, fileName}) => {
+        const filePath = await saveBase64ToFile(base64String, fileName);
+        return uploadFile(filePath);
+      });
+      const fileNames = await Promise.all(filePromises);
+
+      // Ensure that filenames are properly assigned
+      const [
+        portraitImageFilename,
+        signatureImageFilename,
+        barcodeImageFilename,
+        documentImageFilename,
+      ] = fileNames;
+
+      const parseDate = dateString => {
+        return dateString ? new Date(dateString) : null;
+      };
+
+      // Prepare the updated requestData object
+      const requestData = {
+        issuingStateCode: issuingStateCode,
+        documentNumber: documentNumber,
+        dateofExpiry: parseDate(dateofExpiry), // Convert string to Date object
+        dateofIssue: parseDate(dateofIssue), // Convert string to Date object
+        dateofBirth: parseDate(dateofBirth),
+        placeofBirth: placeofBirth,
+        surname: surname,
+        givenName: givenName,
+        nationality: nationality,
+        sex: sex,
+        issuingAuthority: issuingAuthority,
+        surnameandGivenNames: surnameandGivenNames,
+        nationalityCode: nationalityCode,
+        issuingState: issuingState,
+        middleName: middleName,
+        age: parseInt(age, 10), // Convert string to integer
+        monthsToExpire: parseInt(monthsToExpire, 10), // Convert string to integer
+        ageAtIssue: parseInt(ageAtIssue, 10), // Convert string to integer
+        yearsSinceIssue: parseInt(yearsSinceIssue, 10),
+        passportNumber: passportNumber,
+        companyName: companyName,
+        documentClassCode: documentClassCode,
+        address: address,
+        liveness: liveness,
+        similarity: similarity,
+        signatureImage: signatureImageFilename,
+        portraitImage: portraitImageFilename,
+        barcodeimage: barcodeImageFilename,
+        documentImage: documentImageFilename,
+      };
+
+      console.log('Updated requestData:', requestData);
+      // console.log(
+      //   typeof issuingStateCode,
+      //   documentNumber,
+      //   dateofExpiry,
+      //   dateofIssue,
+      //   dateofBirth,
+      //   placeofBirth,
+      //   surname,
+      //   givenName,
+      //   nationality,
+      //   sex,
+      //   issuingAuthority,
+      //   surnameandGivenNames,
+      //   nationalityCode,
+      //   issuingState,
+      //   middleName,
+      //   age,
+      //   monthsToExpire,
+      //   ageAtIssue,
+      //   yearsSinceIssue,
+      //   passportNumber,
+      //   companyName,
+      //   documentClassCode,
+      //   address,
+      //   similarity,
+      //   liveness,
+      //   signatureImage,
+      //   portraitImage,
+      //   portraitImage,
+      //   documentImage,
+      //   barcodeImage,
+      // );
+      // Dispatch the action with updated requestData
+      dispatch(
+        verifedCustomerDataAction(
+          requestData,
+          navigation,
+          userToken,
+          setIsLoading,
+        ),
+      );
+    } catch (error) {
+      console.error('Error processing images:', error);
+    }
+  };
+
+  // Handle the submission
+  const handleSubmission = () => {
+    processImages(images);
+  };
+
+  // Example images array
+  const images = [
+    {
+      base64String: imagePortrait, // Your base64 string for the first image
+      fileName: 'image1.jpg', // Desired file name for the first image
+    },
+    {
+      base64String: signatureImage, // Your base64 string for the second image
+      fileName: 'image2.jpg', // Desired file name for the second image
+    },
+    {
+      base64String: barcodeimage, // Your base64 string for the third image
+      fileName: 'image3.jpg', // Desired file name for the third image
+    },
+    {
+      base64String: documentImage, // Your base64 string for the fourth image
+      fileName: 'image4.jpg', // Desired file name for the fourth image
+    },
+  ];
 
   return (
     <SafeAreaView style={styles.container}>

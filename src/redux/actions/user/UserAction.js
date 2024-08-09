@@ -47,7 +47,7 @@ export const verifedCustomerDataAction =
       await dispatch(verifiedDataSlice(res));
       console.log('88888888');
     } catch (e) {
-      console.log('99999999', e);
+      console.log('99999999', e, e?.message);
 
       setIsLoading(false);
       showAlert(e?.response?.data?.message);
