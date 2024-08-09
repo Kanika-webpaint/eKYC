@@ -123,7 +123,7 @@ const IdScreen = ({navigation}) => {
   const handlePermissions = async () => {
     setIsLoading(true);
     console.log('1111111');
-    if (isCheckStatus?.isVerified == 2) {
+    if (isCheckStatus?.isVerified == 1) {
       showAlert('You are already verified');
       setIsLoading(false);
       await AsyncStorage.clear();
