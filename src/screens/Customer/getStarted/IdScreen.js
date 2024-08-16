@@ -49,7 +49,7 @@ import {
 } from '../../../redux/actions/user/UserAction';
 import {verifyCodeslice} from '../../../redux/slices/user/userSlice';
 import showAlert from '../../../components/showAlert';
-
+import {FirebaseRecaptchaVerifierModal} from 'expo-firebase-recaptcha';
 const IdScreen = ({navigation}) => {
   const [fullName, setFullName] = useState('Please wait...');
   const [doRfid, setDoRfid] = useState(false);
@@ -446,6 +446,7 @@ const IdScreen = ({navigation}) => {
               their customers.
             </Text>
           </View>
+
           <RedButton
             buttonContainerStyle={[
               styles.buttonContainer,
