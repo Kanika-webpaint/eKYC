@@ -7,12 +7,20 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:906176847453:android:d3235a119ac0e26c0af7b4",
+        "mobilesdk_app_id": "1:906176847453:android:a48ae89ffe20d6240af7b4",
         "android_client_info": {
-          "package_name": "com.ekyc"
+          "package_name": "com.ekycValidifyx"
         }
       },
       "oauth_client": [
+        {
+          "client_id": "906176847453-viigidld8ov5tfa61456s45ofg6e5o16.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ekycValidifyx",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
         {
           "client_id": "906176847453-fhfqcqmvqc4tu06n1ol87p9jtfke9ao3.apps.googleusercontent.com",
           "client_type": 3
@@ -31,10 +39,10 @@
               "client_type": 3
             },
             {
-              "client_id": "906176847453-mtmk67s6jlo67pg157sf4htf07ethqrt.apps.googleusercontent.com",
+              "client_id": "906176847453-0ukbrbofdu048m5ei5s26t3tdf6rof4m.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "org.reactjs.native.validifyx"
+                "bundle_id": "com.ekycValidifyx"
               }
             }
           ]
