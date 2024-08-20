@@ -43,3 +43,6 @@ class MainApplication : Application(), ReactApplication {
     ReactNativeFlipper.initializeFlipper(this, reactNativeHost.reactInstanceManager)
   }
 }
+
+
+l
