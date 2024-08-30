@@ -90,10 +90,13 @@ export const loginUserAction =
       const api_url = `${API_URL}/loginuser`;
       const res = await axios.post(api_url, data);
       if (res?.status == 200) {
+        console.log(res, '666666666');
         await AsyncStorage.setItem('token_user', res?.data?.token);
         await AsyncStorage.setItem('role_user', 'user');
+
         const storedToken = await AsyncStorage.getItem('token_user');
         const storedRole = await AsyncStorage.getItem('role_user');
+
         if (storedRole && storedToken) {
           setIsLoading(false);
           await dispatch(verifyCodeslice(true));

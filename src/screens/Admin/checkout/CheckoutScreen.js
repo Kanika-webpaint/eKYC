@@ -10,6 +10,7 @@ import {
   FlatList,
   Dimensions,
   KeyboardAvoidingView,
+  Alert,
 } from 'react-native';
 import colors from '../../../common/colors';
 import RedButton from '../../../components/RedButton';
@@ -274,6 +275,7 @@ function CheckoutScreen({route}) {
                                 configSubscription,
                               )
                               .then(async function (subsResData) {
+                                console.log(subsResData, '--------11111111111');
                                 if (subsResData?.status === 201) {
                                   setIsLoading(false);
                                   setTimeout(async () => {
@@ -289,7 +291,18 @@ function CheckoutScreen({route}) {
                                 }
                               })
                               .catch(function (error) {
-                                console.log(error, 'error');
+                                console.log(error.message, 'error');
+                                if (
+                                  error.message ==
+                                  'Request failed with status code 400'
+                                ) {
+                                  showAlert(
+                                    'User already exists with same email',
+                                  );
+                                } else {
+                                  showAlert('Error - Please try again later!');
+                                }
+                                setIsLoading(false);
                               });
                           },
                         );
@@ -310,9 +323,11 @@ function CheckoutScreen({route}) {
                         showAlert(
                           'Your card was declined.\nPlease enter valid card details.',
                         );
+                        showAlert('Error');
                       }
                     });
                   console.log('res', res);
+                  setIsLoading(false);
                 }
               })
               .catch(function (error) {

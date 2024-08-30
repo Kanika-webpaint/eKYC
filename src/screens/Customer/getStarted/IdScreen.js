@@ -123,7 +123,7 @@ const IdScreen = ({navigation}) => {
   const handlePermissions = async () => {
     setIsLoading(true);
     console.log('1111111');
-    if (isCheckStatus?.isVerified == 1) {
+    if (isCheckStatus?.isVerified == 2) {
       showAlert('You are already verified');
       setIsLoading(false);
       await AsyncStorage.clear();
@@ -149,14 +149,12 @@ const IdScreen = ({navigation}) => {
               'Permission Approved',
               'Camera permissions are approved.',
             );
-            // setIsLoading(false);
-            proceedWithDocumentReading();
+            setIsLoading(false);
           } else {
             Alert.alert(
               'Permission Denied',
               'Camera permissions are required for this feature.',
             );
-            // setIsLoading(false);
           }
           break;
         case RESULTS.LIMITED:
@@ -194,7 +192,6 @@ const IdScreen = ({navigation}) => {
     // );
     setIsLoading(true);
     await prepareDatabase();
-    // setIsLoading(false);
   };
 
   const prepareDatabase = async () => {
@@ -202,8 +199,6 @@ const IdScreen = ({navigation}) => {
       'Full',
       respond => {
         console.log(respond, 'Database preparation complete');
-        // verifyFilePath();
-        // onInitialized();
         initialize();
       },
       error => {
@@ -241,7 +236,6 @@ const IdScreen = ({navigation}) => {
       } else {
         console.error(`File found at ${licPath}`);
         scan();
-        // setIsLoading(false);
       }
 
       // Read the file
@@ -253,7 +247,8 @@ const IdScreen = ({navigation}) => {
         {license: res},
         respond => {
           console.log(respond, 'Initialization successful');
-          // setIsLoading(false);
+          setIsLoading(false);
+
           onInitialized();
         },
         error => {
@@ -270,7 +265,6 @@ const IdScreen = ({navigation}) => {
   };
 
   const onInitialized = () => {
-    // setFullName('Ready');
     const functionality = new Functionality();
     functionality.showCaptureButton = true;
     DocumentReader.setFunctionality(
@@ -361,13 +355,10 @@ const IdScreen = ({navigation}) => {
 
   const clearResults = () => {
     setFullName('Ready');
-    // setDocFrontuseState(require('../../../common/assets/back.png'));
-    // setPortraituseState(require('../../../common/assets/back.png'));
   };
 
   const scan = () => {
     console.log('dddddddd');
-    // setIsLoading(false);
     clearResults();
     const config = new ScannerConfig();
     config.scenario = ScenarioIdentifier.SCENARIO_FULL_PROCESS;
@@ -409,7 +400,6 @@ const IdScreen = ({navigation}) => {
 
   const handleResults = results => {
     if (doRfid && !isReadingRfid && results && results.chipPage !== 0) {
-      // customRFID();
       usualRFID();
     } else {
       isReadingRfid = false;
@@ -486,7 +476,6 @@ const IdScreen = ({navigation}) => {
               <View
                 style={{
                   flexDirection: 'row',
-                  // justifyContent: 'center',
                   alignItems: 'center',
                   backgroundColor: 'white',
                   marginTop: 15,
@@ -507,7 +496,6 @@ const IdScreen = ({navigation}) => {
               <View
                 style={{
                   flexDirection: 'row',
-                  // justifyContent: 'center',
                   alignItems: 'center',
                   backgroundColor: 'white',
                   marginTop: 15,
@@ -531,7 +519,6 @@ const IdScreen = ({navigation}) => {
               <View
                 style={{
                   flexDirection: 'row',
-                  // justifyContent: 'center',
                   alignItems: 'center',
                   backgroundColor: 'white',
                   marginTop: 15,

@@ -46,8 +46,8 @@ import {Buffer} from 'buffer';
 global.Buffer = Buffer;
 
 const DropdownContent = ({label, value, isMatch}) => (
-  <View style={{flexDirection: 'row', backgroundColor: 'lightgrey'}}>
-    <View style={{width: '20%', backgroundColor: 'transparent'}}></View>
+  <View style={styles.dropDown}>
+    <View style={styles.dropDownView}></View>
     <View
       style={{
         width: label === 'Barcode <=>' ? '25%' : '30%',
@@ -73,12 +73,12 @@ const DropdownContent = ({label, value, isMatch}) => (
       }}>
       {label === 'Barcode <=>' ? (
         isMatch ? (
-          <Text style={{color: 'green', fontSize: 20}}>✓</Text>
+          <Text style={styles.dropDownTick}>✓</Text>
         ) : (
-          <Text style={{color: 'grey', fontSize: 40}}>-</Text>
+          <Text style={styles.dropDownDash}>-</Text>
         )
       ) : (
-        <Text style={{color: 'grey', fontSize: 40}}>-</Text>
+        <Text style={styles.dropDownDash}>-</Text>
       )}
     </View>
   </View>
@@ -100,12 +100,10 @@ const FirstRoute = ({data}) => {
     documentNumberField?.values.find(item => item.sourceType === 17)
       ?.originalValue || '';
   const country = fields.find(item => item.fieldName === 'Issuing state');
-  // console.log(country, 'bjjjjjj');
   const countryBarcode =
     country?.values.find(item => item.sourceType === 18)?.value || '';
   const countryVisual =
     country?.values.find(item => item.sourceType === 17)?.value || '';
-  // console.log(countryBarcode, countryVisual, 'pppppppp');
   const imageFront =
     data?.graphicResult?.fields.find(
       item => item.fieldName === 'Document image',
@@ -145,15 +143,7 @@ const FirstRoute = ({data}) => {
         color={countryColor}
       />
 
-      <Text
-        style={{
-          textAlign: 'center',
-          marginTop: 20,
-          color: 'black',
-          fontWeight: '800',
-        }}>
-        {documentName}
-      </Text>
+      <Text style={styles.fieldText}>{documentName}</Text>
       <View
         style={{
           justifyContent: 'center',
@@ -185,17 +175,11 @@ const SecondRoute = ({data}) => {
 
   const renderRow = ({item}) => {
     const {fieldName, value, key, values, status} = item;
-    // console.log(status, '999999999');
     const barcodeValues = values.filter(val => val.sourceType === 18);
     const visualValues = values.filter(val => val.sourceType === 17);
 
     const barcodeSet = new Set(barcodeValues.map(val => val.value));
     const visualSet = new Set(visualValues.map(val => val.value));
-
-    // const valuesMatch =
-    //   [...barcodeSet].every(val => visualSet.has(val)) &&
-    //   [...visualSet].every(val => barcodeSet.has(val));
-
     return (
       <View>
         <View style={{flexDirection: 'row'}} key={key}>
@@ -338,8 +322,6 @@ const ThirdRoute = ({data}) => {
     );
   }, []);
 
-  // console.log(imageDimensions, '----------------');
-
   useEffect(() => {
     if (data?.fields && Array.isArray(data?.fields)) {
       data?.fields.forEach((field, index) => {
@@ -367,7 +349,6 @@ const ThirdRoute = ({data}) => {
     const {fieldName, value, key} = item;
     const dimensions = imageDimensions[key] || {width: 0, height: 0};
     const {width, height} = dimensions;
-    // console.log(width, height, '----------------');
     const maximumWidth = '90%';
     const maximumHeight = 200;
 
@@ -391,14 +372,8 @@ const ThirdRoute = ({data}) => {
             }}>
             <Image
               style={{
-                // maxHeight: '250',
-                // maxWidth: '80%',
                 width: width > maximumWidth ? maximumWidth : width,
                 height: height > maximumHeight ? maximumHeight : height,
-
-                // aspectRatio: width / height,
-                // alignSelf: 'center',
-                // marginHorizontal: '5%',
               }}
               source={{uri: `data:image/png;base64,${value}`}}
               resizeMode="contain"
@@ -613,16 +588,6 @@ const FourthRoute = ({data, img1, img2, similarity}) => {
 <View style={{flex: 1, backgroundColor: 'white'}} />;
 
 const FifthRoute = ({liveness, similarity, data}) => {
-  // console.log(
-  //   liveness,
-  //   'kkkkkkkkk',
-  //   similarity,
-  //   data?.authenticityResult?.checks[0]?.elements,
-  //   'mmmmmmmmmmmm',
-  //   data?.textResult?.status,
-  //   'ffffffffffffffffffffff',
-  // );
-
   return (
     <ScrollView
       showsVerticalScrollIndicator={false}
@@ -636,8 +601,6 @@ const FifthRoute = ({liveness, similarity, data}) => {
         }}>
         <Text
           style={{
-            // paddingLeft: '10%',
-            // marginTop: 20,
             color: 'black',
             fontSize: 20,
             fontWeight: '800',
@@ -651,7 +614,6 @@ const FifthRoute = ({liveness, similarity, data}) => {
           marginLeft: '5%',
           justifyContent: 'space-between',
           marginRight: '3%',
-          // marginTop: 10,
           flexDirection: 'row',
           alignItems: 'center',
         }}>
@@ -669,7 +631,6 @@ const FifthRoute = ({liveness, similarity, data}) => {
           justifyContent: 'space-between',
           alignItems: 'center',
           marginRight: '3%',
-          // marginTop: 10,
           flexDirection: 'row',
         }}>
         <Text>Liveness check</Text>
@@ -689,8 +650,6 @@ const FifthRoute = ({liveness, similarity, data}) => {
         }}>
         <Text
           style={{
-            // paddingLeft: '10%',
-            // marginTop: 20,
             color: 'black',
             fontSize: 20,
             fontWeight: '800',
@@ -763,17 +722,13 @@ const FifthRoute = ({liveness, similarity, data}) => {
 
 const Liveness = ({route}) => {
   const data = route?.params?.data?.testData;
-  // console.log(data?.graphicResult?.fields, 'hhhhhhhhhhhhhhhhh');
   const navigation = useNavigation();
   const {height: screenHeight} = Dimensions.get('window');
   const dispatch = useDispatch();
   const [userToken, setTokenUser] = useState('');
+  const userId = useSelector(state => state.user.verified?.id);
+
   const a = data?.textResult;
-  // a.fields.forEach(field => {
-  //   console.log(
-  //     `Field Name: ${field.fieldName}, Status: ${field.status}, Validity Status: ${field.validityStatus}`,
-  //   );
-  // });
   const [similarity, setSimilarity] = useState('nil');
   const [liveness, setLiveness] = useState('nil');
   const [img1, setImg1] = useState('');
@@ -783,7 +738,7 @@ const Liveness = ({route}) => {
   const [isPortrait, setIsPortrait] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [isFaceLoading, setIsFaceLoading] = useState(false);
-  console.log(liveness, similarity, '8888888888');
+  console.log(liveness, similarity, 'lllllljjjjjjjjj');
   const name = data?.textResult?.fields.find(
     item => item.fieldName === 'Surname and given names',
   );
@@ -929,58 +884,6 @@ const Liveness = ({route}) => {
       ?.value || '';
   console.log(address);
 
-  // const middleName = data?.textResult?.fields.find(
-  //   item => item.fieldName === 'Middle name',
-  // );
-
-  // const middleName = data?.textResult?.fields.find(
-  //   item => item.fieldName === 'Middle name',
-  // );
-
-  // const middleName = data?.textResult?.fields.find(
-  //   item => item.fieldName === 'Middle name',
-  // );
-
-  // const middleName = data?.textResult?.fields.find(
-  //   item => item.fieldName === 'Middle name',
-  // );
-
-  // const middleName = data?.textResult?.fields.find(
-  //   item => item.fieldName === 'Middle name',
-  // );
-
-  // const requestData = {
-  //   issuingStateCode: issuingStateCode,
-  //   documentNumber: documentNumber,
-  //   dateofExpiry: dateofExpiry,
-  //   dateofIssue: dateofIssue,
-  //   dateofBirth: dateofBirth,
-  //   placeofBirth: placeofBirth,
-  //   surname: surname,
-  //   givenName: givenName,
-  //   nationality: nationality,
-  //   sex: sex,
-  //   issuingAuthority: issuingAuthority,
-  //   surnameandGivenNames: surnameandGivenNames,
-  //   nationalityCode: nationalityCode,
-  //   issuingState: issuingState,
-  //   middleName: middleName,
-  //   age: age,
-  //   monthsToExpire: monthsToExpire,
-  //   ageAtIssue: ageAtIssue,
-  //   yearsSinceIssue: yearsSinceIssue,
-  //   passportNumber: passportNumber,
-  //   companyName: companyName,
-  //   documentClassCode: documentClassCode,
-  //   address: address,
-  //   liveness: liveness,
-  //   similarity: similarity,
-  //   signatureImage: signatureImage,
-  //   portraitImage: imagePortrait,
-  //   barcodeimage: barcodeimage,
-  //   documentImage: documentImage,
-  // };
-
   const layout = useWindowDimensions();
   const [index, setIndex] = useState(0);
   const [routes] = React.useState([
@@ -1009,8 +912,6 @@ const Liveness = ({route}) => {
   });
 
   const renderTabBar = props => {
-    // console.log(props?.navigationState?.routes[1]?.key, 'kkkkkkkk');
-
     return (
       <TabBar
         {...props}
@@ -1082,7 +983,6 @@ const Liveness = ({route}) => {
   };
 
   const onInit = json => {
-    // console.log(json, 'kkkkkkk', InitResponse, 'jjjjjjjjjj');
     const response = InitResponse.fromJson(JSON.parse(json));
     console.log(response, '----------------');
     if (response && response.success === false) {
@@ -1106,16 +1006,12 @@ const Liveness = ({route}) => {
       const readFile =
         Platform.OS === 'ios' ? RNFS.readFile : RNFS.readFileAssets;
       const license = await readFile(licPath, 'base64');
-      // console.log('License read successfully');
-
       const config = new InitConfig();
       console.log(config, 'config');
       config.license = license;
       config.online = true;
-      // console.log((config.license = license), 'license');
       FaceSDK.initialize(null, onInit, error => {
         console.log('Initialization callback error:', error);
-        setIsFaceLoading(false);
       });
     } catch (error) {
       FaceSDK.initialize(null, onInit, _e => {});
@@ -1125,8 +1021,17 @@ const Liveness = ({route}) => {
   };
 
   const matchFaces = () => {
+    // console.log(
+    //   image1.current.image,
+    //   '-------------------------',
+    //   image2.current.image,
+    //   '-----------------------------------------------------',
+    // );
     if (!image1.current.image || !image2.current.image) return;
+    // console.log('222');
+
     setSimilarity('Processing');
+    // console.log(similarity, '333');
     const request = new MatchFacesRequest();
     request.images = [image1.current, image2.current];
     FaceSDK.matchFaces(
@@ -1139,6 +1044,7 @@ const Liveness = ({route}) => {
           0.75,
           str => {
             const split = ComparedFacesSplit.fromJson(JSON.parse(str));
+
             setSimilarity(
               split.matchedFaces.length > 0
                 ? (split.matchedFaces[0].similarity * 100).toFixed(0)
@@ -1149,11 +1055,13 @@ const Liveness = ({route}) => {
             setSimilarity(e);
           },
         );
+        setIsFaceLoading(false);
       },
       e => {
         setSimilarity(e);
       },
     );
+    setIsFaceLoading(false);
   };
 
   const livenessCheck = () => {
@@ -1169,9 +1077,10 @@ const Liveness = ({route}) => {
                 ? 'passed'
                 : 'unknown',
             );
-
+            console.log(imagePortrait, 'hhhhhh');
             if (imagePortrait) {
-              setImage(false, imagePortrait?.value, Enum.ImageType.PRINTED);
+              console.log('111');
+              setImage(false, imagePortrait, Enum.ImageType.PRINTED);
               matchFaces();
             }
           }
@@ -1184,254 +1093,6 @@ const Liveness = ({route}) => {
       },
     );
   };
-
-  // function base64ToBlob(base64, type = 'image/jpeg') {
-  //   const byteCharacters = atob(base64);
-  //   const byteNumbers = new Array(byteCharacters.length);
-  //   for (let i = 0; i < byteCharacters.length; i++) {
-  //     byteNumbers[i] = byteCharacters.charCodeAt(i);
-  //   }
-  //   const byteArray = new Uint8Array(byteNumbers);
-  //   return new Blob([byteArray], {type});
-  // }
-
-  // const handleSubmission = () => {
-  //   const formData = new FormData();
-  //   console.log(imagePortrait, '44444');
-  //   // const imageBlob = base64ToBlob(
-  //   //   imagePortrait.replace(/^data:image\/(png|jpeg);base64,/, ''),
-  //   // );
-  //   // formData.append('image', imageBlob, 'portrait.jpg');
-  //   formData.append('image', {
-  //     imagePortrait,
-  //     type: 'image/jpeg',
-  //     name: 'portrait.jpg',
-  //   });
-
-  //   axios
-  //     .post('https://validifyx.com/node/api/upload', formData, {
-  //       headers: {
-  //         'Content-Type': 'multipart/form-data',
-  //       },
-  //     })
-  //     .then(response => {
-  //       console.log('Upload Success', response.data);
-  //     })
-  //     .catch(error => {
-  //       console.log('Upload Error', error.message);
-  //       if (error.response) {
-  //         console.log('Error Response:', error.response.data);
-  //       } else if (error.request) {
-  //         console.log('Error Request:', error.request);
-  //       } else {
-  //         console.log('General Error:', error.message);
-  //       }
-  //     });
-  // };
-  // const handleSubmission = async () => {
-  //   setIsLoading(true);
-  //   console.log('111111');
-
-  //   const base64Images = [
-  //     `data:image/jpeg;base64,${imagePortrait}`,
-  //     // `data:image/jpeg;base64,${signatureImage}`,
-  //     `data:image/jpeg;base64,${barcodeimage}`,
-  //     `data:image/jpeg;base64,${documentImage}`,
-  //   ];
-
-  //   console.log('Base64 Images:', base64Images);
-
-  //   try {
-  //     const blobs = await processImages(base64Images);
-  //     console.log('Blobs:', blobs);
-
-  //     if (blobs.length === 0) {
-  //       throw new Error('No blobs were created from base64 images.');
-  //     }
-
-  //     blobs.forEach(blob => {
-  //       console.log('Uploading blob:', blob);
-  //       uploadBlob(blob);
-  //     });
-  //   } catch (error) {
-  //     console.error('Error in handleSubmission:', error);
-  //   }
-
-  //   setIsLoading(false);
-  // };
-
-  // const processImages = async images => {
-  //   console.log('Processing images...');
-  //   try {
-  //     const blobs = await Promise.all(
-  //       images.map(async image => {
-  //         try {
-  //           const [header, base64Data] = image.split(',');
-  //           const contentType = header.split(':')[1].split(';')[0];
-  //           const blob = base64ToBlob(base64Data, contentType);
-  //           console.log('Processed blob:', blob);
-  //           return blob;
-  //         } catch (error) {
-  //           console.error('Error processing image:', error);
-  //           return null;
-  //         }
-  //       }),
-  //     );
-
-  //     // Ensure the result is an array and filter out null values
-  //     if (Array.isArray(blobs)) {
-  //       return blobs.filter(blob => blob !== null);
-  //     } else {
-  //       console.error('Result of Promise.all is not an array:', blobs);
-  //       return [];
-  //     }
-  //   } catch (error) {
-  //     console.error('Error in processImages:', error);
-  //     return [];
-  //   }
-  // };
-
-  // const base64ToBlob = (base64, contentType = '', sliceSize = 512) => {
-  //   try {
-  //     const byteCharacters = Buffer.from(base64, 'base64').toString('binary');
-  //     const byteArrays = [];
-
-  //     for (
-  //       let offset = 0;
-  //       offset < byteCharacters.length;
-  //       offset += sliceSize
-  //     ) {
-  //       const slice = byteCharacters.slice(offset, offset + sliceSize);
-  //       const byteNumbers = new Array(slice.length);
-
-  //       for (let i = 0; i < slice.length; i++) {
-  //         byteNumbers[i] = slice.charCodeAt(i);
-  //       }
-
-  //       const byteArray = new Uint8Array(byteNumbers);
-  //       byteArrays.push(byteArray);
-  //     }
-
-  //     return new Blob(byteArrays, {type: contentType});
-  //   } catch (error) {
-  //     console.error('Error converting base64 to blob:', error);
-  //     return null;
-  //   }
-  // };
-
-  // const uploadBlob = async blob => {
-  //   console.log('Blob ID:', blob?._data?.blobId);
-
-  //   if (!blob || blob.size === 0) {
-  //     console.error('Blob is empty or invalid');
-  //     return;
-  //   }
-
-  //   try {
-  //     // Fetch the actual binary data using the blobId if necessary
-  //     const actualBlob = await getActualBlobData(blob?._data?.blobId);
-
-  //     if (!actualBlob) {
-  //       console.error('Failed to retrieve actual blob data.');
-  //       return;
-  //     }
-
-  //     const formData = new FormData();
-  //     formData.append('file', actualBlob, 'image.jpg');
-
-  //     const response = await axios.post(
-  //       'https://validifyx.com/node/api/upload',
-  //       formData,
-  //       {
-  //         headers: {
-  //           'Content-Type': 'multipart/form-data',
-  //         },
-  //       },
-  //     );
-
-  //     console.log('Upload result:', response.data);
-  //   } catch (error) {
-  //     console.error(
-  //       'Error uploading blob:',
-  //       error.response ? error.response.data : error.message,
-  //     );
-  //   }
-  // };
-
-  // Dummy function to represent fetching actual blob data using blobId
-  // const getActualBlobData = async blobId => {
-  //   // Logic to retrieve actual Blob data from the blobId
-  //   // This might involve fetching from local storage, a server, or other sources
-  //   // For now, let's assume we have a function that retrieves this
-  //   const actualBlob = /* your logic to retrieve blob */ null;
-
-  //   return actualBlob;
-  // };
-
-  // const uploadBlob = async blob => {
-  //   const formData = new FormData();
-  //   formData.append('file', blob, 'image.jpg');
-
-  //   try {
-  //     const response = await fetch('https://validifyx.com/node/api/upload', {
-  //       method: 'POST',
-  //       body: formData,
-  //     });
-
-  //     if (!response.ok) {
-  //       throw new Error('Network response was not ok');
-  //     }
-
-  //     const result = await response.json();
-  //     console.log('Upload result:', result);
-  //   } catch (error) {
-  //     console.error('Error uploading blob:', error);
-  //   }
-  // };
-
-  // Call handleSubmission to start the process
-  // handleSubmission();
-
-  // const uploadImages = async base64Images => {
-  //   console.log(base64Images.length, '7777777');
-  //   const formData = new FormData();
-  //   console.log(base64Images.length, 'aaaaaaaa');
-
-  //   base64Images.forEach((base64Image, index) => {
-  //     const contentType = 'image/jpeg'; // Adjust the content type if needed
-  //     const base64Data = base64Image.startsWith('data:image/')
-  //       ? base64Image.split(',')[1]
-  //       : base64Image;
-
-  //     console.log(base64Data, 'bbbbbbb');
-
-  //     try {
-  //       const blob = base64ToBlob(base64Data, contentType);
-  //       formData.append('images', blob, `image${index}.jpg`);
-  //     } catch (error) {
-  //       console.error('Error creating Blob:', error);
-  //     }
-
-  //     formData.append('images', blob, `image${index}.jpg`);
-  //   });
-
-  //   try {
-  //     console.log(formData, '9999999');
-  //     const response = await axios.post(
-  //       'https://validifyx.com/node/api/upload',
-  //       formData,
-  //       {
-  //         headers: {
-  //           'Content-Type': 'multipart/form-data',
-  //         },
-  //       },
-  //     );
-
-  //     console.log('Upload successful', response);
-  //   } catch (error) {
-  //     console.error('Upload failed', error);
-  //   }
-  // };
 
   const generateUniqueFileName = fileName => {
     const timestamp = new Date().getTime();
@@ -1554,42 +1215,10 @@ const Liveness = ({route}) => {
         portraitImage: portraitImageFilename,
         barcodeimage: barcodeImageFilename,
         documentImage: documentImageFilename,
+        user_id: parseInt(userId, 10),
       };
 
       console.log('Updated requestData:', requestData);
-      // console.log(
-      //   typeof issuingStateCode,
-      //   documentNumber,
-      //   dateofExpiry,
-      //   dateofIssue,
-      //   dateofBirth,
-      //   placeofBirth,
-      //   surname,
-      //   givenName,
-      //   nationality,
-      //   sex,
-      //   issuingAuthority,
-      //   surnameandGivenNames,
-      //   nationalityCode,
-      //   issuingState,
-      //   middleName,
-      //   age,
-      //   monthsToExpire,
-      //   ageAtIssue,
-      //   yearsSinceIssue,
-      //   passportNumber,
-      //   companyName,
-      //   documentClassCode,
-      //   address,
-      //   similarity,
-      //   liveness,
-      //   signatureImage,
-      //   portraitImage,
-      //   portraitImage,
-      //   documentImage,
-      //   barcodeImage,
-      // );
-      // Dispatch the action with updated requestData
       dispatch(
         verifedCustomerDataAction(
           requestData,
@@ -1630,29 +1259,19 @@ const Liveness = ({route}) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View
-        style={{
-          height: 60,
-          backgroundColor: 'white',
-          justifyContent: 'center',
-        }}>
+      <View style={styles.mainView}>
         <TouchableOpacity
-          style={{width: '15%', backgroundColor: 'white', marginLeft: '2%'}}
+          style={styles.mainInnerView}
           onPress={() => {
             navigation.navigate('IdScreen');
           }}>
           <Image
             source={require('../../../../common/assets/back.png')}
-            style={{height: 30, width: 30, marginLeft: '5%'}}
+            style={styles.mainImage}
           />
         </TouchableOpacity>
       </View>
-      <View
-        style={{
-          borderWidth: 0.7,
-          width: '100%',
-          borderColor: 'lightgrey',
-        }}></View>
+      <View style={styles.line}></View>
       <View style={styles.headerContainer}>
         <View style={styles.headerLeft}>
           {surnameandGivenNames && (
@@ -1664,7 +1283,7 @@ const Liveness = ({route}) => {
             {data && data?.textResult?.status == '0' ? (
               <Image
                 source={require('../../../../common/assets/alert.png')}
-                style={{width: 30, height: 30}}
+                style={styles.alertImage}
                 resizeMode="contain"
               />
             ) : (
@@ -1701,7 +1320,10 @@ const Liveness = ({route}) => {
                 style={{width: 30, height: 30, marginLeft: 10}}
                 resizeMode="contain"
               />
-            ) : parseFloat(similarity) < 75 && parseFloat(similarity) >= 0 ? (
+            ) : (parseFloat(similarity) < 75 &&
+                parseFloat(similarity) >= 0 &&
+                parseFloat(similarity)) ||
+              'error' ? (
               <Image
                 source={require('../../../../common/assets/notsimilarity.png')}
                 style={{width: 30, height: 30, marginLeft: 10}}
@@ -1726,7 +1348,6 @@ const Liveness = ({route}) => {
           navigationState={{index, routes}}
           renderScene={renderScene}
           onIndexChange={setIndex}
-          // initialLayout={{width: layout.width}}
           renderTabBar={renderTabBar}
         />
       </View>
@@ -1772,6 +1393,26 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F5FCFF',
   },
+  mainView: {
+    height: 60,
+    backgroundColor: 'white',
+    justifyContent: 'center',
+  },
+  mainInnerView: {
+    width: '15%',
+    backgroundColor: 'white',
+    marginLeft: '2%',
+  },
+  mainImage: {
+    height: 30,
+    width: 30,
+    marginLeft: '5%',
+  },
+  line: {
+    borderWidth: 0.7,
+    width: '100%',
+    borderColor: 'lightgrey',
+  },
   headerContainer: {
     width: '100%',
     height: 150,
@@ -1796,6 +1437,10 @@ const styles = StyleSheet.create({
     marginVertical: 2,
     fontWeight: '800',
   },
+  alertImage: {
+    width: 30,
+    height: 30,
+  },
   sexText: {
     marginVertical: 2,
   },
@@ -1814,11 +1459,9 @@ const styles = StyleSheet.create({
   },
   indicator: {
     backgroundColor: 'black',
-    // width: 100,
   },
   tabBar: {
     backgroundColor: 'white',
-    // paddingHorizontal: 10,
   },
   tabLabel: {
     color: 'gray',
@@ -1855,9 +1498,28 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  // tabStyle: {
-  //   width: 100,
-  // },
+  dropDown: {
+    flexDirection: 'row',
+    backgroundColor: 'lightgrey',
+  },
+  dropDownView: {
+    width: '20%',
+    backgroundColor: 'transparent',
+  },
+  dropDownDash: {
+    color: 'grey',
+    fontSize: 40,
+  },
+  dropDownTick: {
+    color: 'green',
+    fontSize: 20,
+  },
+  fieldText: {
+    textAlign: 'center',
+    marginTop: 20,
+    color: 'black',
+    fontWeight: '800',
+  },
 });
 
 export default Liveness;

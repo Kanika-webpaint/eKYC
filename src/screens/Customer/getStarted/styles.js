@@ -58,8 +58,6 @@ export const styles = StyleSheet.create({
     height: '100%',
     padding: 20,
     backgroundColor: 'white',
-    // borderRadius: 10,
-    // alignItems: 'center',
   },
   modalText: {
     fontSize: 18,
@@ -67,7 +65,6 @@ export const styles = StyleSheet.create({
   },
   closeButton: {
     position: 'absolute',
-    // top: 10,
     right: 10,
   },
   closeButtonText: {
