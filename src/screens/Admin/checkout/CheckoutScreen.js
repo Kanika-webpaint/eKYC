@@ -1,3 +1,10 @@
+/**
+ * Sample React Native App
+ * https://github.com/facebook/react-native
+ *
+ * @format
+ */
+
 import React, {useState, useEffect, useCallback} from 'react';
 import {
   SafeAreaView,
@@ -10,7 +17,6 @@ import {
   FlatList,
   Dimensions,
   KeyboardAvoidingView,
-  Alert,
 } from 'react-native';
 import colors from '../../../common/colors';
 import RedButton from '../../../components/RedButton';
@@ -122,6 +128,7 @@ function CheckoutScreen({route}) {
   const fetchCardDetails = cardDetails => {
     if (cardDetails?.complete) {
       setCardDetails(cardDetails);
+      console.log(cardDetails, '--------=====');
     } else {
       setCardDetails(null);
     }
@@ -180,6 +187,7 @@ function CheckoutScreen({route}) {
             },
           };
           const resToken = await createToken({...cardDetails, type: 'Card'});
+          console.log(resToken, '0000000000');
           if (resToken && resToken?.token && resToken?.token?.id) {
             const data = {
               type: 'card',
@@ -216,20 +224,26 @@ function CheckoutScreen({route}) {
                     paymentMethod: resPaymentMethod?.data?.id,
                   };
                   const api_url = `${API_URL}/stripesubscription`;
-                  const res = await axios
+                  await axios
                     .post(
                       api_url,
                       JSON.stringify(subscriptionData),
                       configSubscription,
                     )
                     .then(async function (resSubscription) {
+                      console.log(resSubscription, '88888888');
                       const clientSecret =
                         resSubscription?.data?.clientSecret?.payment_intent
                           ?.client_secret;
-                      console.log('clientsecret', clientSecret);
                       if (clientSecret) {
+                        console.log(clientSecret, '999999999');
                         resSubscription?.data?.clientSecret?.lines?.data?.map(
                           async item => {
+                            console.log(
+                              item?.plan?.active,
+                              '7777777',
+                              typeof item?.plan?.active,
+                            );
                             const responseSubs = {
                               subscriptionId:
                                 resSubscription?.data?.clientSecret
@@ -267,6 +281,8 @@ function CheckoutScreen({route}) {
                               name: resSubscription?.data?.clientSecret
                                 ?.customer_name,
                             };
+                            console.log(responseSubs, '---------');
+
                             const api_url = `${API_URL}/orgcheckout`;
                             await axios
                               .post(
@@ -275,7 +291,7 @@ function CheckoutScreen({route}) {
                                 configSubscription,
                               )
                               .then(async function (subsResData) {
-                                console.log(subsResData, '--------11111111111');
+                                // console.log(subsResData?.status, '666666');
                                 if (subsResData?.status === 201) {
                                   setIsLoading(false);
                                   setTimeout(async () => {
@@ -290,18 +306,17 @@ function CheckoutScreen({route}) {
                                   showAlert('Please try again later.');
                                 }
                               })
+
                               .catch(function (error) {
-                                console.log(error.message, 'error');
+                                console.log(error, 'error', error?.message);
                                 if (
-                                  error.message ==
-                                  'Request failed with status code 400'
+                                  error?.message ===
+                                  'Request failed with status code 409'
                                 ) {
-                                  showAlert(
-                                    'User already exists with same email',
-                                  );
-                                } else {
-                                  showAlert('Error - Please try again later!');
+                                  showAlert('Email id already exists');
+                                  console.log(error?.message);
                                 }
+
                                 setIsLoading(false);
                               });
                           },
@@ -314,7 +329,11 @@ function CheckoutScreen({route}) {
                       }
                     })
                     .catch(function (error) {
-                      console.log(error, 'errorrr');
+                      console.log(
+                        error?.response?.data?.error,
+                        'errorrr',
+                        error,
+                      );
                       if (
                         error?.response?.data?.error?.statusCode == 402 ||
                         error?.response?.data?.error?.code === 'card_declined'
@@ -323,15 +342,12 @@ function CheckoutScreen({route}) {
                         showAlert(
                           'Your card was declined.\nPlease enter valid card details.',
                         );
-                        showAlert('Error');
                       }
+                      setIsLoading(false);
                     });
-                  console.log('res', res);
-                  setIsLoading(false);
                 }
               })
               .catch(function (error) {
-                console.log('err1', error);
                 setIsLoading(false);
                 showAlert('Something went wrong.\nPlease try again later.');
               });
@@ -346,7 +362,6 @@ function CheckoutScreen({route}) {
             }
           }
         } catch (error) {
-          console.log('err2', error);
           setIsLoading(false);
           showAlert('Something went wrong.\nPlease try again later.');
         }

@@ -71,4 +71,32 @@ export const styles = StyleSheet.create({
     fontSize: 50,
     color: 'black',
   },
+  selfieText: {
+    fontSize: 30,
+    color: 'black',
+  },
+  readyText: {
+    fontSize: 25,
+    color: 'black',
+    marginTop: 30,
+  },
+  selfieMainView: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'white',
+    marginTop: 15,
+    width: '90%',
+  },
+  selfieInnerView: {
+    width: '20%',
+    backgroundColor: 'white',
+  },
+  illuminationText: {
+    fontSize: 22,
+    color: 'black',
+  },
+  back: {
+    height: 20,
+    width: 20,
+  },
 });

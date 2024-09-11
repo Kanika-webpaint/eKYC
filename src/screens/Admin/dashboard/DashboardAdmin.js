@@ -54,7 +54,7 @@ function DashboardAdmin() {
       try {
         const orgDetailsData = await getOrgDetails();
         setOrgDetails(orgDetailsData);
-
+        console.log(orgDetailsData, '==========');
         const currentDateAndDayData = await getCurrentDateAndDay();
         setCurrentDateAndDay(currentDateAndDayData);
       } catch (error) {
@@ -68,6 +68,7 @@ function DashboardAdmin() {
     AsyncStorage.getItem('token')
       .then(value => {
         if (value) {
+          console.log(value, '89898989');
           dispatch(getUsersListAction(value, setIsLoading));
         }
       })

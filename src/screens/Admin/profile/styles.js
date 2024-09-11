@@ -68,6 +68,11 @@ export const styles = StyleSheet.create({
     elevation: 2,
     marginTop: 20,
   },
+  image: {
+    width: 65,
+    height: 65,
+    borderRadius: 35,
+  },
   img: {height: 30, width: 30, resizeMode: 'contain', alignSelf: 'center'},
   verifyImg: {
     height: 30,
@@ -76,6 +81,10 @@ export const styles = StyleSheet.create({
     position: 'absolute',
     left: 45,
     bottom: 40,
+  },
+  userDetailsView: {
+    marginTop: 20,
+    marginHorizontal: 20,
   },
   verifiedStatus: {
     color: colors.white,

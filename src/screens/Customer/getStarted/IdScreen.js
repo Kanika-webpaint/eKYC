@@ -68,7 +68,7 @@ const IdScreen = ({navigation}) => {
   const dispatch = useDispatch();
   const [userToken, setTokenUser] = useState('');
   const isCheckStatus = useSelector(state => state.user.verified);
-  console.log(isCheckStatus, 'hjjjjjjjjj');
+  console.log(isCheckStatus, '--------checkStatus');
   const [radioButtons, setRadioButtons] = useState([
     {label: 'Loading', id: '0'},
   ]);
@@ -122,8 +122,7 @@ const IdScreen = ({navigation}) => {
 
   const handlePermissions = async () => {
     setIsLoading(true);
-    console.log('1111111');
-    if (isCheckStatus?.isVerified == 2) {
+    if (isCheckStatus?.isVerified == 1) {
       showAlert('You are already verified');
       setIsLoading(false);
       await AsyncStorage.clear();
@@ -185,11 +184,6 @@ const IdScreen = ({navigation}) => {
   };
 
   const proceedWithDocumentReading = async () => {
-    console.log('---------------');
-    // await DocumentReader.deinitializeReader(
-    //   s => {},
-    //   e => {},
-    // );
     setIsLoading(true);
     await prepareDatabase();
   };
@@ -216,14 +210,12 @@ const IdScreen = ({navigation}) => {
         ? RNFS.MainBundlePath + '/regula.license'
         : 'regula.license';
 
-    console.log(licPath, '1111111111');
+    console.log(licPath, '------licpath');
     const readFile =
       Platform.OS === 'ios' ? RNFS.readFile : RNFS.readFileAssets;
 
     try {
       // Log the path being used
-      console.log('Reading file from path:', licPath);
-
       // Check if file exists (optional but useful for debugging)
       const fileExists = RNFS.exists(licPath);
       console.log(fileExists);
@@ -234,7 +226,7 @@ const IdScreen = ({navigation}) => {
         setIsLoading(false);
         return;
       } else {
-        console.error(`File found at ${licPath}`);
+        console.log(`File found at ${licPath}`);
         scan();
       }
 
@@ -276,7 +268,6 @@ const IdScreen = ({navigation}) => {
   };
 
   const handleCrossButtonClick = () => {
-    console.log('hhhh');
     setModalVisible(false);
     navigation.navigate('Liveness', {detail: 'cancel', data: {testData}});
   };
@@ -358,7 +349,6 @@ const IdScreen = ({navigation}) => {
   };
 
   const scan = () => {
-    console.log('dddddddd');
     clearResults();
     const config = new ScannerConfig();
     config.scenario = ScenarioIdentifier.SCENARIO_FULL_PROCESS;
@@ -468,29 +458,18 @@ const IdScreen = ({navigation}) => {
                 alignItems: 'center',
                 justifyContent: 'center',
               }}>
-              <Text style={{fontSize: 30, color: 'black'}}>Selfie Time!</Text>
+              <Text style={styles.selfieText}>Selfie Time!</Text>
 
-              <Text style={{fontSize: 25, color: 'black', marginTop: 30}}>
-                Get Ready
-              </Text>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  backgroundColor: 'white',
-                  marginTop: 15,
-                  width: '90%',
-                }}>
-                <View style={{width: '20%', backgroundColor: 'white'}}>
+              <Text style={styles.readyText}>Get Ready</Text>
+              <View style={styles.selfieMainView}>
+                <View style={styles.selfieInnerView}>
                   <Image
                     source={require('../../../common/assets/back.png')}
-                    style={{height: 20, width: 20}}
+                    style={styles.back}
                   />
                 </View>
 
-                <Text style={{fontSize: 22, color: 'black'}}>
-                  Good illumination
-                </Text>
+                <Text style={styles.illuminationText}>Good illumination</Text>
               </View>
 
               <View

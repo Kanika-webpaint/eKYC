@@ -1217,6 +1217,7 @@ const Liveness = ({route}) => {
         documentImage: documentImageFilename,
         user_id: parseInt(userId, 10),
       };
+      console.log(userId, '5656566566');
 
       console.log('Updated requestData:', requestData);
       dispatch(

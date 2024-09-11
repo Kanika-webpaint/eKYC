@@ -88,7 +88,7 @@ function UserProfile({route}) {
                 source={{
                   uri: `https://validifyx.com/node/api/file/${userDetail.documents[0].portraitImage}`,
                 }}
-                style={{width: 65, height: 65, borderRadius: 35}}
+                style={styles.image}
               />
             ) : (
               <Image source={userRed} style={styles.img} />
@@ -101,7 +101,7 @@ function UserProfile({route}) {
         </View>
 
         {userDetail && (
-          <View style={{marginTop: 20, marginHorizontal: 20}}>
+          <View style={styles.userDetailsView}>
             <TextInput
               editable={false}
               value={userDetail?.username || ''}
