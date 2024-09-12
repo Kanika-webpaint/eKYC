@@ -44,9 +44,6 @@
 	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>Validify access your camera to verify document and take selfie to verify the document.</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-<string>We need access to your photo library to proceed further.</string>
-
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string></string>
 	<key>UIAppFonts</key>

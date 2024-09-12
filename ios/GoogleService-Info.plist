@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>906176847453-0ukbrbofdu048m5ei5s26t3tdf6rof4m.apps.googleusercontent.com</string>
+	<string>906176847453-mtmk67s6jlo67pg157sf4htf07ethqrt.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.906176847453-0ukbrbofdu048m5ei5s26t3tdf6rof4m</string>
+	<string>com.googleusercontent.apps.906176847453-mtmk67s6jlo67pg157sf4htf07ethqrt</string>
 	<key>ANDROID_CLIENT_ID</key>
 	<string>906176847453-dj8mr33qeet0p3npsbhnios3g5juq9bl.apps.googleusercontent.com</string>
 	<key>API_KEY</key>
@@ -15,7 +15,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.ekycValidifyx</string>
+	<string>org.reactjs.native.validifyx</string>
 	<key>PROJECT_ID</key>
 	<string>validifyx-ed3cc</string>
 	<key>STORAGE_BUCKET</key>
@@ -31,6 +31,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:906176847453:ios:4464a08f40c3af850af7b4</string>
+	<string>1:906176847453:ios:fc4a0ef15a9c55020af7b4</string>
 </dict>
 </plist>
