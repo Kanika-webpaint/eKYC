@@ -196,6 +196,7 @@ function CheckoutScreen({route}) {
             axios
               .post(STRIPE_PAYMENT_METHOD_API, data, config)
               .then(async function (resPaymentMethod) {
+                console.log(resPaymentMethod, '788888877777777');
                 if (
                   resPaymentMethod &&
                   resPaymentMethod?.data &&
@@ -291,7 +292,7 @@ function CheckoutScreen({route}) {
                                 configSubscription,
                               )
                               .then(async function (subsResData) {
-                                // console.log(subsResData?.status, '666666');
+                                console.log(subsResData?.status, '666666');
                                 if (subsResData?.status === 201) {
                                   setIsLoading(false);
                                   setTimeout(async () => {

@@ -15,9 +15,8 @@
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		18A7B6062C636D8300647A34 /* db.dat in Resources */ = {isa = PBXBuildFile; fileRef = 18A7B6052C636D8300647A34 /* db.dat */; settings = {ASSET_TAGS = (New, ); }; };
 		18A7B60C2C637CC900647A34 /* regula.license in Resources */ = {isa = PBXBuildFile; fileRef = 18A7B60B2C637CC900647A34 /* regula.license */; settings = {ASSET_TAGS = (New, ); }; };
-		18B068D02BBE6BB60082B3F0 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 18B068CF2BBE6BB60082B3F0 /* GoogleService-Info.plist */; settings = {ASSET_TAGS = (New, ); }; };
 		18C22C312C91980000A5BA6C /* DocumentReaderCore.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 18C22C302C91980000A5BA6C /* DocumentReaderCore.xcframework */; };
-		18CD54EB2C92E6810076C561 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 18CD54EA2C92E6810076C561 /* GoogleService-Info.plist */; };
+		18CDD9392C947288001A3790 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 18CDD9382C947288001A3790 /* GoogleService-Info.plist */; settings = {ASSET_TAGS = (New, ); }; };
 		2FC78133EE334F329EF8E981 /* Roboto-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0887265B80424E0F9C0D6255 /* Roboto-Light.ttf */; };
 		3C8D0A5940DE4CE8916F3E8E /* Roboto-BoldCondensedItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 22E5A53E3DAB460C86D2843D /* Roboto-BoldCondensedItalic.ttf */; };
 		43C3F18B78EC42938D40B77D /* Roboto-MediumItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E2A9443072A14A2CBDD71D07 /* Roboto-MediumItalic.ttf */; };
@@ -79,6 +78,15 @@
 		18CD54E62C92CCA60076C561 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		18CD54E82C92D3AA0076C561 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		18CD54EA2C92E6810076C561 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		18CDD9292C94138F001A3790 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		18CDD92B2C941524001A3790 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		18CDD92D2C944FDC001A3790 /* GoogleService-Info (2).plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info (2).plist"; sourceTree = "<group>"; };
+		18CDD92F2C945EFE001A3790 /* eKYCRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = eKYCRelease.entitlements; path = eKYC/eKYCRelease.entitlements; sourceTree = "<group>"; };
+		18CDD9302C946765001A3790 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		18CDD9322C9469A5001A3790 /* GoogleService-Info (3).plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info (3).plist"; sourceTree = "<group>"; };
+		18CDD9342C946A19001A3790 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		18CDD9362C94707C001A3790 /* GoogleService-Info (4).plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info (4).plist"; sourceTree = "<group>"; };
+		18CDD9382C947288001A3790 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		18CE51272C9058AC0055E8C7 /* DocumentReader.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = DocumentReader.xcframework; path = Pods/DocumentReader/DocumentReader.xcframework; sourceTree = "<group>"; };
 		18CE97F72C897A220005DD71 /* eKYC.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = eKYC.entitlements; path = eKYC/eKYC.entitlements; sourceTree = "<group>"; };
 		18E0D9FB2C60E4C100C2FB86 /* GoogleService-Info (3).plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info (3).plist"; sourceTree = "<group>"; };
@@ -148,6 +156,7 @@
 		13B07FAE1A68108700A75B9A /* eKYC */ = {
 			isa = PBXGroup;
 			children = (
+				18CDD92F2C945EFE001A3790 /* eKYCRelease.entitlements */,
 				18CE97F72C897A220005DD71 /* eKYC.entitlements */,
 				18B068CF2BBE6BB60082B3F0 /* GoogleService-Info.plist */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
@@ -181,10 +190,18 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				18CDD9382C947288001A3790 /* GoogleService-Info.plist */,
+				18CDD9362C94707C001A3790 /* GoogleService-Info (4).plist */,
+				18CDD9342C946A19001A3790 /* GoogleService-Info.plist */,
+				18CDD9322C9469A5001A3790 /* GoogleService-Info (3).plist */,
+				18CDD9302C946765001A3790 /* GoogleService-Info.plist */,
+				18CDD92D2C944FDC001A3790 /* GoogleService-Info (2).plist */,
 				18C22C2E2C91855D00A5BA6C /* GoogleService-Info.plist */,
 				18CD54E62C92CCA60076C561 /* GoogleService-Info.plist */,
 				18CD54E82C92D3AA0076C561 /* GoogleService-Info.plist */,
 				18CD54EA2C92E6810076C561 /* GoogleService-Info.plist */,
+				18CDD9292C94138F001A3790 /* GoogleService-Info.plist */,
+				18CDD92B2C941524001A3790 /* GoogleService-Info.plist */,
 				18A7B6072C636F2900647A34 /* regula.license */,
 				18A7B60B2C637CC900647A34 /* regula.license */,
 				18A7B6052C636D8300647A34 /* db.dat */,
@@ -347,7 +364,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				18CD54EB2C92E6810076C561 /* GoogleService-Info.plist in Resources */,
+				18CDD9392C947288001A3790 /* GoogleService-Info.plist in Resources */,
 				18A7B60C2C637CC900647A34 /* regula.license in Resources */,
 				18A7B6062C636D8300647A34 /* db.dat in Resources */,
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
@@ -361,7 +378,6 @@
 				A1975D5304B9476983540A6C /* Roboto-Condensed.ttf in Resources */,
 				A5287ECBC63B4D18A5CBD4B6 /* Roboto-CondensedItalic.ttf in Resources */,
 				B63FBD3BE1534DE9BDF27857 /* Roboto-Italic.ttf in Resources */,
-				18B068D02BBE6BB60082B3F0 /* GoogleService-Info.plist in Resources */,
 				2FC78133EE334F329EF8E981 /* Roboto-Light.ttf in Resources */,
 				FCA462D1761C42789502C61C /* Roboto-LightItalic.ttf in Resources */,
 				F2E612B46D714F36ABE7A8D0 /* Roboto-Medium.ttf in Resources */,
@@ -607,21 +623,22 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = eKYC/eKYC.entitlements;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 1.2;
 				DEVELOPMENT_TEAM = 599483GMUY;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = eKYC/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.2;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = org.reactjs.native.validifyx1;
+				PRODUCT_BUNDLE_IDENTIFIER = org.reactjs.native.validifyx;
 				PRODUCT_NAME = eKYC;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -635,25 +652,26 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = eKYC/eKYC.entitlements;
+				CODE_SIGN_ENTITLEMENTS = eKYC/eKYCRelease.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 1.2;
 				DEVELOPMENT_TEAM = 599483GMUY;
+				ENABLE_TESTABILITY = YES;
 				INFOPLIST_FILE = eKYC/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.2;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
-				"PRODUCT_BUNDLE_IDENTIFIER[sdk=iphoneos*]" = org.reactjs.native.example.eKYC1;
+				PRODUCT_BUNDLE_IDENTIFIER = org.reactjs.native.validifyx;
 				PRODUCT_NAME = eKYC;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
