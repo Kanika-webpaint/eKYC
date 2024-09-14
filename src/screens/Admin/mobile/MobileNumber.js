@@ -185,9 +185,10 @@ function MobileNumber() {
             );
             break;
           default:
-            showAlert('An unknown error occurred. Please try again later.');
+            errorMessage = `Error Code: ${error.code}\nError Message: ${error.message}`;
             break;
         }
+        showAlert(errorMessage);
       }
     } else {
       setIsLoading(false);
