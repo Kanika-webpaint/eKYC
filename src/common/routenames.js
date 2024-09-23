@@ -14,7 +14,8 @@ import AdminProfile from '../screens/Admin/adminProfile/AdminProfile';
 import Settings from '../screens/Admin/settings/Settings';
 import ChangePassword from '../screens/Admin/changePassword/ChangePassword';
 import Liveness from '../screens/Customer/getStarted/Liveness';
-
+import Welcome from '../screens/Customer/getStarted/Welcome/Welcome';
+import UniqueCode from '../screens/Customer/getStarted/UniqueCode/UniqueCode';
 export const routeNames = {
   MobileVerification: MobileNumber,
   Plan: ChoosePlan,
@@ -32,4 +33,6 @@ export const routeNames = {
   Settings: Settings,
   ChangePassword: ChangePassword,
   Liveness: Liveness,
+  Welcome: Welcome,
+  UniqueCode: UniqueCode,
 };

@@ -86,6 +86,7 @@ export const verificationStatusAction =
 
 export const loginUserAction =
   (data, navigation, setIsLoading) => async dispatch => {
+    console.log('data :>> ', data);
     try {
       const api_url = `${API_URL}/loginuser`;
       const res = await axios.post(api_url, data);

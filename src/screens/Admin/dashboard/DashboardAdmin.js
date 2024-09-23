@@ -48,7 +48,7 @@ function DashboardAdmin() {
   const keyboardVerticalOffset = Platform.OS === 'ios' ? 40 : 0;
   const usersList = useSelector(state => state?.org?.getUsersList);
   const [enableScrollViewScroll, setEnableScrollViewScroll] = useState(true);
-
+  console.log(OrganizationHomeList?.organization?.subscriptionId, '-0-099999');
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -203,7 +203,9 @@ function DashboardAdmin() {
   };
 
   const navigateToProfile = () => {
-    navigation.navigate('Settings');
+    navigation.navigate('Settings', {
+      data: OrganizationHomeList?.organization?.subscriptionId,
+    });
   };
 
   const onStartShouldSetResponderCapture = () => {

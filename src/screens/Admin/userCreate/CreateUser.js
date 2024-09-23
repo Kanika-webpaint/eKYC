@@ -85,13 +85,17 @@ function CreateUser() {
 
   const handleCreateUser = () => {
     const newErrorMessages = {};
-
+    console.log('userData :>> ', userData);
     if (!userData.username) {
       newErrorMessages.username = 'Username is required';
     }
 
     if (!userData.phoneNo) {
       newErrorMessages.phoneNo = 'Phone Number is required';
+    }
+
+    if (!userData.email) {
+      newErrorMessages.email = 'Email is required';
     }
 
     if (Object.keys(newErrorMessages).length > 0) {
@@ -103,6 +107,7 @@ function CreateUser() {
       const requestData = {
         username: userData?.username,
         phoneNumber: countryCodeSelected + userData?.phoneNo,
+        email: userData.email,
       };
 
       const isBasicPlan =
@@ -189,6 +194,23 @@ function CreateUser() {
               </View>
               <ErrorMessage
                 errorMessageText={errorMessages.phoneNo}
+                style={{marginLeft: 5}}
+              />
+              <Text style={styles.emailAddress}>Email</Text>
+              <View style={styles.emailAddress}>
+                {/* <Image source={email} style={styles.emailAddress} /> */}
+
+                <TextInput
+                  value={userData?.email}
+                  placeholderTextColor={colors.light_grey}
+                  placeholder="Enter email here"
+                  style={styles.number}
+                  onChangeText={text => handleInputChange('email', text)}
+                  keyboardType="email-address"
+                />
+              </View>
+              <ErrorMessage
+                errorMessageText={errorMessages.email}
                 style={{marginLeft: 5}}
               />
               <RedButton

@@ -43,6 +43,7 @@ import CheckoutForm from '../../../components/CheckoutForm';
 import Header from '../../../components/Header';
 
 function CheckoutScreen({route}) {
+  console.log('route :>> ', route);
   const [userData, setFormData] = useState({
     email: '',
     cardNo: '',
@@ -136,6 +137,7 @@ function CheckoutScreen({route}) {
 
   const handleCheckout = async () => {
     const newErrorMessages = {};
+
     if (!userData.name.trim()) {
       newErrorMessages.name = 'Name is required';
     }
@@ -160,6 +162,7 @@ function CheckoutScreen({route}) {
     if (selectedCity === null) {
       setCityErrorMsg(true);
     }
+
     if (Object.keys(newErrorMessages).length > 0) {
       setErrorMessages(newErrorMessages);
       if (selectedState !== null) {
@@ -169,203 +172,134 @@ function CheckoutScreen({route}) {
         setCityErrorMsg(false);
       }
       return;
-    } else {
-      if (!cardDetails || !cardDetails.complete) {
-        showAlert('Please enter valid card details');
-        return;
-      } else {
-        setCardDetailsErrMsg(false);
-        setStateErrorMsg(false);
-        setCityErrorMsg(false);
-        try {
-          setIsLoading(true);
-          showAlert('Subscribing..please wait!!');
-          const config = {
-            headers: {
-              'Content-Type': 'application/x-www-form-urlencoded',
-              Authorization: `Bearer ${STRIPE_CLIENT_SECRET_KEY}`,
-            },
-          };
-          const resToken = await createToken({...cardDetails, type: 'Card'});
-          console.log(resToken, '0000000000');
-          if (resToken && resToken?.token && resToken?.token?.id) {
-            const data = {
-              type: 'card',
-              card: {token: resToken?.token?.id},
+    }
+
+    if (!cardDetails || !cardDetails.complete) {
+      showAlert('Please enter valid card details');
+      return;
+    }
+
+    setCardDetailsErrMsg(false);
+    setStateErrorMsg(false);
+    setCityErrorMsg(false);
+
+    try {
+      setIsLoading(true);
+      showAlert('Subscribing..please wait!!');
+
+      const resToken = await createToken({...cardDetails, type: 'Card'});
+      console.log(resToken, 'Token Response');
+
+      if (resToken && resToken.token && resToken.token.id) {
+        const subscriptionData = {
+          name: userData.name,
+          email: userData.email,
+          address: {
+            city: selectedCity,
+            country: 'Nigeria',
+            line1: userData.line1,
+            line2: userData.line2,
+            postal_code: userData.postalCode,
+            state: selectedState,
+          },
+
+          token: resToken.token.id,
+          planId: route?.params?.priceId,
+        };
+        console.log(subscriptionData, 'Subscription Data');
+
+        const api_url = `${API_URL}/stripesubscription`;
+        const configSubscription = {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        };
+
+        const resSubscription = await axios.post(
+          api_url,
+          JSON.stringify(subscriptionData),
+          configSubscription,
+        );
+        console.log(resSubscription, 'Subscription Response');
+
+        const clientSecret = await resSubscription.data?.clientSecret
+          ?.payment_intent?.client_secret;
+        console.log('clientSecret :>> ', clientSecret);
+        if (clientSecret) {
+          console.log(clientSecret, 'Client Secret');
+          for (const item of resSubscription.data.clientSecret.lines.data) {
+            const responseSubs = {
+              subscriptionId: resSubscription.data.clientSecret.subscription,
+              customerId: resSubscription.data.clientSecret.customer,
+              paymentIntentId:
+                resSubscription.data.clientSecret.payment_intent.id,
+              planStatus: item.active?.plan,
+              planId: route?.params?.planId,
+              priceId: route?.params?.priceId,
+
+              amount: resSubscription.data.clientSecret.payment_intent.amount,
+              currency: resSubscription.data.clientSecret.currency,
+              planInterval: item.plan.interval,
+              planDescription: item.plan.nickname,
+              quantity: item.quantity,
+              city: resSubscription.data.clientSecret.customer_address.city,
+              country:
+                resSubscription.data.clientSecret.customer_address.country,
+              address: resSubscription.data.clientSecret.customer_address.line1,
+              zip: resSubscription.data.clientSecret.customer_address
+                .postal_code,
+              state: resSubscription.data.clientSecret.customer_address.state,
+              email: resSubscription.data.clientSecret.customer_email,
+              name: resSubscription.data.clientSecret.customer_name,
             };
-            axios
-              .post(STRIPE_PAYMENT_METHOD_API, data, config)
-              .then(async function (resPaymentMethod) {
-                if (
-                  resPaymentMethod &&
-                  resPaymentMethod?.data &&
-                  resPaymentMethod?.data?.id
-                ) {
-                  const configSubscription = {
-                    headers: {
-                      'Content-Type': 'application/json',
-                    },
-                  };
-                  const subscriptionData = {
-                    name: userData?.name,
-                    email: userData?.email,
-                    address: {
-                      city: selectedCity,
-                      country: 'Nigeria',
-                      line1: userData?.line1,
-                      line2: userData?.line2,
-                      postal_code: userData?.postalCode,
-                      state: selectedState,
-                    },
-                    price_id:
-                      route?.params?.amount == 'N14999'
-                        ? PRICE_BASIC_PLAN
-                        : PRICE_PREMIUM_PLAN,
-                    paymentMethod: resPaymentMethod?.data?.id,
-                  };
-                  const api_url = `${API_URL}/stripesubscription`;
-                  await axios
-                    .post(
-                      api_url,
-                      JSON.stringify(subscriptionData),
-                      configSubscription,
-                    )
-                    .then(async function (resSubscription) {
-                      console.log(resSubscription, '88888888');
-                      const clientSecret =
-                        resSubscription?.data?.clientSecret?.payment_intent
-                          ?.client_secret;
-                      if (clientSecret) {
-                        console.log(clientSecret, '999999999');
-                        resSubscription?.data?.clientSecret?.lines?.data?.map(
-                          async item => {
-                            console.log(
-                              item?.plan?.active,
-                              '7777777',
-                              typeof item?.plan?.active,
-                            );
-                            const responseSubs = {
-                              subscriptionId:
-                                resSubscription?.data?.clientSecret
-                                  ?.subscription,
-                              customerId:
-                                resSubscription?.data?.clientSecret?.customer,
-                              paymentIntentId:
-                                resSubscription?.data?.clientSecret
-                                  ?.payment_intent?.id,
-                              planStatus: item?.plan?.active, // this should be in the api
-                              amount:
-                                resSubscription?.data?.clientSecret
-                                  ?.payment_intent?.amount,
-                              currency:
-                                resSubscription?.data?.clientSecret?.currency,
-                              planInterval: item?.plan?.interval,
-                              planDescription: item?.plan?.nickname,
-                              quantity: item?.quantity,
-                              city: resSubscription?.data?.clientSecret
-                                ?.customer_address?.city,
-                              country:
-                                resSubscription?.data?.clientSecret
-                                  ?.customer_address?.country,
-                              address:
-                                resSubscription?.data?.clientSecret
-                                  ?.customer_address?.line1,
-                              zip: resSubscription?.data?.clientSecret
-                                ?.customer_address?.postal_code,
-                              state:
-                                resSubscription?.data?.clientSecret
-                                  ?.customer_address?.state,
-                              email:
-                                resSubscription?.data?.clientSecret
-                                  ?.customer_email,
-                              name: resSubscription?.data?.clientSecret
-                                ?.customer_name,
-                            };
-                            console.log(responseSubs, '---------');
+            console.log(responseSubs, 'Response Subscription Data');
 
-                            const api_url = `${API_URL}/orgcheckout`;
-                            await axios
-                              .post(
-                                api_url,
-                                JSON.stringify(responseSubs),
-                                configSubscription,
-                              )
-                              .then(async function (subsResData) {
-                                // console.log(subsResData?.status, '666666');
-                                if (subsResData?.status === 201) {
-                                  setIsLoading(false);
-                                  setTimeout(async () => {
-                                    setIsLoading(false);
-                                    showAlert(
-                                      'Password has been sent on your email.',
-                                    );
-                                    navigation.navigate('SuccessScreen');
-                                  }, 500);
-                                } else {
-                                  setIsLoading(false);
-                                  showAlert('Please try again later.');
-                                }
-                              })
+            const checkoutApiUrl = `${API_URL}/orgcheckout`;
+            const subsResData = await axios.post(
+              checkoutApiUrl,
+              JSON.stringify(responseSubs),
+              configSubscription,
+            );
 
-                              .catch(function (error) {
-                                console.log(error, 'error', error?.message);
-                                if (
-                                  error?.message ===
-                                  'Request failed with status code 409'
-                                ) {
-                                  showAlert('Email id already exists');
-                                  console.log(error?.message);
-                                }
-
-                                setIsLoading(false);
-                              });
-                          },
-                        );
-                      } else {
-                        setIsLoading(false);
-                        showAlert(
-                          'Apologies for the inconvenience,\nplease try again later.',
-                        );
-                      }
-                    })
-                    .catch(function (error) {
-                      console.log(
-                        error?.response?.data?.error,
-                        'errorrr',
-                        error,
-                      );
-                      if (
-                        error?.response?.data?.error?.statusCode == 402 ||
-                        error?.response?.data?.error?.code === 'card_declined'
-                      ) {
-                        setIsLoading(false);
-                        showAlert(
-                          'Your card was declined.\nPlease enter valid card details.',
-                        );
-                      }
-                      setIsLoading(false);
-                    });
-                }
-              })
-              .catch(function (error) {
-                setIsLoading(false);
-                showAlert('Something went wrong.\nPlease try again later.');
-              });
-          } else {
-            if (
-              resToken &&
-              resToken?.error &&
-              resToken?.error?.code == 'Failed'
-            ) {
-              showAlert(resToken?.error?.message);
+            if (subsResData.status === 201) {
               setIsLoading(false);
+              setTimeout(() => {
+                showAlert('Password has been sent to your email.');
+                navigation.navigate('SuccessScreen');
+              }, 500);
+            } else {
+              setIsLoading(false);
+              showAlert('Please try again later.');
             }
           }
-        } catch (error) {
+        } else {
           setIsLoading(false);
-          showAlert('Something went wrong.\nPlease try again later.');
+          showAlert('Apologies for the inconvenience, please try again later.');
         }
+      } else {
+        if (resToken.error && resToken.error.code === 'Failed') {
+          showAlert(resToken.error.message);
+        }
+        setIsLoading(false);
       }
+    } catch (error) {
+      console.error(error);
+
+      if (error?.message === 'Request failed with status code 409') {
+        showAlert('Email id already exists');
+        console.log(error?.message);
+      }
+
+      setIsLoading(false);
+
+      if (
+        error.response?.data?.error?.statusCode === 402 ||
+        error.response?.data?.error?.code === 'card_declined'
+      ) {
+        showAlert('Your card was declined. Please enter valid card details.');
+      }
+
+      setIsLoading(false);
     }
   };
 

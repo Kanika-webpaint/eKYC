@@ -53,7 +53,11 @@ function PlanDetails({route}) {
   const NavigateToCheckout = () => {
     setIsLoading(true);
     setTimeout(() => {
-      navigation.navigate('Checkout', {amount: route?.params?.amount || ''});
+      navigation.navigate('Checkout', {
+        amount: route?.params?.amount || '',
+        planId: route?.params?.planId || '',
+        priceId: route?.params?.priceId || '',
+      });
       setIsLoading(false);
     }, 100);
   };
@@ -77,7 +81,8 @@ function PlanDetails({route}) {
           <View style={styles.mainView}>
             <Image source={planIcon} style={styles.imagePlanSelect} />
             <Text style={styles.amount}>
-              {route?.params?.amount === 'N14999' ? 'N14,999' : 'N13,499'}
+              {route?.params?.amount}
+              {/* {route?.params?.amount === 'N14999' ? 'N14,999' : 'N13,499'} */}
             </Text>
             <FlatList
               scrollEnabled={false}

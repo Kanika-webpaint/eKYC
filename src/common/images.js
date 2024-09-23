@@ -1,4 +1,3 @@
-
 export const x_logo = require('./assets/x_logo.png');
 export const validifyX_logo = require('./assets/validifyX_logo.png');
 export const background_image = require('./assets/background_image.png');
@@ -45,3 +44,4 @@ export const bin = require('./assets/bin.png');
 export const edit = require('./assets/draw.png');
 export const lock = require('./assets/lock.png');
 export const whiteArrow = require('./assets/whiteArrow.png');
+export const admin = require('./assets/admin.png');

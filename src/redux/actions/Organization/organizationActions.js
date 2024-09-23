@@ -12,15 +12,21 @@ import {
 
 export const LoginAdminAction =
   (data, setIsLoading, setLoggedIn) => async dispatch => {
+    console.log();
     try {
       const api_url = `${API_URL}/loginorganization`;
       const res = await axios.post(api_url, data);
+      console.log(res, '0-0-0-0-0-0-0');
       if (res?.status == 200) {
         setIsLoading(false);
         await AsyncStorage.setItem('token', res?.data?.token);
         await AsyncStorage.setItem('role', 'organization');
+        // await AsyncStorage.setItem('subscriptionId', res?.data?.subscriptionId);
+
         const storedToken = await AsyncStorage.getItem('token');
         const storedRole = await AsyncStorage.getItem('role');
+        // const suscriptionId = await AsyncStorage.getItem('subscriptionId');
+
         if (storedRole && storedToken) {
           await dispatch(loginAdminslice(res, setLoggedIn));
         }

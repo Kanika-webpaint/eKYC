@@ -38,7 +38,7 @@ function MobileNumber() {
   const [mobileNumber, setMobileNumber] = useState('');
   const [numberWithCode, setNumberWithCode] = useState('');
   const [show, setShow] = useState(false);
-  const [showOTP, setShowOTP] = useState(false);
+  const [showOTP, setShowOTP] = useState(true);
   const [countryCode, setCountryCode] = useState(false);
   const [showError, setShowError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -197,32 +197,35 @@ function MobileNumber() {
   };
 
   const handleVerifyCode = text => {
+    console.log('text :>> ', text);
     if (text && text.length == 6) {
-      confirmResult
-        .confirm(text)
-        .then(user => {
-          if (user) {
-            setDisabled(false);
-          }
-        })
-        .catch(error => {
-          setIsLoading(false);
-          switch (error.code) {
-            case 'auth/invalid-verification-code':
-              console.log(error.code, 'case 1');
-              showAlert(
-                'Invalid verification code.\nPlease enter a valid code.',
-              );
-              break;
-            case 'auth/missing-verification-code':
-              console.log(error.code, 'case 2');
-              showAlert('Verification code is missing.');
-              break;
-            default:
-              break;
-          }
-        });
+      setDisabled(false);
+      // confirmResult
+      // .confirm(text)
+      // .then(user => {
+      //   if (user) {
+      //     setDisabled(false);
+      //   }
+      // })
+      // .catch(error => {
+      //   setIsLoading(false);
+      //   switch (error.code) {
+      //     case 'auth/invalid-verification-code':
+      //       console.log(error.code, 'case 1');
+      //       showAlert(
+      //         'Invalid verification code.\nPlease enter a valid code.',
+      //       );
+      //       break;
+      //     case 'auth/missing-verification-code':
+      //       console.log(error.code, 'case 2');
+      //       showAlert('Verification code is missing.');
+      //       break;
+      //     default:
+      //       break;
+      //   }
+      // });
     } else {
+      setDisabled(false);
       setIsLoading(false);
       showAlert('Please enter a 6 digit OTP code.');
     }
@@ -237,8 +240,9 @@ function MobileNumber() {
     setIsLoading(true);
     Keyboard.dismiss();
     const requestData = {
-      phoneNumber: numberWithCode,
+      logincode: value,
     };
+
     dispatch(loginUserAction(requestData, navigation, setIsLoading));
   };
 
@@ -323,7 +327,7 @@ function MobileNumber() {
             textMiddle={showOTP ? 'Unique Registration code' : 'Mobile Number'}
             textLast={showOTP ? '(Received by SMS)' : '(Receive an OTP by SMS)'}
           />
-          {showOTP ? (
+          {showOTP && (
             <View style={styles.codeSection}>
               <CodeField
                 ref={ref}
@@ -354,7 +358,8 @@ function MobileNumber() {
                 )}
               />
             </View>
-          ) : (
+          )}
+          {/* ) : (
             <>
               <View style={styles.container}>
                 <TouchableOpacity
@@ -389,9 +394,12 @@ function MobileNumber() {
                 </View>
               )}
             </>
-          )}
-          {showOTP ? <SubmitOTP /> : <SubmitButton />}
+          )} */}
+          {/* {showOTP ? <SubmitOTP /> : <SubmitButton />} */}
+          {showOTP && <SubmitOTP />}
+
           {showOTP ? <BottomView /> : <LoginAsAdmin />}
+          <LoginAsAdmin />
           <CountryPick
             show={show}
             onBackdropPress={() => setShow(false)}

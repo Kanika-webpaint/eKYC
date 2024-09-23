@@ -98,6 +98,16 @@ const NavigationStack = () => {
           <>
             <Stack.Screen
               options={{headerShown: false}}
+              name="Welcome"
+              component={routeNames.Welcome}
+            />
+            <Stack.Screen
+              options={{headerShown: false}}
+              name="UniqueCode"
+              component={routeNames.UniqueCode}
+            />
+            <Stack.Screen
+              options={{headerShown: false}}
               name="MobileVerification"
               component={routeNames.MobileVerification}
             />
